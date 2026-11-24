@@ -2,7 +2,9 @@
 
 A self-contained study course for testing out of **CSC 1111, Introduction to Problem Solving and Computer Programming** (Sinclair College), which is taught in C++.
 
-Open `index.html` in a browser. It runs offline from that one file; there is nothing to install.
+**Use it now:** https://shaynhornik.github.io/csc-1111-practice-module/
+
+Or download the repository and open `index.html` in a browser. It runs offline from that one file; there is nothing to install.
 
 ## What is in it
 
