@@ -1,0 +1,2462 @@
+{
+ "units": [
+  {
+   "id": "u1",
+   "title": "How programs get made",
+   "summary": "What computers and programs are made of, how source code becomes an executable, the parts of a C++ program, the programming process, and how to plan with pseudocode, flowcharts and hierarchy charts.",
+   "lessons": [
+    {
+     "id": "u1-l1",
+     "title": "Hardware and software",
+     "book": "Sections 1.1 and 1.2, pages 1 to 9",
+     "html": "<p>One machine can handle a huge variety of tasks because it is <strong>programmable</strong>: it does whatever its program tells it to. A computer system has five major hardware parts: the <strong>CPU</strong>, <strong>main memory</strong>, <strong>secondary storage</strong>, <strong>input devices</strong> and <strong>output devices</strong>.</p>\n<h4>The CPU</h4>\n<p>The central processing unit runs program instructions. It has two parts: the <strong>control unit</strong>, which fetches each instruction and directs the other parts, and the <strong>arithmetic and logic unit (ALU)</strong>, which does the math and comparisons. The CPU repeats the <strong>fetch/decode/execute cycle</strong>: fetch the next instruction from memory, decode it to see what it asks for, execute it, then move to the next one. Today's CPUs are small chips called <strong>microprocessors</strong>.</p>\n<h4>Main memory</h4>\n<p>Main memory is <strong>random-access memory (RAM)</strong>. A running program and the data it is using live here. RAM is divided into <strong>bytes</strong>; each byte is eight <strong>bits</strong> (bit is short for binary digit, a tiny switch that is on or off). Every byte has a unique number called its <strong>address</strong>; the CPU uses the address to find what it wants. RAM is <strong>volatile</strong>: when power goes off, its contents are lost.</p>\n<h4>Secondary storage</h4>\n<p>Disks, solid-state drives and flash drives hold programs and files for the long term. Secondary storage is <strong>nonvolatile</strong>, so it keeps data with the power off. It is bigger and cheaper per byte than RAM but much slower. That is why computers have both: RAM for fast working space, secondary storage for permanent copies. A program is copied from secondary storage into RAM before the CPU runs it.</p>\n<h4>Input and output devices</h4>\n<p>Input devices (keyboard, mouse, microphone, scanner) send data into the computer. Output devices (monitor, printer, speakers) send results out. A disk or USB drive counts as input when data is read from it and as output when data is saved to it.</p>\n<h4>Software</h4>\n<p>Software is the set of programs that tells the hardware what to do. There are two general categories:</p>\n<ul><li><strong>System software</strong> controls and supports the computer itself: the <strong>operating system</strong> (the fundamental programs that manage hardware, memory and files and run other programs), <strong>utility programs</strong> (virus scanners, file compression, backup) and software development tools (compilers and editors).</li>\n<li><strong>Application software</strong> does work for the user: word processors, spreadsheets, email, browsers, games.</li></ul>\n<p>Exam trap: a browser or word processor is application software, not system software, even though the operating system runs it.</p>"
+    },
+    {
+     "id": "u1-l2",
+     "title": "Programs, languages, compiling and linking",
+     "book": "Sections 1.3 and 1.4, pages 9 to 14",
+     "html": "<p>A <strong>program</strong> is a list of instructions that the computer carries out to accomplish some job. An <strong>algorithm</strong> is a finite sequence of precisely stated steps that gets a job done or solves a problem. A program is an algorithm written in a language the computer can be made to run.</p>\n<h4>Machine language and programming languages</h4>\n<p>The only language a CPU runs directly is <strong>machine language</strong>: binary instructions specific to that CPU. <strong>Assembly language</strong> gives those instructions short names. Both are <strong>low-level</strong>: they match the hardware, and a program written for one CPU will not run on another. A <strong>high-level language</strong> such as C++ uses English-like statements and does not depend on one CPU. High-level programs are more <strong>portable</strong>: the same source code can be compiled for different systems, usually with few or no changes.</p>\n<h4>From source code to a running program</h4>\n<ol>\n<li>You type <strong>source code</strong> into a <strong>source file</strong> (for C++, a .cpp file). You can use a text editor or an <strong>integrated development environment (IDE)</strong>, which bundles editor, compiler and debugger.</li>\n<li>The <strong>preprocessor</strong> reads the source file first and handles lines that begin with <code>#</code>, such as <code>#include</code>. These are <strong>preprocessor directives</strong>. The preprocessor pastes in the named file and produces the text the compiler will see.</li>\n<li>The <strong>compiler</strong> translates the program into machine language and writes an <strong>object file</strong> (object code). Syntax errors are found here, and no object file is produced if there are any.</li>\n<li>The <strong>linker</strong> merges the object file with the prewritten pieces the program needs from the <strong>runtime library</strong>, C++'s stock of ready-made code (for example the code behind <code>cout</code>), and produces the <strong>executable file</strong>. An object file holds machine code but is not a complete program until it is linked.</li>\n<li>The operating system loads the executable into RAM and the CPU runs it.</li>\n</ol>\n<p>Order to memorize: source file, preprocessor, compiler, object file, linker, executable file. One command can run all three tools: <code>g++ -o ship ship.cpp</code>.</p>\n<p>A compiler translates the whole program before it runs. That differs from an interpreter, which translates and runs one statement at a time.</p>\n<pre><code>#include &lt;iostream&gt;   // preprocessor directive\nusing namespace std;\nint main()\n{\n    cout &lt;&lt; \"Hello\" &lt;&lt; endl;   // source code\n    return 0;\n}</code></pre>"
+    },
+    {
+     "id": "u1-l3",
+     "title": "What a C++ program is made of",
+     "book": "Section 1.4, pages 14 to 17",
+     "html": "<p>Every language has the same kinds of building blocks. Look at this program:</p>\n<pre><code>#include &lt;iostream&gt;\nusing namespace std;\n\nint main()\n{\n    double pounds, price, charge;   // variable definition\n    cin &gt;&gt; pounds;\n    cin &gt;&gt; price;\n    charge = pounds * price;\n    cout &lt;&lt; \"Charge: \" &lt;&lt; charge &lt;&lt; endl;\n    return 0;\n}</code></pre>\n<table><thead><tr><th>Element</th><th>Meaning</th><th>Examples above</th></tr></thead><tbody>\n<tr><td>Key words (reserved words)</td><td>Words with a fixed meaning in C++. Always lowercase. Cannot be used for anything else.</td><td>using, namespace, int, double, return</td></tr>\n<tr><td>Programmer-defined identifiers</td><td>Names you invent for variables and functions.</td><td>pounds, price, charge</td></tr>\n<tr><td>Operators</td><td>Symbols that act on operands (usually data).</td><td>=, *, &lt;&lt;, &gt;&gt;</td></tr>\n<tr><td>Punctuation</td><td>Marks the start or end of a statement or separates list items.</td><td>; and , and { }</td></tr>\n<tr><td>Syntax</td><td>The rules for putting all of these together correctly.</td><td>semicolon needed after a statement</td></tr>\n</tbody></table>\n<p><code>main</code> and <code>cout</code> are not key words. <code>main</code> is a special function name, and <code>cout</code> is an object from the iostream library. The <code>=</code> symbol is the <strong>assignment operator</strong>: it stores the value of the right side in the variable on the left.</p>\n<h4>Lines versus statements</h4>\n<p>A <strong>line</strong> is one row of text in the file. A <strong>statement</strong> is a full command telling the computer to take some action; in C++ most statements end with a semicolon. One statement may be spread over several lines, and one line may hold several statements. Blank lines and comments are lines but not statements. A comment starts with <code>//</code> (to end of line) or sits between <code>/*</code> and <code>*/</code>; the compiler ignores it.</p>\n<h4>Variables</h4>\n<p>A <strong>variable</strong> is a location in memory that has been given a name. Its value can change while the program runs, and storing a new value replaces the old one. A <strong>variable definition</strong> states the type and name and creates the variable (<code>double charge;</code>). Define a variable before the first line that uses it. Numbers come in two general kinds: <strong>integers</strong> (whole numbers such as 5 or -129) and <strong>floating-point</strong> numbers (such as 6.7); <code>double</code> holds floating-point numbers.</p>"
+    },
+    {
+     "id": "u1-l4",
+     "title": "Input, processing, output, and the programming process",
+     "book": "Sections 1.5 to 1.7, pages 17 to 24",
+     "html": "<h4>Input, processing, output</h4>\n<p>Nearly every program does three things. <strong>Input</strong> is data the program receives from the outside world (keyboard, file, device); in C++ you use <code>cin</code>. <strong>Processing</strong> is what the program does to the data (calculations, comparisons). <strong>Output</strong> is what it sends out (screen, printer, file); in C++ you use <code>cout</code>. Defining a program means naming its purpose, input, processing and output.</p>\n<h4>The programming process</h4>\n<ol>\n<li>State exactly what problem the program must solve.</li>\n<li>Visualize the program running (sketch the screens with sample input and output).</li>\n<li>Build a model with a hierarchy chart, flowchart or pseudocode.</li>\n<li>Check the model for logical errors.</li>\n<li>Type the code, save and compile it.</li>\n<li>Correct compile errors; repeat steps 5 and 6.</li>\n<li>Run the program with test data.</li>\n<li>Correct errors found while running; repeat steps 5 to 8.</li>\n<li>Validate the results: does the program really solve the original problem?</li>\n</ol>\n<p>The emphasis is on planning: a good program starts with a design, not with typing. <strong>Desk-checking</strong> means stepping through the program by hand, writing down each variable's value and what is displayed after every statement. A <strong>logic error</strong> is a mistake that makes a program produce wrong results even though it compiles.</p>\n<h4>Procedural versus object-oriented</h4>\n<p><strong>Procedural programming</strong> centers on procedures (in C++, <strong>functions</strong>): collections of statements that do one task, often sharing variables. <strong>Object-oriented programming (OOP)</strong> centers on <strong>objects</strong>. An object bundles data together with the procedures that work on that data, and you make an object do something by sending it a message (calling one of its functions). C++ supports both styles.</p>\n<p>Software engineering covers the whole job: design, writing, testing, debugging, documenting and maintaining software. Top-down design splits a task into modules, which large projects hand to different teams.</p>"
+    },
+    {
+     "id": "u1-l5",
+     "title": "Algorithms, pseudocode and hierarchy charts",
+     "book": "Sections 1.3 and 1.6, pages 9 and 19 to 21; design tools",
+     "html": "<p>An <strong>algorithm</strong> is a finite list of precise steps that solves a problem. Design tools let you work the algorithm out before writing C++.</p>\n<h4>Pseudocode</h4>\n<p><strong>Pseudocode</strong> is a cross between English and a programming language. The computer cannot run it, there is no compiler for it and no official syntax, but good pseudocode is precise enough to translate line by line. Common conventions: <code>Input</code> or <code>Read</code> gets a value, <code>Display</code> or <code>Print</code> shows one, <code>Set x = ...</code> assigns, and <code>If / Else / End If</code> and <code>While / End While</code> mark selection and repetition, with indentation showing what is inside.</p>\n<pre><code>Input price\nInput quantity\nSet total = price * quantity\nIf total &gt; 100\n    Set total = total - 10\nEnd If\nDisplay total</code></pre>\n<p>Translating: Input becomes <code>cin &gt;&gt;</code>, Display becomes <code>cout &lt;&lt;</code>, Set becomes <code>=</code>, If becomes <code>if (...) { }</code>. Define the variables first.</p>\n<pre><code>double price, quantity, total;\ncin &gt;&gt; price &gt;&gt; quantity;\ntotal = price * quantity;\nif (total &gt; 100)\n    total = total - 10;\ncout &lt;&lt; total &lt;&lt; endl;</code></pre>\n<h4>The three structures</h4>\n<ul><li><strong>Sequence</strong>: steps run one after another.</li>\n<li><strong>Selection</strong>: a condition picks which steps run (<code>if</code>, <code>if/else</code>).</li>\n<li><strong>Repetition</strong> (iteration): steps repeat while a condition holds (<code>while</code>, <code>for</code>).</li></ul>\n<h4>Reading pseudocode</h4>\n<p>To find what pseudocode outputs, trace it: keep a column for each variable, update it line by line, and note each Display. Some questions state a program in plain English (\"The variable x starts with 0. Add 1 to x. Display x.\"); trace those the same way. A common design error is a step placed too early, such as calculating a total before the values it uses have been input.</p>\n<h4>Hierarchy charts</h4>\n<p>A <strong>hierarchy chart</strong> shows the structure of a program: a box at the top for the overall task, with boxes below for the subtasks it divides into, and below those their subtasks. This is <strong>top-down design</strong> (divide and conquer). The chart shows <em>what</em> the parts are and how they nest, not the order of execution or any decisions. Subtasks often become functions or modules.</p>"
+    },
+    {
+     "id": "u1-l6",
+     "title": "Flowcharts",
+     "book": "Section 1.6 and Appendix C material (written from standard practice)",
+     "html": "<p>A <strong>flowchart</strong> is a diagram of the logical flow of a program. Each step is a shape and <strong>flow lines</strong> (arrows) join them to show the order.</p>\n<table><thead><tr><th>Shape</th><th>Name</th><th>Used for</th></tr></thead><tbody>\n<tr><td>Oval (rounded rectangle)</td><td>Terminal</td><td>Start and End (or Stop)</td></tr>\n<tr><td>Parallelogram</td><td>Input/output</td><td>Reading a value, displaying a value</td></tr>\n<tr><td>Rectangle</td><td>Process</td><td>Calculations and assignments</td></tr>\n<tr><td>Diamond</td><td>Decision</td><td>A yes/no (true/false) question; two lines leave it, labeled Yes and No</td></tr>\n<tr><td>Small circle</td><td>Connector</td><td>Continues the chart elsewhere or on another page; matching labels join up (some standards draw a separate home-plate shape for an off-page connector)</td></tr>\n<tr><td>Rectangle with an extra line inside each side</td><td>Predefined process</td><td>A call to a module (function) charted separately</td></tr>\n</tbody></table>\n<p>Flow lines normally run top to bottom, with arrowheads showing direction. A process, input or output box has one line in and one out; a decision has one in and two out. The chart has exactly one Start.</p>\n<h4>How the structures look</h4>\n<ul><li><strong>Sequence</strong>: boxes in a straight vertical line.</li>\n<li><strong>Selection</strong>: a diamond splits the flow into a Yes path and a No path. Both paths join again afterward. An if with no else has one empty path.</li>\n<li><strong>Repetition</strong>: a diamond tests a condition; the Yes path runs boxes and then a flow line loops <em>back up</em> to the diamond; the No path leaves the loop. A test at the top before the body is a pre-test loop, which is what C++ <code>while</code> is. If the boxes come first and the diamond comes after them, the body always runs at least once: a post-test loop, C++ <code>do-while</code>.</li></ul>\n<p>Example flowchart in words: Start; Input n; Set count = 1; Diamond \"count &lt;= n?\"; Yes: Display count, Set count = count + 1, back to the diamond; No: End. In C++:</p>\n<pre><code>int n, count = 1;\ncin &gt;&gt; n;\nwhile (count &lt;= n)\n{\n    cout &lt;&lt; count &lt;&lt; endl;\n    count = count + 1;\n}</code></pre>\n<p>Checking a flowchart means tracing it by hand, as in desk-checking. A loop whose flow line never leaves (the variable in the diamond never changes) is an infinite loop on paper too.</p>"
+    }
+   ],
+   "questions": [
+    {
+     "id": "u1-q001",
+     "lesson": "u1-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which hardware component fetches, decodes and executes program instructions?",
+     "choices": [
+      "The CPU",
+      "Main memory",
+      "Secondary storage",
+      "The output device"
+     ],
+     "answer": 0,
+     "explain": "The CPU runs the fetch/decode/execute cycle. Memory only holds instructions and data."
+    },
+    {
+     "id": "u1-q002",
+     "lesson": "u1-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What happens to the contents of main memory (RAM) when the computer is switched off?",
+     "choices": [
+      "They are kept, because RAM is permanent storage",
+      "They are lost, because RAM is volatile",
+      "They are automatically moved to the CPU",
+      "They are sent to the output device"
+     ],
+     "answer": 1,
+     "explain": "RAM needs power to hold data. Anything that must survive goes to secondary storage."
+    },
+    {
+     "id": "u1-q003",
+     "lesson": "u1-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "The CPU has a control unit and a second unit that performs math and comparisons. Name it.",
+     "answer": "arithmetic logic unit",
+     "accept": [
+      "arithmetic logic unit",
+      "ALU",
+      "arithmetic and logic unit",
+      "arithmetic/logic unit",
+      "arithmetic-logic unit",
+      "the alu",
+      "the arithmetic and logic unit",
+      "arithmetic and logic unit (ALU)"
+     ],
+     "explain": "The ALU (arithmetic and logic unit) does calculations and comparisons; the control unit directs operations."
+    },
+    {
+     "id": "u1-q004",
+     "lesson": "u1-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which of these is system software?",
+     "choices": [
+      "A spreadsheet program",
+      "An email program",
+      "The operating system",
+      "A web browser"
+     ],
+     "answer": 2,
+     "explain": "The operating system manages the computer itself. Spreadsheets, email programs and browsers do work for the user, so they are application software."
+    },
+    {
+     "id": "u1-q005",
+     "lesson": "u1-l1",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Secondary storage such as a solid-state drive keeps its data when the power is off.",
+     "answer": true,
+     "explain": "Secondary storage is nonvolatile. It is slower than RAM, so programs are copied into RAM to run."
+    },
+    {
+     "id": "u1-q006",
+     "lesson": "u1-l2",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "What does a compiler do?",
+     "choices": [
+      "Combines object files with library code",
+      "Handles lines that begin with #",
+      "Runs the program one statement at a time",
+      "Translates source code into machine language (object code)"
+     ],
+     "answer": 3,
+     "explain": "Compiling translates the whole source into object code. Combining with library code is the linker's job; # lines belong to the preprocessor."
+    },
+    {
+     "id": "u1-q007",
+     "lesson": "u1-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which program combines your object file with library code to create the executable file?",
+     "choices": [
+      "The linker",
+      "The preprocessor",
+      "The compiler",
+      "The editor"
+     ],
+     "answer": 0,
+     "explain": "The linker joins the object file to the runtime library routines the program uses (such as the code behind cout) and writes the executable file. The compiler only makes the object file."
+    },
+    {
+     "id": "u1-q008",
+     "lesson": "u1-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Lines that begin with # (such as #include) are handled by the ___ before the compiler sees the code.",
+     "answer": "preprocessor",
+     "accept": [
+      "preprocessor",
+      "the preprocessor",
+      "pre-processor",
+      "c preprocessor"
+     ],
+     "explain": "The preprocessor processes directives first and passes the resulting text to the compiler."
+    },
+    {
+     "id": "u1-q009",
+     "lesson": "u1-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which pair of statements about languages is correct?",
+     "choices": [
+      "C++ is low-level because it is compiled; machine language is portable",
+      "C++ is high-level and portable; machine language is low-level and specific to one kind of CPU",
+      "Both C++ and machine language are high-level but only C++ needs a compiler",
+      "C++ must be rewritten for each CPU; machine language runs on all CPUs"
+     ],
+     "answer": 1,
+     "explain": "High-level languages hide hardware detail and compile for many CPUs. Machine language is binary instructions for one CPU family."
+    },
+    {
+     "id": "u1-q010",
+     "lesson": "u1-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Machine language is the only language a CPU can execute directly.",
+     "answer": true,
+     "explain": "Everything else, including C++, must be translated to machine language first."
+    },
+    {
+     "id": "u1-q011",
+     "lesson": "u1-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Which is the correct order for turning a C++ program into a running program?",
+     "choices": [
+      "source file, compiler, preprocessor, linker, object file, executable file",
+      "source file, linker, object file, compiler, executable file",
+      "source file, preprocessor, compiler, object file, linker, executable file",
+      "source file, preprocessor, linker, compiler, executable file, object file"
+     ],
+     "answer": 2,
+     "explain": "The preprocessor runs first, the compiler produces an object file, and the linker produces the executable. The compiler never makes the executable by itself."
+    },
+    {
+     "id": "u1-q012",
+     "lesson": "u1-l3",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "In the statement `int total = 5;` which item is a programmer-defined identifier?",
+     "code": "int total = 5;",
+     "choices": [
+      "int",
+      "=",
+      "5",
+      "total"
+     ],
+     "answer": 3,
+     "explain": "int is a key word, = is an operator, 5 is a literal. total is a name the programmer made up."
+    },
+    {
+     "id": "u1-q013",
+     "lesson": "u1-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which of these is NOT a C++ key word?",
+     "choices": [
+      "cout",
+      "return",
+      "int",
+      "while"
+     ],
+     "answer": 0,
+     "explain": "cout is an object defined in the iostream library, not a reserved word. return, int and while are reserved."
+    },
+    {
+     "id": "u1-q014",
+     "lesson": "u1-l3",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "In the statement `charge = pounds * price;` the = symbol is called the ___ operator.",
+     "code": "charge = pounds * price;",
+     "answer": "assignment",
+     "accept": [
+      "assignment",
+      "assignment operator"
+     ],
+     "explain": "= stores the value on the right in the variable on the left. It is not the equality test, which is ==."
+    },
+    {
+     "id": "u1-q015",
+     "lesson": "u1-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "How many statements are in this code?",
+     "code": "int x = 4;\ncout << \"x is \"\n     << x << endl;",
+     "choices": [
+      "3",
+      "2",
+      "1",
+      "4"
+     ],
+     "answer": 1,
+     "explain": "A statement ends at its semicolon. The cout statement runs over two lines but is still one statement, plus the definition makes two."
+    },
+    {
+     "id": "u1-q016",
+     "lesson": "u1-l3",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Every line of a C++ source file is exactly one statement.",
+     "answer": false,
+     "explain": "Blank lines and comments are not statements, one statement can span several lines, and one line can hold several statements."
+    },
+    {
+     "id": "u1-q017",
+     "lesson": "u1-l3",
+     "type": "output",
+     "difficulty": 1,
+     "prompt": "What does this code print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "cout << \"A\";\ncout << \"B\" << endl;\ncout << \"C\";",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    cout << \"A\";\n    cout << \"B\" << endl;\n    cout << \"C\";\n    return 0;\n}\n",
+     "answer": "AB\nC",
+     "explain": "The first two statements print AB and a newline. C then prints on the next line."
+    },
+    {
+     "id": "u1-q018",
+     "lesson": "u1-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "cout << \"x\"; // cout << \"y\";\n/* cout << \"w\"; */\ncout << \"z\" << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    cout << \"x\"; // cout << \"y\";\n    /* cout << \"w\"; */\n    cout << \"z\" << endl;\n    return 0;\n}\n",
+     "answer": "xz",
+     "explain": "The compiler ignores everything from // to end of line and everything between /* and */. Only the x and z statements run."
+    },
+    {
+     "id": "u1-q019",
+     "lesson": "u1-l3",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "The rules that say how key words, operators and punctuation may be combined in a language are called its ___.",
+     "answer": "syntax",
+     "accept": [
+      "syntax"
+     ],
+     "explain": "Syntax errors are violations of these rules and the compiler reports them."
+    },
+    {
+     "id": "u1-q020",
+     "lesson": "u1-l4",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "A program asks the user for an age, works out the birth year, and shows the result on the screen. The step that takes the age from the keyboard is which of a program's three basic activities?",
+     "choices": [
+      "Processing",
+      "Output",
+      "Input",
+      "Linking"
+     ],
+     "answer": 2,
+     "explain": "Receiving data from the keyboard is input. Working out the birth year is processing and showing it is output; linking is a step in building the program, not something the running program does."
+    },
+    {
+     "id": "u1-q021",
+     "lesson": "u1-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "According to the steps of the programming process, what comes first?",
+     "choices": [
+      "Type the code and compile it",
+      "Run the program with test data",
+      "Check the results for validity",
+      "State exactly what problem the program must solve"
+     ],
+     "answer": 3,
+     "explain": "Planning comes first: purpose, input, processing and output. Code is typed after the model is built and checked."
+    },
+    {
+     "id": "u1-q022",
+     "lesson": "u1-l4",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "A program reads a radius, calculates the area of a circle and displays it. Calculating the area is which activity?",
+     "choices": [
+      "Processing",
+      "Input",
+      "Output",
+      "Compiling"
+     ],
+     "answer": 0,
+     "explain": "Reading the radius is input, displaying is output, and the math in between is processing."
+    },
+    {
+     "id": "u1-q023",
+     "lesson": "u1-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "double hours = 6, rate = 12.5, pay;\npay = hours * rate;\ncout << \"Pay: \" << pay << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    double hours = 6, rate = 12.5, pay;\n    pay = hours * rate;\n    cout << \"Pay: \" << pay << endl;\n    return 0;\n}\n",
+     "answer": "Pay: 75",
+     "explain": "hours times rate is 75. A double that holds a whole value prints without a decimal point by default."
+    },
+    {
+     "id": "u1-q024",
+     "lesson": "u1-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which statement best describes object-oriented programming compared with procedural programming?",
+     "choices": [
+      "OOP is centered on functions that share data with each other",
+      "OOP is centered on objects that combine data with the functions that work on that data",
+      "OOP requires every program to have no variables",
+      "OOP means the program is designed with flowcharts only"
+     ],
+     "answer": 1,
+     "explain": "Procedural programming centers on procedures. In OOP, each object carries its own data along with the procedures that work with it."
+    },
+    {
+     "id": "u1-q025",
+     "lesson": "u1-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is desk-checking?",
+     "choices": [
+      "Running the program on a very large input",
+      "Compiling the program on a second computer",
+      "Stepping through a program by hand, recording variable values and output after each statement",
+      "Asking the compiler to list all warnings"
+     ],
+     "answer": 2,
+     "explain": "Desk-checking is a manual trace on paper. It finds logic errors before or after running the program."
+    },
+    {
+     "id": "u1-q026",
+     "lesson": "u1-l4",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "Is this legal? A program's first line inside `main` is `total = 5;`, and `int total;` appears two lines later. The compiler accepts it.",
+     "answer": false,
+     "explain": "The compiler reads top to bottom, so the definition (type and name) must come before the first use. Here `total` is used before it exists, which is an error."
+    },
+    {
+     "id": "u1-q027",
+     "lesson": "u1-l5",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A set of well-defined, ordered steps for solving a problem is called an ___.",
+     "answer": "algorithm",
+     "accept": [
+      "algorithm",
+      "an algorithm"
+     ],
+     "explain": "An algorithm is the idea; a program is an algorithm written in a programming language."
+    },
+    {
+     "id": "u1-q028",
+     "lesson": "u1-l5",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Pseudocode must follow strict syntax rules because the compiler checks it.",
+     "answer": false,
+     "explain": "Pseudocode is for people. No compiler reads it and it has no official syntax, though it should be precise enough to translate."
+    },
+    {
+     "id": "u1-q029",
+     "lesson": "u1-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What does a hierarchy chart show?",
+     "choices": [
+      "The exact order in which statements execute, with decisions",
+      "The values stored in each variable",
+      "The machine language produced by the compiler",
+      "The overall task broken down into subtasks, level by level"
+     ],
+     "answer": 3,
+     "explain": "A hierarchy chart shows structure (top-down design). Execution order and decisions belong in flowcharts and pseudocode."
+    },
+    {
+     "id": "u1-q030",
+     "lesson": "u1-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "This pseudocode is run. What is displayed?",
+     "code": "Set total = 0\nSet i = 1\nWhile i <= 5\n    Set total = total + i\n    Set i = i + 1\nEnd While\nDisplay total",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int total = 0;\n    int i = 1;\n    while (i <= 5)\n    {\n        total = total + i;\n        i = i + 1;\n    }\n    cout << total << endl;\n    return 0;\n}\n",
+     "answer": "15",
+     "explain": "The loop adds 1+2+3+4+5. When i becomes 6 the test fails and total, 15, is displayed."
+    },
+    {
+     "id": "u1-q031",
+     "lesson": "u1-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "This pseudocode is run. What is displayed?",
+     "code": "Set a = 3\nSet b = 8\nSet temp = a\nSet a = b\nSet b = temp\nDisplay a\nDisplay b",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int a = 3, b = 8, temp;\n    temp = a;\n    a = b;\n    b = temp;\n    cout << a << endl;\n    cout << b << endl;\n    return 0;\n}\n",
+     "answer": "8\n3",
+     "explain": "temp saves 3, a takes 8, b takes the saved 3. The two values are swapped, and each Display is on its own line."
+    },
+    {
+     "id": "u1-q032",
+     "lesson": "u1-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which C++ code matches this pseudocode?",
+     "code": "Input age\nIf age >= 18\n    Display \"adult\"\nElse\n    Display \"minor\"\nEnd If",
+     "choices": [
+      "if (age >= 18)\n    cout << \"adult\";\nelse\n    cout << \"minor\";",
+      "if (age = 18)\n    cout << \"adult\";\nelse\n    cout << \"minor\";",
+      "if (age > 18)\n    cout << \"adult\";\nelse\n    cout << \"minor\";",
+      "if (age >= 18)\n    cout << \"adult\";\ncout << \"minor\";"
+     ],
+     "answer": 0,
+     "explain": "The pseudocode tests greater than or equal to 18 and has an Else. = assigns instead of comparing, > leaves out 18, and omitting else prints both words for adults."
+    },
+    {
+     "id": "u1-q033",
+     "lesson": "u1-l6",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "In a flowchart, the oval shape is used for the start and end points. What is it called?",
+     "answer": "terminal",
+     "accept": [
+      "terminal",
+      "terminal symbol",
+      "terminator",
+      "start/end",
+      "start/stop",
+      "start/end symbol",
+      "terminal (start/end)",
+      "start terminal"
+     ],
+     "explain": "The terminal symbol (an oval) marks where the flowchart begins and ends."
+    },
+    {
+     "id": "u1-q034",
+     "lesson": "u1-l6",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "In a flowchart, a parallelogram stands for a calculation (process).",
+     "answer": false,
+     "explain": "A parallelogram is input or output. Calculations go in a rectangle."
+    },
+    {
+     "id": "u1-q035",
+     "lesson": "u1-l6",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which flowchart shape asks a yes/no question and has two exit lines?",
+     "choices": [
+      "Rectangle",
+      "Diamond",
+      "Oval",
+      "Parallelogram"
+     ],
+     "answer": 1,
+     "explain": "The decision diamond tests a condition and its two exits are labeled Yes and No (true and false)."
+    },
+    {
+     "id": "u1-q036",
+     "lesson": "u1-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is the small circle in a flowchart for?",
+     "choices": [
+      "Start and end",
+      "Displaying output",
+      "A connector that continues the flow at another point or page",
+      "Making a calculation"
+     ],
+     "answer": 2,
+     "explain": "Matching labeled circles join separate pieces of a flowchart. Start/end is an oval, output is a parallelogram."
+    },
+    {
+     "id": "u1-q037",
+     "lesson": "u1-l6",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "A flowchart reads: Start; Set n = 1; Diamond \"n <= 3?\"; Yes: Display n * n, Set n = n + 1, flow line back to the diamond; No: End. What does it display?",
+     "code": "Start\nSet n = 1\nn <= 3 ?\n  Yes: Display n * n\n       Set n = n + 1\n       (back to the test)\n  No: End",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int n = 1;\n    while (n <= 3)\n    {\n        cout << n * n << endl;\n        n = n + 1;\n    }\n    return 0;\n}\n",
+     "answer": "1\n4\n9",
+     "explain": "The loop runs for n = 1, 2, 3 and shows 1, 4, 9. At n = 4 the No path ends the program."
+    },
+    {
+     "id": "u1-q038",
+     "lesson": "u1-l6",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "A flowchart reads: Start; Set x = 10; Diamond \"x > 5?\" Yes: Display \"big\"; No: skip. Both paths join. Diamond \"x > 12?\" Yes: Display \"huge\"; No: skip. Both paths join; End. What is displayed?",
+     "code": "Start\nSet x = 10\nx > 5 ?   Yes: Display \"big\"\n(paths join)\nx > 12 ?  Yes: Display \"huge\"\n(paths join)\nEnd",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int x = 10;\n    if (x > 5)\n        cout << \"big\" << endl;\n    if (x > 12)\n        cout << \"huge\" << endl;\n    return 0;\n}\n",
+     "answer": "big",
+     "explain": "Both decisions are tested one after the other. x > 5 is true so big shows; x > 12 is false so huge does not."
+    },
+    {
+     "id": "u1-q039",
+     "lesson": "u1-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A flowchart reads: Start; Input x (parallelogram); Diamond \"x > 0?\"; Yes: Display \"positive\"; No: Display \"not positive\"; End. Which C++ matches?",
+     "choices": [
+      "cin >> x;\nif (x > 0)\n    cout << \"positive\";\ncout << \"not positive\";",
+      "cout << x;\nif (x > 0)\n    cout << \"positive\";\nelse\n    cout << \"not positive\";",
+      "cin >> x;\nwhile (x > 0)\n    cout << \"positive\";\ncout << \"not positive\";",
+      "cin >> x;\nif (x > 0)\n    cout << \"positive\";\nelse\n    cout << \"not positive\";"
+     ],
+     "answer": 3,
+     "explain": "A diamond with two exit paths is if/else. Without else, not positive would always print too; a parallelogram labeled Input means cin; a loop would need a path back to the diamond."
+    },
+    {
+     "id": "u1-q040",
+     "lesson": "u1-l6",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "A flowchart reads: Start; Set n = 20; Set count = 0; Diamond \"n > 1?\"; Yes: Set n = n / 2 (integer division), Set count = count + 1, back to the diamond; No: Display count; End. What is displayed?",
+     "code": "Start\nSet n = 20\nSet count = 0\nn > 1 ?\n  Yes: Set n = n / 2   (integer division)\n       Set count = count + 1\n       (back to the test)\n  No: Display count\nEnd",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int n = 20, count = 0;\n    while (n > 1)\n    {\n        n = n / 2;\n        count = count + 1;\n    }\n    cout << count << endl;\n    return 0;\n}\n",
+     "answer": "4",
+     "explain": "n goes 20, 10, 5, 2, 1 with the count at 4 when n reaches 1. Integer division makes 5 / 2 equal 2."
+    },
+    {
+     "id": "u1-q041",
+     "lesson": "u1-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "This program is written as English statements. What would it display if it were a real program?",
+     "code": "The variable p starts with the value 4.\nThe variable q starts with the value 7.\nAdd 3 to p.\nStore the value of p times q in q.\nSubtract p from q, and store the result in q.\nDisplay the value in q.",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int p = 4, q = 7;\n    p = p + 3;\n    q = p * q;\n    q = q - p;\n    cout << q << endl;\n    return 0;\n}\n",
+     "answer": "42",
+     "explain": "p becomes 7, then q becomes 7 * 7 = 49, then 49 - 7 = 42. Each step uses the values left by the step before it."
+    },
+    {
+     "id": "u1-q042",
+     "lesson": "u1-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "This program is written as English statements. What would it display if it were a real program?",
+     "code": "Create three variables: a = 2, b = 9, c = 0.\nCompute a plus b and put the answer in c.\nPut c multiplied by 2 into a.\nPut a plus c into b.\nShow a, b and c on one line, separated by spaces.",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int a = 2, b = 9, c = 0;\n    c = a + b;\n    a = c * 2;\n    b = a + c;\n    cout << a << \" \" << b << \" \" << c << endl;\n    return 0;\n}\n",
+     "answer": "22 33 11",
+     "explain": "c gets 2 + 9 = 11, then a gets 11 * 2 = 22 (the old 2 is gone), then b gets 22 + 11 = 33, replacing the 9."
+    },
+    {
+     "id": "u1-q043",
+     "lesson": "u1-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "This pseudocode should ask for a ticket price and a quantity, then display the total cost. What is the error?",
+     "code": "Set cost = price * quantity\nDisplay \"Enter the ticket price\"\nInput price\nDisplay \"Enter the quantity\"\nInput quantity\nDisplay cost",
+     "choices": [
+      "Every Display must come after all of the Input steps",
+      "The multiplication should be an addition",
+      "cost is calculated before price and quantity have been input",
+      "Pseudocode lines must end with semicolons"
+     ],
+     "answer": 2,
+     "explain": "A step can only use values that already exist. The Set cost line belongs after both Input steps; as written it multiplies values that have not been entered yet. Prompts (Display) before each Input are correct."
+    },
+    {
+     "id": "u1-q044",
+     "lesson": "u1-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A flowchart reads: Start; Display \"Card value? \" (parallelogram); Input value (parallelogram); Display \"Amount spent? \" (parallelogram); Input spent (parallelogram); Set remain = value - spent (rectangle); Display remain (parallelogram); End. Which C++ matches?",
+     "choices": [
+      "remain = value - spent;\ncout << \"Card value? \";\ncin >> value;\ncout << \"Amount spent? \";\ncin >> spent;\ncout << remain;",
+      "cout << \"Card value? \";\ncin >> value;\ncout << \"Amount spent? \";\ncin >> spent;\nremain = spent - value;\ncout << remain;",
+      "cout << \"Card value? \";\ncout << value;\ncout << \"Amount spent? \";\ncout << spent;\nremain = value - spent;\ncout << remain;",
+      "cout << \"Card value? \";\ncin >> value;\ncout << \"Amount spent? \";\ncin >> spent;\nremain = value - spent;\ncout << remain;"
+     ],
+     "answer": 3,
+     "explain": "The steps run top to bottom: each Input parallelogram becomes cin, and the process rectangle subtracts spent from value after both are read. Calculating first would use values not yet entered, and cout cannot read input."
+    },
+    {
+     "id": "u1-q045",
+     "lesson": "u1-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "This pseudocode is run. What is displayed?",
+     "code": "Set temp = 68\nIf temp > 80\n    Display \"hot\"\nElse If temp > 60\n    Display \"mild\"\nElse\n    Display \"cold\"\nEnd If\nDisplay \"done\"",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int temp = 68;\n    if (temp > 80)\n        cout << \"hot\" << endl;\n    else if (temp > 60)\n        cout << \"mild\" << endl;\n    else\n        cout << \"cold\" << endl;\n    cout << \"done\" << endl;\n    return 0;\n}\n",
+     "answer": "mild\ndone",
+     "explain": "68 > 80 is false, so the next test runs: 68 > 60 is true and mild is shown. The chain stops at the first true test, and done is shown after End If either way."
+    },
+    {
+     "id": "u1-q046",
+     "lesson": "u1-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "This pseudocode is run. What is displayed?",
+     "code": "Set n = 10\nWhile n > 0\n    Display n\n    Set n = n - 3\nEnd While",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int n = 10;\n    while (n > 0)\n    {\n        cout << n << endl;\n        n = n - 3;\n    }\n    return 0;\n}\n",
+     "answer": "10\n7\n4\n1",
+     "explain": "n is shown, then reduced by 3: 10, 7, 4, 1. After 1 it becomes -2, the test n > 0 fails, and the loop ends without showing -2."
+    },
+    {
+     "id": "u1-q047",
+     "lesson": "u1-l6",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "A flowchart reads: Start; Set k = 5; Display k; Set k = k + 1; Diamond \"k < 5?\"; Yes: flow line back up to Display k; No: End. What is displayed?",
+     "code": "Start\nSet k = 5\nDisplay k        <-----+\nSet k = k + 1          |\nk < 5 ?   Yes ---------+\n  No: End",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int k = 5;\n    do\n    {\n        cout << k << endl;\n        k = k + 1;\n    } while (k < 5);\n    return 0;\n}\n",
+     "answer": "5",
+     "explain": "The diamond comes after the body, so this is a post-test loop (a do-while in C++): the body runs once before the first test. k becomes 6, 6 < 5 is false, and the chart ends."
+    },
+    {
+     "id": "u1-q048",
+     "lesson": "u1-l5",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Which C++ code matches this pseudocode?",
+     "code": "Set sum = 0\nInput num\nWhile num != 0\n    Set sum = sum + num\n    Input num\nEnd While\nDisplay sum",
+     "choices": [
+      "sum = 0;\ncin >> num;\nwhile (num != 0)\n{\n    sum = sum + num;\n}\ncout << sum;",
+      "sum = 0;\ncin >> num;\nwhile (num != 0)\n{\n    sum = sum + num;\n    cin >> num;\n}\ncout << sum;",
+      "sum = 0;\ncin >> num;\nif (num != 0)\n{\n    sum = sum + num;\n    cin >> num;\n}\ncout << sum;",
+      "sum = 0;\ncin >> num;\nwhile (num != 0)\n{\n    sum = sum + num;\n    cin >> num;\n    cout << sum;\n}"
+     ],
+     "answer": 1,
+     "explain": "Both Input steps are needed: one before the loop and one as the last step inside it, and Display sum comes after End While. Dropping the inner input makes an infinite loop, if runs the steps at most once, and output inside the loop shows a running total."
+    },
+    {
+     "id": "u1-q049",
+     "lesson": "u1-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "This pseudocode is run and the user types 3 and then 4. What is displayed?",
+     "code": "Input a\nInput b\nSet c = a * a + b * b\nDisplay c",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int a, b, c;\n    cin >> a;\n    cin >> b;\n    c = a * a + b * b;\n    cout << c << endl;\n    return 0;\n}\n",
+     "stdin": "3\n4\n",
+     "answer": "25",
+     "explain": "a is 3 and b is 4, so c is 9 + 16 = 25. Multiplication is done before addition, just as in C++."
+    },
+    {
+     "id": "u1-q050",
+     "lesson": "u1-l6",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "In a flowchart, a diamond's Yes path runs some boxes and then a flow line goes back up to the same diamond. Which structure is this?",
+     "choices": [
+      "Sequence",
+      "Selection",
+      "A connector",
+      "Repetition (a loop)"
+     ],
+     "answer": 3,
+     "explain": "A flow line that returns to an earlier decision makes steps repeat, so it is a loop. Selection also uses a diamond, but its two paths join below it and never go back up."
+    },
+    {
+     "id": "u1-q051",
+     "lesson": "u1-l6",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "You are drawing the flowchart for a program that reads a price and a tax rate, calculates the tax, and displays it. Which shape holds the step `tax = price * rate`?",
+     "choices": [
+      "Parallelogram",
+      "Rectangle",
+      "Diamond",
+      "Oval"
+     ],
+     "answer": 1,
+     "explain": "Calculations and assignments are processes, drawn as rectangles. Reading the price and rate and displaying the tax go in parallelograms."
+    },
+    {
+     "id": "u1-q052",
+     "lesson": "u1-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A program reads a starting balance, the total of deposits, the total of withdrawals and a monthly interest rate, then calculates and displays the current balance. In its hierarchy chart, which box belongs at the very top?",
+     "choices": [
+      "Read the total of deposits",
+      "Display the balance",
+      "Start",
+      "Find the current account balance"
+     ],
+     "answer": 3,
+     "explain": "The top box names the whole task. Getting the input, calculating and displaying are subtasks on the level below it. Start is a flowchart terminal, not part of a hierarchy chart."
+    },
+    {
+     "id": "u1-q053",
+     "lesson": "u1-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "In standard flowcharting, what does a rectangle with an extra vertical line just inside each side stand for?",
+     "choices": [
+      "A predefined process: a call to a module or function that is charted separately",
+      "An input step",
+      "Two calculations done at the same time",
+      "The end of the program"
+     ],
+     "answer": 0,
+     "explain": "The predefined process symbol shows a call to a module (function) whose steps are charted elsewhere. A plain rectangle is an ordinary process; input is a parallelogram and the end is an oval."
+    },
+    {
+     "id": "u1-q054",
+     "lesson": "u1-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "One computer can run a game, a spreadsheet and a browser because its behavior is set by whatever instructions it is given: it is ___ (one word).",
+     "answer": "programmable",
+     "accept": [
+      "programmable",
+      "programmed",
+      "reprogrammable",
+      "a programmable machine"
+     ],
+     "explain": "A computer is not built for one job. It does whatever job its program tells it to do."
+    },
+    {
+     "id": "u1-q055",
+     "lesson": "u1-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which statement about main memory is correct?",
+     "choices": [
+      "Each byte has a unique address, and each byte is made of eight bits",
+      "Bytes have no addresses; the CPU searches memory for the data it needs",
+      "Each bit has its own address, and a byte is two bits",
+      "A byte is sixteen bits, and only the first byte has an address"
+     ],
+     "answer": 0,
+     "explain": "Memory is divided into bytes of 8 bits (bit is short for binary digit). Every byte has its own number, its address, which the CPU uses to find it."
+    },
+    {
+     "id": "u1-q056",
+     "lesson": "u1-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Each byte of main memory is identified by a unique number called its ___.",
+     "answer": "address",
+     "accept": [
+      "address",
+      "memory address",
+      "an address",
+      "its address"
+     ],
+     "explain": "Addresses run from lowest to highest, like numbered post office boxes. A variable's name stands for the address where its value is stored."
+    },
+    {
+     "id": "u1-q057",
+     "lesson": "u1-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A virus scanner, a file-compression program and a backup program are all examples of which kind of software?",
+     "choices": [
+      "Application software",
+      "Operating systems",
+      "Software development tools",
+      "Utility programs, a kind of system software"
+     ],
+     "answer": 3,
+     "explain": "Utility programs do a specialized job that improves the computer's operation or protects data. The textbook classes them as system software, not application software."
+    },
+    {
+     "id": "u1-q058",
+     "lesson": "u1-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Source code written in a high-level language can usually be recompiled for a different kind of CPU with little or no editing. That property is called being ___.",
+     "answer": "portable",
+     "accept": [
+      "portable",
+      "portability",
+      "being portable"
+     ],
+     "explain": "C++ is portable: the same source code can be recompiled for another system with little or no change. Machine language is not portable."
+    },
+    {
+     "id": "u1-q059",
+     "lesson": "u1-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "An object file can be run by itself, because the compiler has already translated it into machine language.",
+     "answer": false,
+     "explain": "The object file holds machine code but not the runtime library routines the program uses (such as the code behind cout). The linker must add them to make the executable file."
+    },
+    {
+     "id": "u1-q060",
+     "lesson": "u1-l3",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Words such as int, double and return have a special meaning in C++ and may be used only for that purpose. They are called key words or ___ words.",
+     "answer": "reserved",
+     "accept": [
+      "reserved",
+      "reserved words",
+      "reserved word"
+     ],
+     "explain": "Key words are reserved for the language and are always lowercase. You cannot use one as a variable name."
+    },
+    {
+     "id": "u1-q061",
+     "lesson": "u1-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "In the statement `total = price * qty;` which symbols are operators?",
+     "choices": [
+      "; and =",
+      "only *",
+      "= and *",
+      "* and ;"
+     ],
+     "answer": 2,
+     "explain": "= (assignment) and * (multiplication) act on operands. The semicolon is punctuation: it marks the end of the statement."
+    },
+    {
+     "id": "u1-q062",
+     "lesson": "u1-l3",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A named storage location in memory, whose value can change while the program runs, is a ___.",
+     "answer": "variable",
+     "accept": [
+      "variable",
+      "a variable"
+     ],
+     "explain": "The name stands for a location in RAM. Storing a new value replaces the old one."
+    },
+    {
+     "id": "u1-q063",
+     "lesson": "u1-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "In the nine-step programming process, which step comes right before typing the code?",
+     "choices": [
+      "Run the program with test data",
+      "Check the model for logical errors",
+      "Validate the results",
+      "Correct errors found while running"
+     ],
+     "answer": 1,
+     "explain": "The order is: define, visualize, model with design tools, check the model for logic errors, and only then type, save and compile. Testing and validating come after the code compiles."
+    },
+    {
+     "id": "u1-q064",
+     "lesson": "u1-l4",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "When you clearly define what a program is to do, which four items do you identify?",
+     "choices": [
+      "Purpose, input, processing and output",
+      "Sequence, selection, repetition and hierarchy",
+      "Source code, object code, library and executable",
+      "Variables, constants, functions and objects"
+     ],
+     "answer": 0,
+     "explain": "Step 1 names what the program is for, what goes in, what is done to it, and what comes out."
+    },
+    {
+     "id": "u1-q065",
+     "lesson": "u1-l4",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "Visualizing a program running means picturing, or sketching, its screens with sample input and output before you write the code.",
+     "answer": true,
+     "explain": "Putting yourself in the user's place this way decides what the program will ask and display, which settles most of its output early."
+    },
+    {
+     "id": "u1-q066",
+     "lesson": "u1-l2",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "What is an integrated development environment (IDE)?",
+     "choices": [
+      "A collection of prewritten library code that the linker adds",
+      "The part of the operating system that loads programs into memory",
+      "A program that translates and runs one statement at a time",
+      "One package that combines a text editor, compiler, debugger and other tools under a single set of menus"
+     ],
+     "answer": 3,
+     "explain": "In an IDE one click can preprocess, compile, link and run. Prewritten code is the runtime library, and translating one statement at a time describes an interpreter."
+    },
+    {
+     "id": "u1-q067",
+     "lesson": "u1-l2",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "The large collection of prewritten C++ code for jobs like screen output and math functions, which the linker joins to your object code, is called the ___ library.",
+     "answer": "runtime",
+     "accept": [
+      "runtime",
+      "run-time",
+      "run time",
+      "runtime library",
+      "run-time library",
+      "standard",
+      "standard library",
+      "c++ standard library"
+     ],
+     "explain": "The compiler does not put library code into the object file; the linker adds the library routines the program uses."
+    },
+    {
+     "id": "u1-q068",
+     "lesson": "u1-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which part of the CPU coordinates the computer's operations and determines where to get the next instruction?",
+     "choices": [
+      "The arithmetic and logic unit",
+      "Main memory",
+      "The control unit",
+      "Secondary storage"
+     ],
+     "answer": 2,
+     "explain": "The control unit fetches and decodes instructions and sends control signals to the other parts. The ALU only does the math and comparisons."
+    },
+    {
+     "id": "u1-q069",
+     "lesson": "u1-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "In what order does the CPU handle each instruction of a program?",
+     "choices": [
+      "Fetch, decode, execute",
+      "Execute, decode, fetch",
+      "Fetch, execute, decode",
+      "Decode, fetch, execute"
+     ],
+     "answer": 0,
+     "explain": "The control unit fetches the next instruction from main memory, decodes it to see what it asks for, and then the right component executes it. The cycle repeats for every instruction."
+    }
+   ],
+   "programs": [
+    {
+     "id": "u1-p1",
+     "title": "Shipping charge with a heavy-parcel rate (pseudocode to C++)",
+     "task": "Translate this pseudocode into a C++ program.\n\nDisplay \"Enter pounds and price per pound: \"\nInput pounds\nInput price\nIf pounds > 20\n    Set charge = 20 * price + (pounds - 20) * price * 2\nElse\n    Set charge = pounds * price\nEnd If\nDisplay \"Shipping charge: $\" and charge\n\nUse double for all three variables. Finish the output line with a newline.",
+     "stdin": "25 3",
+     "sampleOutput": "Enter pounds and price per pound: Shipping charge: $90",
+     "solution": "#include <iostream>\nusing namespace std;\n\nint main()\n{\n    double pounds, price, charge;\n\n    cout << \"Enter pounds and price per pound: \";\n    cin >> pounds >> price;\n\n    if (pounds > 20)\n        charge = 20 * price + (pounds - 20) * price * 2;\n    else\n        charge = pounds * price;\n\n    cout << \"Shipping charge: $\" << charge << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u1-p2",
+     "title": "Average of n scores (pseudocode to C++)",
+     "task": "Translate this pseudocode into a C++ program.\n\nInput n\nSet total = 0\nSet i = 1\nWhile i <= n\n    Input score\n    Set total = total + score\n    Set i = i + 1\nEnd While\nSet average = total / n\nDisplay \"Average: \" and average\n\nUse int for n and i, and double for score, total and average. Finish the output with a newline. No prompts are displayed.",
+     "stdin": "4\n80 90 70 100",
+     "sampleOutput": "Average: 85",
+     "solution": "#include <iostream>\nusing namespace std;\n\nint main()\n{\n    int n, i;\n    double score, total, average;\n\n    cin >> n;\n    total = 0;\n    i = 1;\n    while (i <= n)\n    {\n        cin >> score;\n        total = total + score;\n        i = i + 1;\n    }\n    average = total / n;\n    cout << \"Average: \" << average << endl;\n    return 0;\n}\n"
+    }
+   ]
+  },
+  {
+   "id": "u8",
+   "title": "Testing and debugging",
+   "summary": "Kinds of errors, hand tracing, choosing test data, the classic C++ bug patterns, and stubs and drivers.",
+   "lessons": [
+    {
+     "id": "u8-l1",
+     "title": "Kinds of errors and what the compiler tells you",
+     "book": "Sections 1.6 and 3.10, pages 21 and 133; general debugging",
+     "html": "<p><strong>Debugging</strong> is finding and fixing the errors in a program. Errors fall into three main families, plus linker errors.</p>\n<table><thead><tr><th>Kind</th><th>When it shows up</th><th>Example</th></tr></thead><tbody>\n<tr><td><strong>Syntax error</strong></td><td>At compile time. The compiler reports it with a line number and no executable is made.</td><td>missing semicolon, misspelled key word, undefined variable, unmatched brace</td></tr>\n<tr><td><strong>Logic error</strong></td><td>The program compiles and runs but gives wrong results.</td><td>wrong formula, <code>=</code> instead of <code>==</code>, loop that runs one time too few</td></tr>\n<tr><td><strong>Linker error</strong></td><td>After compiling, when the object file is linked. No executable is made.</td><td>a function that has a prototype and is called but was never defined</td></tr>\n<tr><td><strong>Run-time error</strong></td><td>While the program runs: it crashes or stops abnormally.</td><td>integer division by zero (undefined behavior; on most systems it stops the program), running out of memory</td></tr>\n</tbody></table>\n<p>Many textbooks, including Gaddis, use \"runtime error\" loosely for any mistake found while running, which includes wrong answers. On an exam, decide by the symptom: it will not compile is a syntax error; it runs but the answer is wrong is a logic error; it crashes is a run-time error.</p>\n<h4>Errors versus warnings</h4>\n<p>An <strong>error</strong> stops compilation. A <strong>warning</strong> does not: the compiler still builds the program, but it is telling you the code is legal and probably wrong. Typical warnings: a variable that is never used, a variable that may be used before it is set, a comparison between signed and unsigned values, and an assignment inside an <code>if</code> condition. Treat every warning as a possible logic error and fix it. Turning on more warnings (for g++, <code>-Wall</code>) catches bugs early.</p>\n<h4>What the compiler cannot find</h4>\n<p>The compiler checks the rules of the language, not your intent. A program with no errors and no warnings can still print the wrong thing. Only testing, hand tracing and careful reading find logic errors.</p>\n<p>C++ is case-sensitive: <code>Cout</code> or <code>Return</code> is a compile error, not a typo the compiler forgives. A single missing brace or semicolon often causes a flood of messages that begin on the line <em>after</em> the real mistake, so fix the first error, then recompile.</p>\n<pre><code>int total = 0           // syntax error: missing ;\ncout &lt;&lt; total / 0;     // would be a run-time error for int\naverage = a + b / 2;    // logic error if you meant (a + b) / 2</code></pre>"
+    },
+    {
+     "id": "u8-l2",
+     "title": "Hand tracing and desk-checking",
+     "book": "Section 3.10, pages 133 and 134",
+     "html": "<p><strong>Hand tracing</strong> is a debugging technique where you pretend to be the computer and execute the program one statement at a time on paper. Chapter 1 calls the same process <strong>desk-checking</strong>: stepping through the code on paper, writing down each variable's contents and what is displayed after each statement. It is especially good at finding math mistakes and other logic errors.</p>\n<h4>How to do it</h4>\n<ol><li>Set up a table in which every variable gets its <strong>own column</strong> and every statement you execute gets its own row.</li>\n<li>Pick sample input whose correct answer you can work out in advance.</li>\n<li>Go statement by statement. After each one, write the new value in that variable's column. A value stays until some statement changes it.</li>\n<li>Write down what is displayed after every output statement.</li>\n<li>Compare the result with the answer you expected. The first row where the chart goes wrong points to the bug.</li></ol>\n<p>Example of a bug found by tracing:</p>\n<pre><code>double n1, n2, n3, avg;\nn1 = 10; n2 = 20; n3 = 30;\navg = n1 + n2 + n3 / 3;</code></pre>\n<table><thead><tr><th>after statement</th><th>n1</th><th>n2</th><th>n3</th><th>avg</th></tr></thead><tbody>\n<tr><td>n1 = 10</td><td>10</td><td>?</td><td>?</td><td>?</td></tr>\n<tr><td>n2 = 20</td><td>10</td><td>20</td><td>?</td><td>?</td></tr>\n<tr><td>n3 = 30</td><td>10</td><td>20</td><td>30</td><td>?</td></tr>\n<tr><td>avg = ...</td><td>10</td><td>20</td><td>30</td><td>40</td></tr>\n</tbody></table>\n<p>A correct average would be 20, but the chart shows 40. Division has higher precedence than addition, so only n3 was divided: 10 + 20 + 10 = 40. The fix is <code>(n1 + n2 + n3) / 3</code>.</p>\n<h4>Tracing loops</h4>\n<p>For a loop, add a row for each pass and include the loop variable. Record the value the condition sees each time it is tested, including the final test that fails. Count passes carefully: a loop from 1 while <code>i &lt;= 4</code> runs 4 times; while <code>i &lt; 4</code> it runs 3.</p>\n<p>Tracing also verifies a flowchart or pseudocode before any code is written, which is step 4 of the programming process.</p>"
+    },
+    {
+     "id": "u8-l3",
+     "title": "Choosing test data",
+     "book": "Section 1.6 (pages 21 and 22) and 3.10, plus general testing practice",
+     "html": "<p>Testing means running a program with sample input to see whether the output is right. Passing one test proves little. A good set of <strong>test cases</strong> each has an input and the <strong>expected output</strong> that you worked out by hand <em>before</em> running. If you take the program's own output as correct, you will never notice that it is wrong.</p>\n<h4>Three kinds of test data</h4>\n<ul>\n<li><strong>Normal (typical) data</strong>: ordinary values well inside the allowed range, such as 72 for a score that may be 0 to 100.</li>\n<li><strong>Boundary data</strong>: values at, just inside, and just outside the edges of a range, where off-by-one mistakes (<code>&lt;</code> versus <code>&lt;=</code>) hide. For a valid range of 0 to 100: 0, 1, 99, 100, and the outside neighbors -1 and 101. For a rule like \"60 or more passes\": 59, 60, 61.</li>\n<li><strong>Invalid data</strong>: input the program should reject or handle, such as a negative age, letters where a number is expected, or zero when it will be a divisor.</li></ul>\n<p>Also test the special cases for the problem: an empty list, a count of 0 or 1, all values equal, the largest and smallest values.</p>\n<h4>Coverage</h4>\n<p>Every path in the program should run at least once. If there is an if, test one input that makes it true and one that makes it false. If there is a loop, test it running zero times (if possible), once, and many times. For an if/else-if chain with four branches, you need at least four inputs, one per branch, plus the boundaries between branches.</p>\n<h4>Example</h4>\n<pre><code>// Pass if score is 60 or more\nif (score &gt; 60)          // bug: should be &gt;=\n    cout &lt;&lt; \"pass\";\nelse\n    cout &lt;&lt; \"fail\";</code></pre>\n<p>Test scores 40 and 90 both give correct answers. Only the boundary test, 60, shows that this prints \"fail\" when it should say \"pass\".</p>\n<p>Testing can show that bugs exist; it can never prove that none remain. Finally, <strong>validate</strong> the results: check that the program solves the original problem, not just that it matches your design.</p>"
+    },
+    {
+     "id": "u8-l4",
+     "title": "Common bug patterns in C++",
+     "book": "General debugging practice (no single book section); relates to Chapters 4 and 5",
+     "html": "<p>These mistakes appear again and again, and exams love them. Most of them compile.</p>\n<h4>1. = versus ==</h4>\n<p><code>if (x = 5)</code> assigns 5 to x and the condition is the value 5, which is true. It is always true (for any nonzero value) and it changes x. Use <code>==</code> to compare.</p>\n<h4>2. Stray semicolon</h4>\n<p><code>if (x &gt; 10);</code> ends the if with an empty statement. The next statement then runs every time. <code>while (i &lt; 3);</code> makes an empty body, so a loop that should end now loops forever. <code>for (...);</code> repeats nothing and then runs the block once.</p>\n<h4>3. Missing braces</h4>\n<p>Without <code>{ }</code>, an <code>if</code>, <code>else</code> or loop controls only the <em>one</em> statement after it. Indentation does not matter to the compiler. The second line below always runs.</p>\n<pre><code>if (n &gt; 0)\n    cout &lt;&lt; \"positive \";\n    cout &lt;&lt; \"done\";      // always runs</code></pre>\n<h4>4. Missing break</h4>\n<p>In a <code>switch</code>, execution falls through into the next case until a <code>break</code> (or the end). Forgetting it prints extra output.</p>\n<h4>5. Integer division</h4>\n<p>When both operands are <code>int</code>, <code>/</code> drops the fraction: <code>7 / 2</code> is 3, and <code>double r = 7 / 2;</code> stores 3.0. Make at least one operand a double: <code>7 / 2.0</code> or <code>static_cast&lt;double&gt;(7) / 2</code>. Also <code>%</code> works only on integers.</p>\n<h4>6. Uninitialized variable or accumulator</h4>\n<p>A local variable has no defined starting value. <code>int sum; sum += x;</code> adds to garbage. Start totals at 0 and products at 1.</p>\n<h4>7. Off-by-one</h4>\n<p><code>for (i = 0; i &lt;= n; i++)</code> runs n + 1 times; <code>for (i = 1; i &lt; n; i++)</code> runs n - 1 times. Decide which and check the boundaries.</p>\n<h4>8. Operator precedence</h4>\n<p><code>a + b / 2</code> divides only b. Add parentheses when you mean something else. Note also <code>&amp;&amp;</code> binds tighter than <code>||</code>. A range test written <code>x &lt; 0 &amp;&amp; x &gt; 100</code> can never be true; \"outside the range\" needs <code>||</code>.</p>\n<h4>9. Others</h4>\n<p>Comparing doubles with <code>==</code> (they hold approximations, so compare the difference to a small tolerance), a <code>while</code> loop whose body never changes the variable it tests (an infinite loop), forgetting to read input before using it, and using the wrong variable (a copy-paste slip) are common too.</p>"
+    },
+    {
+     "id": "u8-l5",
+     "title": "Stubs and drivers",
+     "book": "Section 6.16, pages 372 and 373; debugger use from general practice",
+     "html": "<p>When a program is split into functions, you can test the pieces in isolation. Two small tools help.</p>\n<h4>Stub</h4>\n<p>A <strong>stub</strong> is a dummy function used in place of a real function that is not written (or not trusted) yet. It usually does nothing except display a message that it was called, often with the argument values it received. If the real function returns a value, the stub returns a fixed <strong>test value</strong> so the calling code can continue. Stubs let you test the <em>calling</em> code: is the function called when expected, and are the right values passed?</p>\n<pre><code>double getTax(double amount)      // stub\n{\n    cout &lt;&lt; \"getTax called with \" &lt;&lt; amount &lt;&lt; endl;\n    return 10.0;                  // fixed test value\n}</code></pre>\n<h4>Driver</h4>\n<p>A <strong>driver</strong> is a small program (or a main function) whose only job is to call one function with test data and show what comes back. Drivers test the <em>function</em> itself, apart from the rest of the program.</p>\n<pre><code>int main()                        // driver for square()\n{\n    cout &lt;&lt; square(3) &lt;&lt; endl;     // expect 9\n    cout &lt;&lt; square(-2) &lt;&lt; endl;    // expect 4\n    cout &lt;&lt; square(0) &lt;&lt; endl;     // expect 0\n    return 0;\n}</code></pre>\n<h4>Which when</h4>\n<table><thead><tr><th>Tool</th><th>Replaces</th><th>Tests</th></tr></thead><tbody>\n<tr><td>Stub</td><td>the function</td><td>the code that calls it</td></tr>\n<tr><td>Driver</td><td>the caller (main)</td><td>the function</td></tr></tbody></table>\n<p>Build incrementally: write and test one function at a time. Stubs let you run a whole program early; drivers let you check each real function with chosen normal, boundary and invalid inputs. When the pieces work, replace the stubs with the real functions and run the full program.</p>\n<h4>Other debugging aids</h4>\n<p>A temporary <code>cout</code> that prints variable values at key points (for a loop, on every pass) shows where a program first goes wrong. Remove or comment out these diagnostic lines when done.</p>\n<p>A <strong>debugger</strong> (built into most IDEs) does the hand trace for you: set a <strong>breakpoint</strong> on a line and the program pauses there; <strong>step</strong> runs one statement at a time; a <strong>watch</strong> shows chosen variables' current values while the program is paused.</p>"
+    }
+   ],
+   "questions": [
+    {
+     "id": "u8-q001",
+     "lesson": "u8-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "A program has a missing semicolon at the end of a statement. What kind of error is this?",
+     "choices": [
+      "Logic error",
+      "Syntax error",
+      "Run-time error",
+      "Validation error"
+     ],
+     "answer": 1,
+     "explain": "The compiler rejects code that breaks the language rules, so it never produces an executable. Logic and run-time errors need a program that compiles."
+    },
+    {
+     "id": "u8-q002",
+     "lesson": "u8-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A program compiles with no messages and runs to the end, but it prints 7 where the correct answer is 5. What kind of error is it?",
+     "choices": [
+      "Syntax error",
+      "Compiler warning",
+      "Logic error",
+      "Linker error"
+     ],
+     "answer": 2,
+     "explain": "Nothing stopped it from running; it just computes the wrong thing. Only testing or tracing can find it."
+    },
+    {
+     "id": "u8-q003",
+     "lesson": "u8-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A program compiles, but when run it crashes at the moment it divides an int by an int variable that holds 0. What kind of error is this?",
+     "code": "int a = 10, b = 0;\ncout << a / b;",
+     "choices": [
+      "Syntax error",
+      "Logic error caught by the compiler",
+      "Preprocessor error",
+      "Run-time error"
+     ],
+     "answer": 3,
+     "explain": "The mistake appears only while running and stops the program abnormally. The compiler cannot know the variable will be 0. (Integer division by zero is undefined behavior in C++; on most systems it ends the program.)"
+    },
+    {
+     "id": "u8-q004",
+     "lesson": "u8-l1",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "A compiler warning, unlike a compiler error, does not by itself stop the executable file from being created.",
+     "answer": true,
+     "explain": "Warnings are not errors, so the build finishes (unless you tell the compiler to treat warnings as errors, for example g++ -Werror). They often point at real logic bugs, so read them."
+    },
+    {
+     "id": "u8-q005",
+     "lesson": "u8-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A mistake that lets a program compile and run but produces wrong results is called a ___ error.",
+     "answer": "logic",
+     "accept": [
+      "logic",
+      "logical",
+      "logic error"
+     ],
+     "explain": "The compiler checks the grammar, not the intent. Wrong formulas and wrong conditions are logic errors."
+    },
+    {
+     "id": "u8-q006",
+     "lesson": "u8-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "Hand trace this code. What does it print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "double n1 = 6, n2 = 12, n3 = 18, avg;\navg = n1 + n2 + n3 / 3;\ncout << avg << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    double n1 = 6, n2 = 12, n3 = 18, avg;\n    avg = n1 + n2 + n3 / 3;\n    cout << avg << endl;\n    return 0;\n}\n",
+     "answer": "24",
+     "explain": "n3 / 3 is evaluated first and is 6, so avg is 6 + 12 + 6 = 24. The intended average, 12, needs parentheses around the sum."
+    },
+    {
+     "id": "u8-q007",
+     "lesson": "u8-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "Hand trace this code. What does it print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int x = 0;\nfor (int i = 1; i <= 4; i++)\n    x = x * 2 + i;\ncout << x << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int x = 0;\n    for (int i = 1; i <= 4; i++)\n        x = x * 2 + i;\n    cout << x << endl;\n    return 0;\n}\n",
+     "answer": "26",
+     "explain": "x goes 0 to 1, then 1*2+2 = 4, then 4*2+3 = 11, then 11*2+4 = 26."
+    },
+    {
+     "id": "u8-q008",
+     "lesson": "u8-l2",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "The programmer meant to swap a and b. What does this print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int a = 5, b = 9;\na = b;\nb = a;\ncout << a << \" \" << b << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int a = 5, b = 9;\n    a = b;\n    b = a;\n    cout << a << \" \" << b << endl;\n    return 0;\n}\n",
+     "answer": "9 9",
+     "explain": "After a = b, a is 9 and the old 5 is gone. Then b = a copies 9 again. Swapping needs a temporary variable."
+    },
+    {
+     "id": "u8-q009",
+     "lesson": "u8-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Stepping through a program by hand and writing down each variable's value after each statement is called hand tracing or ___-checking.",
+     "answer": "desk",
+     "accept": [
+      "desk",
+      "desk-checking",
+      "desk checking",
+      "deskchecking"
+     ],
+     "explain": "Desk-checking uses a chart with a column per variable. It finds logic errors without running the program."
+    },
+    {
+     "id": "u8-q010",
+     "lesson": "u8-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "How many times does the body of this loop run?",
+     "code": "int n = 10, steps = 0;\nwhile (n != 1)\n{\n    if (n % 2 == 0)\n        n = n / 2;\n    else\n        n = 3 * n + 1;\n    steps++;\n}\ncout << steps;",
+     "choices": [
+      "6",
+      "5",
+      "7",
+      "10"
+     ],
+     "answer": 0,
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int n = 10, steps = 0;\n    while (n != 1)\n    {\n        if (n % 2 == 0)\n            n = n / 2;\n        else\n            n = 3 * n + 1;\n        steps++;\n    }\n    cout << steps;\n    return 0;\n}\n",
+     "expect": "6",
+     "explain": "n goes 10, 5, 16, 8, 4, 2, 1: the body runs for each change, six times, and the loop stops when n reaches 1."
+    },
+    {
+     "id": "u8-q011",
+     "lesson": "u8-l3",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which kind of test data is a value at the very edge of the allowed range, such as 0 or 100 when scores must be 0 to 100?",
+     "choices": [
+      "Normal data",
+      "Boundary data",
+      "Invalid data",
+      "Random data"
+     ],
+     "answer": 1,
+     "explain": "Boundary values catch < versus <= mistakes. Values outside the range, such as -1 or 101, are invalid data."
+    },
+    {
+     "id": "u8-q012",
+     "lesson": "u8-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A function accepts a percentage from 0 to 100 inclusive. Which set of test inputs is best?",
+     "choices": [
+      "50, 51, 52, 53",
+      "0, 100",
+      "-1, 0, 1, 50, 99, 100, 101",
+      "25, 50, 75"
+     ],
+     "answer": 2,
+     "explain": "A good set includes normal data, both boundaries, their neighbors, and invalid values on both sides."
+    },
+    {
+     "id": "u8-q013",
+     "lesson": "u8-l3",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "Input the program should reject, such as an age of -5, is called ___ test data.",
+     "answer": "invalid",
+     "accept": [
+      "invalid",
+      "invalid data",
+      "invalid input",
+      "bad",
+      "bad data",
+      "erroneous",
+      "illegal"
+     ],
+     "explain": "Invalid data checks that the program handles bad input instead of failing or accepting it."
+    },
+    {
+     "id": "u8-q014",
+     "lesson": "u8-l3",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "If a program gives the right output for one test run, that proves the program is correct.",
+     "answer": false,
+     "explain": "Testing can show that bugs exist but never that none remain. Test normal, boundary and invalid cases and every branch."
+    },
+    {
+     "id": "u8-q015",
+     "lesson": "u8-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "The program should pass anyone with 60 or more. What does it print for the boundary value 60? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int score = 60;\nif (score > 60)\n    cout << \"pass\" << endl;\nelse\n    cout << \"fail\" << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int score = 60;\n    if (score > 60)\n        cout << \"pass\" << endl;\n    else\n        cout << \"fail\" << endl;\n    return 0;\n}\n",
+     "answer": "fail",
+     "explain": "60 is not greater than 60, so the else branch runs. The bug is > where >= was needed, and only a boundary test exposes it."
+    },
+    {
+     "id": "u8-q016",
+     "lesson": "u8-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int x = 3;\nif (x = 5)\n    cout << \"five \";\ncout << x << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int x = 3;\n    if (x = 5)\n        cout << \"five \";\n    cout << x << endl;\n    return 0;\n}\n",
+     "answer": "five 5",
+     "explain": "x = 5 assigns 5, and the value of the expression is 5, which is true. So the message prints and x is now 5."
+    },
+    {
+     "id": "u8-q017",
+     "lesson": "u8-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int n = 2;\nif (n > 5);\n    cout << \"big\";",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int n = 2;\n    if (n > 5);\n        cout << \"big\";\n    return 0;\n}\n",
+     "answer": "big",
+     "explain": "The semicolon ends the if with an empty statement. The cout is a separate statement that always runs."
+    },
+    {
+     "id": "u8-q018",
+     "lesson": "u8-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int n = -1;\nif (n > 0)\n    cout << \"a\" << endl;\n    cout << \"b\" << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int n = -1;\n    if (n > 0)\n        cout << \"a\" << endl;\n        cout << \"b\" << endl;\n    return 0;\n}\n",
+     "answer": "b",
+     "explain": "Without braces only the first cout belongs to the if. The second always runs regardless of the indentation."
+    },
+    {
+     "id": "u8-q019",
+     "lesson": "u8-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int choice = 2;\nswitch (choice)\n{\n    case 1: cout << \"one\" << endl;\n    case 2: cout << \"two\" << endl;\n    case 3: cout << \"three\" << endl;\n            break;\n    default: cout << \"other\" << endl;\n}",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int choice = 2;\n    switch (choice)\n    {\n        case 1: cout << \"one\" << endl;\n        case 2: cout << \"two\" << endl;\n        case 3: cout << \"three\" << endl;\n                break;\n        default: cout << \"other\" << endl;\n    }\n    return 0;\n}\n",
+     "answer": "two\nthree",
+     "explain": "Case 2 matches and with no break execution falls through into case 3, which does have a break."
+    },
+    {
+     "id": "u8-q020",
+     "lesson": "u8-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int a = 7, b = 2;\ndouble r1 = a / b;\ndouble r2 = static_cast<double>(a) / b;\ncout << r1 << \" \" << r2 << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int a = 7, b = 2;\n    double r1 = a / b;\n    double r2 = static_cast<double>(a) / b;\n    cout << r1 << \" \" << r2 << endl;\n    return 0;\n}\n",
+     "answer": "3 3.5",
+     "explain": "a / b is integer division giving 3 before it is stored in the double. Casting one operand first makes the division floating-point."
+    },
+    {
+     "id": "u8-q021",
+     "lesson": "u8-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is the bug in this code?",
+     "code": "int sum;\nfor (int i = 1; i <= 5; i++)\n    sum += i;\ncout << sum;",
+     "choices": [
+      "The loop runs one time too many",
+      "The variable i should be a double",
+      "sum should be declared after the loop",
+      "sum starts with an unpredictable value because it was never initialized"
+     ],
+     "answer": 3,
+     "explain": "A local int has no defined starting value, so the accumulator needs sum = 0. The loop bounds here are fine."
+    },
+    {
+     "id": "u8-q022",
+     "lesson": "u8-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "The code is meant to add 1 through 5. What does it print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int sum = 0;\nfor (int i = 1; i < 5; i++)\n    sum += i;\ncout << sum << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int sum = 0;\n    for (int i = 1; i < 5; i++)\n        sum += i;\n    cout << sum << endl;\n    return 0;\n}\n",
+     "answer": "10",
+     "explain": "With i < 5 the loop stops before 5, adding 1+2+3+4 = 10. The fix is i <= 5."
+    },
+    {
+     "id": "u8-q023",
+     "lesson": "u8-l4",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "What happens when this code runs?",
+     "code": "int i = 0;\nwhile (i < 3);\n{\n    cout << i << \" \";\n    i++;\n}",
+     "choices": [
+      "The loop never ends and nothing is printed, because the semicolon is the loop body",
+      "It prints 0 1 2",
+      "It prints 0 1 2 3",
+      "It prints nothing and ends normally"
+     ],
+     "answer": 0,
+     "explain": "while (i < 3); is a loop with an empty body; i never changes, so the condition stays true forever. The braced block after it is not part of the loop."
+    },
+    {
+     "id": "u8-q024",
+     "lesson": "u8-l5",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A dummy function that stands in for a real one and usually just displays a message that it was called is a ___.",
+     "answer": "stub",
+     "accept": [
+      "stub",
+      "a stub"
+     ],
+     "explain": "Stubs let you test the code that calls a function before the function is written."
+    },
+    {
+     "id": "u8-q025",
+     "lesson": "u8-l5",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A small program that tests a function by calling it with test data and displaying the result is a ___.",
+     "answer": "driver",
+     "accept": [
+      "driver",
+      "a driver",
+      "test driver",
+      "driver program",
+      "driver function"
+     ],
+     "explain": "A driver lets you try the function out by itself, apart from everything else the program does."
+    },
+    {
+     "id": "u8-q026",
+     "lesson": "u8-l5",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "A stub usually displays a message showing that it was called, rather than doing the real work.",
+     "answer": true,
+     "explain": "A stub only needs to show that it was reached and with what arguments, plus return a test value if the real function returns one."
+    },
+    {
+     "id": "u8-q027",
+     "lesson": "u8-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "You wrote main() with a menu but have not written the calcFee function yet. What should you use to test the menu logic?",
+     "choices": [
+      "A driver for calcFee",
+      "A stub for calcFee",
+      "A second compiler",
+      "A larger set of boundary data for the menu only"
+     ],
+     "answer": 1,
+     "explain": "A stub replaces the missing function so main can run and you can see it is called with the right arguments. A driver would test calcFee, which does not exist yet."
+    },
+    {
+     "id": "u8-q028",
+     "lesson": "u8-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "This program uses a stub for getTax. What does it print?",
+     "code": "double getTax(double amount)\n{\n    cout << \"getTax called with \" << amount << endl;\n    return 10.0;\n}\n\nint main()\n{\n    double price = 200;\n    double total = price + getTax(price);\n    cout << \"Total: \" << total << endl;\n    return 0;\n}",
+     "program": "#include <iostream>\nusing namespace std;\n\ndouble getTax(double amount)\n{\n    cout << \"getTax called with \" << amount << endl;\n    return 10.0;\n}\n\nint main()\n{\n    double price = 200;\n    double total = price + getTax(price);\n    cout << \"Total: \" << total << endl;\n    return 0;\n}\n",
+     "answer": "getTax called with 200\nTotal: 210",
+     "explain": "The stub displays its message and returns the fixed test value 10, so the total is 200 + 10."
+    },
+    {
+     "id": "u8-q029",
+     "lesson": "u8-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "This main() is a driver for the function square. What does it print?",
+     "code": "int square(int n)\n{\n    return n * n;\n}\n\nint main()\n{\n    int tests[3] = {3, -2, 0};\n    for (int i = 0; i < 3; i++)\n        cout << tests[i] << \" -> \" << square(tests[i]) << endl;\n    return 0;\n}",
+     "program": "#include <iostream>\nusing namespace std;\n\nint square(int n)\n{\n    return n * n;\n}\n\nint main()\n{\n    int tests[3] = {3, -2, 0};\n    for (int i = 0; i < 3; i++)\n        cout << tests[i] << \" -> \" << square(tests[i]) << endl;\n    return 0;\n}\n",
+     "answer": "3 -> 9\n-2 -> 4\n0 -> 0",
+     "explain": "A driver just calls the function with chosen test values and shows the results."
+    },
+    {
+     "id": "u8-q030",
+     "lesson": "u8-l5",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "A stub for a function that returns an int should normally:",
+     "choices": [
+      "Return nothing, so the caller notices the failure",
+      "Contain the full finished algorithm",
+      "Display a message and return a fixed test value",
+      "Call main() to test itself"
+     ],
+     "answer": 2,
+     "explain": "The caller needs some value to continue; a fixed test value lets you check how the caller uses the result."
+    },
+    {
+     "id": "u8-q031",
+     "lesson": "u8-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A program contains the prototype `double computeTotal(double);` and calls computeTotal, but the function body was never written. Compiling the .cpp file succeeds, yet building the executable fails with \"undefined reference to computeTotal\". Which step reported the error?",
+     "choices": [
+      "The preprocessor",
+      "The linker",
+      "The running program",
+      "The compiler's syntax check"
+     ],
+     "answer": 1,
+     "explain": "The prototype satisfies the compiler, so an object file is made. When the linker tries to connect the call to the function's code, it finds none and stops, so no executable is produced."
+    },
+    {
+     "id": "u8-q032",
+     "lesson": "u8-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "The compiler lists 14 errors. The first one is on line 9, where a statement is missing its semicolon. What is the best next step?",
+     "choices": [
+      "Fix the missing semicolon, then recompile and see which errors remain",
+      "Fix all 14 errors, starting with the last one listed",
+      "Run the program anyway, since only one line is really wrong",
+      "Delete line 9 and every other line the messages mention"
+     ],
+     "answer": 0,
+     "explain": "One missing semicolon or brace confuses the compiler about the lines that follow and produces a cascade of messages. Fixing the first error often makes many of the others disappear."
+    },
+    {
+     "id": "u8-q033",
+     "lesson": "u8-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "A student types `Cout << \"Total\";` with a capital C. What happens?",
+     "choices": [
+      "It runs normally, because C++ ignores capitalization",
+      "It compiles, but prints nothing at run time",
+      "It compiles and runs, but the output is wrong (a logic error)",
+      "The compiler reports an error, because C++ is case-sensitive and Cout is not defined"
+     ],
+     "answer": 3,
+     "explain": "C++ treats Cout and cout as different names. Cout was never declared, so this is a compile-time (syntax) error and no executable is made."
+    },
+    {
+     "id": "u8-q034",
+     "lesson": "u8-l1",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "A syntax error is reported by the compiler. A mistake that shows itself only once the finished program is executing is called a runtime error.",
+     "answer": true,
+     "explain": "It shows up only when the program is executed, unlike a syntax error, which the compiler finds. Gaddis notes runtime errors are usually logic errors such as a math mistake; a crash such as integer division by zero also appears only at run time."
+    },
+    {
+     "id": "u8-q035",
+     "lesson": "u8-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "The code should print \"out of range\" for any score below 0 or above 100. What does it print when score is 150? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int score = 150;\nif (score < 0 && score > 100)\n    cout << \"out of range\" << endl;\nelse\n    cout << \"ok\" << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int score = 150;\n    if (score < 0 && score > 100)\n        cout << \"out of range\" << endl;\n    else\n        cout << \"ok\" << endl;\n    return 0;\n}\n",
+     "answer": "ok",
+     "explain": "No number is both below 0 and above 100, so the && condition is always false and the else runs. The test needs ||: score < 0 || score > 100."
+    },
+    {
+     "id": "u8-q036",
+     "lesson": "u8-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "After `double total = 0.1 + 0.2;` a program tests `if (total == 0.3)`. Why is this test a bug risk?",
+     "choices": [
+      "== cannot be used with double values, so it is a compile error",
+      "0.1 + 0.2 is computed as an integer, giving 0",
+      "Doubles store most decimal fractions approximately, so the sum may differ from 0.3 in its last bits and the test can be false",
+      "An if statement needs braces when it compares doubles"
+     ],
+     "answer": 2,
+     "explain": "Values like 0.1 have no exact binary form, so tiny rounding differences appear. Compare doubles by checking that the difference is within a small tolerance, such as fabs(total - 0.3) < 0.0001."
+    },
+    {
+     "id": "u8-q037",
+     "lesson": "u8-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is wrong with this loop?",
+     "code": "int i = 1;\nwhile (i <= 5)\n{\n    cout << i << \" \";\n}",
+     "choices": [
+      "It prints 1 2 3 4 5 and stops",
+      "i is never changed inside the loop, so the condition stays true and it prints 1 forever",
+      "It never runs, because i starts at 1",
+      "It runs 4 times, because of <="
+     ],
+     "answer": 1,
+     "explain": "A loop must change something its condition tests. Adding i++; inside the braces makes it print 1 to 5 and stop."
+    },
+    {
+     "id": "u8-q038",
+     "lesson": "u8-l5",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "In a debugger, what is a breakpoint?",
+     "choices": [
+      "A line marked so the program pauses there, letting you examine variables before continuing",
+      "A line where the compiler found a syntax error",
+      "The point where the program crashes",
+      "A comment that tells the compiler to skip a line"
+     ],
+     "answer": 0,
+     "explain": "When execution reaches a breakpoint it stops. You can then look at (watch) variables and step through the following statements one at a time."
+    },
+    {
+     "id": "u8-q039",
+     "lesson": "u8-l5",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "A debugger can show you the variables' values only after the program has finished running.",
+     "answer": false,
+     "explain": "A debugger pauses the running program, at a breakpoint or one statement at a time (stepping), and shows current values while it is paused. It is an automated hand trace."
+    },
+    {
+     "id": "u8-q040",
+     "lesson": "u8-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A loop that totals 10 input values gives the wrong total. Which temporary debugging statement gives the most useful information?",
+     "choices": [
+      "A cout inside the loop that prints the pass number, the value just read and the running total on each pass",
+      "A cout before the loop that prints \"starting\"",
+      "A cout after the loop that prints the final total",
+      "A cout at the end of main that prints \"done\""
+     ],
+     "answer": 0,
+     "explain": "Printing the values on every pass shows the exact pass where the total first goes wrong. Remove or comment out such diagnostic lines once the bug is fixed."
+    },
+    {
+     "id": "u8-q041",
+     "lesson": "u8-l2",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "Hand trace this code. The user types 4 9 2 7 0. What does it print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int num, best = 0, count = 0;\ncin >> num;\nwhile (num != 0)\n{\n    if (num > best)\n        best = num;\n    count++;\n    cin >> num;\n}\ncout << count << \" \" << best << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int num, best = 0, count = 0;\n    cin >> num;\n    while (num != 0)\n    {\n        if (num > best)\n            best = num;\n        count++;\n        cin >> num;\n    }\n    cout << count << \" \" << best << endl;\n    return 0;\n}\n",
+     "stdin": "4 9 2 7 0\n",
+     "answer": "4 9",
+     "explain": "The loop handles 4, 9, 2 and 7, then reads 0 and stops, so count is 4. best changes to 4 and then to 9; 2 and 7 are not larger."
+    },
+    {
+     "id": "u8-q042",
+     "lesson": "u8-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A program prints child for ages below 13, teen for 13 to 19, and adult for 20 and over. Which set of test ages checks the boundaries between the branches?",
+     "choices": [
+      "5, 15, 40",
+      "13, 20",
+      "0, 100",
+      "12, 13, 19, 20"
+     ],
+     "answer": 3,
+     "explain": "Boundary tests sit on both sides of each cut-off: 12 and 13, then 19 and 20. 5, 15 and 40 run each branch once but would miss a < written where <= was needed."
+    },
+    {
+     "id": "u8-q043",
+     "lesson": "u8-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A loop reads n numbers and totals them. Which values of n best test the loop?",
+     "choices": [
+      "Only a typical value such as 8",
+      "Several typical values such as 7, 8 and 9",
+      "0, 1 and a typical larger value such as 8",
+      "Only the largest value the program allows"
+     ],
+     "answer": 2,
+     "explain": "Test a loop running zero times, once, and many times. The 0 and 1 cases catch a wrong starting value or an off-by-one test that typical values hide."
+    },
+    {
+     "id": "u8-q044",
+     "lesson": "u8-l3",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "It is fine to run the program first and then use its output as the expected result for each test case.",
+     "answer": false,
+     "explain": "Expected output must be worked out by hand before running. Otherwise a wrong answer simply becomes the expected one and the test can never fail."
+    },
+    {
+     "id": "u8-q045",
+     "lesson": "u8-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "int x = 5;\nif (x = 0)\n    cout << \"zero\";\nelse\n    cout << \"nonzero\";\ncout << \" \" << x << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int x = 5;\n    if (x = 0)\n        cout << \"zero\";\n    else\n        cout << \"nonzero\";\n    cout << \" \" << x << endl;\n    return 0;\n}\n",
+     "answer": "nonzero 0",
+     "explain": "x = 0 stores 0 in x, and the condition takes that value, 0, which is false, so the else runs. x is now 0. g++ -Wall warns about an assignment used as a condition, a hint that == was meant."
+    },
+    {
+     "id": "u8-q046",
+     "lesson": "u8-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? Assume the code is inside main(), with iostream included and using namespace std; in effect.",
+     "code": "for (int i = 0; i < 3; i++)\n    cout << i;\n    cout << \"x\";\ncout << endl;",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    for (int i = 0; i < 3; i++)\n        cout << i;\n        cout << \"x\";\n    cout << endl;\n    return 0;\n}\n",
+     "answer": "012x",
+     "explain": "Without braces only the first cout is the loop body. The indented cout << \"x\" is a separate statement that runs once, after the loop ends."
+    },
+    {
+     "id": "u8-q047",
+     "lesson": "u8-l4",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A loop that runs one time too many or one time too few has an ___ error.",
+     "answer": "off-by-one",
+     "accept": [
+      "off-by-one",
+      "off by one",
+      "off-by-one error",
+      "off by one error",
+      "obo",
+      "fencepost",
+      "fence-post",
+      "fence post"
+     ],
+     "explain": "It usually comes from the wrong comparison (< versus <=) or the wrong starting value. Boundary tests catch it."
+    }
+   ],
+   "programs": [
+    {
+     "id": "u8-p1",
+     "title": "Fix the grade program",
+     "task": "The program below should read three integer test scores, display their average, and display a letter grade (90 or more is A, 80 or more is B, otherwise C). It has several bugs. Describe each bug in a comment, then write the corrected program.\n\n#include <iostream>\nusing namespace std;\nint main()\n{\n    int s1, s2, s3;\n    double avg;\n    cin >> s1 >> s2 >> s3;\n    avg = s1 + s2 + s3 / 3;\n    cout << \"Average: \" << avg << endl;\n    if (avg = 90)\n        cout << \"Grade: A\" << endl;\n    else if (avg >= 80);\n        cout << \"Grade: B\" << endl;\n    else\n        cout << \"Grade: C\" << endl;\n    return 0;\n}",
+     "stdin": "80 85 90",
+     "sampleOutput": "Average: 85\nGrade: B",
+     "solution": "#include <iostream>\nusing namespace std;\n\nint main()\n{\n    int s1, s2, s3;\n    double avg;\n    cin >> s1 >> s2 >> s3;\n\n    // Bug 1: s3 / 3 was done before the additions. Parentheses fix the precedence,\n    //        and 3.0 keeps the division from truncating.\n    avg = (s1 + s2 + s3) / 3.0;\n    cout << \"Average: \" << avg << endl;\n\n    // Bug 2: \"avg = 90\" assigned instead of testing. It should be avg >= 90.\n    if (avg >= 90)\n        cout << \"Grade: A\" << endl;\n    // Bug 3: a stray semicolon after the else-if ended it with an empty statement,\n    //        which also left the following else without an if (compile error).\n    else if (avg >= 80)\n        cout << \"Grade: B\" << endl;\n    else\n        cout << \"Grade: C\" << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u8-p2",
+     "title": "Fix the sum and average program",
+     "task": "The program below should read n and a mode. It adds the whole numbers 1 through n. Mode 1 displays the sum. Mode 2 displays the average of those numbers as a decimal (for n = 4 that is 2.5). Any other mode displays \"Unknown mode\". It has several bugs. Describe each in a comment, then write the corrected program.\n\n#include <iostream>\nusing namespace std;\nint main()\n{\n    int n, mode, sum;\n    cin >> n >> mode;\n    for (int i = 1; i < n; i++)\n        sum += i;\n    switch (mode)\n    {\n        case 1: cout << \"Sum: \" << sum << endl;\n        case 2: cout << \"Average: \" << sum / n << endl;\n                break;\n        default: cout << \"Unknown mode\" << endl;\n    }\n    return 0;\n}",
+     "stdin": "4 2",
+     "sampleOutput": "Average: 2.5",
+     "solution": "#include <iostream>\nusing namespace std;\n\nint main()\n{\n    int n, mode;\n    int sum = 0;            // Bug 1: sum was never initialized\n    cin >> n >> mode;\n\n    for (int i = 1; i <= n; i++)   // Bug 2: i < n stopped one number short\n        sum += i;\n\n    switch (mode)\n    {\n        case 1:\n            cout << \"Sum: \" << sum << endl;\n            break;                 // Bug 3: no break, so mode 1 fell into case 2\n        case 2:\n            // Bug 4: sum / n was integer division (2, not 2.5)\n            cout << \"Average: \" << static_cast<double>(sum) / n << endl;\n            break;\n        default:\n            cout << \"Unknown mode\" << endl;\n    }\n    return 0;\n}\n"
+    }
+   ]
+  },
+  {
+   "id": "u9",
+   "title": "Introduction to objects",
+   "summary": "Procedural versus object-oriented programming, classes and objects, private data and public member functions, accessors and mutators, constructors, and a first look at destructors, inline functions, separate files, arrays of objects and UML.",
+   "lessons": [
+    {
+     "id": "u9-l1",
+     "title": "Procedural versus object-oriented programming",
+     "book": "Sections 1.7 and 13.1, pages 22 to 23 and 751 to 757",
+     "html": "<p>In <strong>procedural programming</strong> the program is built around <strong>procedures</strong> (functions in C++). The data sits in separate variables and structures that are passed to the functions. The data and the code that works on it are separate things. When the data format changes, every function that touches it may have to change, which breeds bugs in large programs.</p>\n<p>In <strong>object-oriented programming (OOP)</strong> the program is built around <strong>objects</strong>. An object is a unit of software that packages some data together with the procedures that act on that data.</p>\n<ul>\n<li>The data in an object are its <strong>attributes</strong> (C++ calls them <strong>member variables</strong>).</li>\n<li>The procedures it performs are its <strong>member functions</strong>. Other languages call them <strong>methods</strong>.</li></ul>\n<h4>Encapsulation and data hiding</h4>\n<p><strong>Encapsulation</strong> means bundling the data with the code that works on it inside one object. <strong>Data hiding</strong> means an object can hide its data from code outside the object. Only the object's own member functions access the data directly; outside code uses the member functions as a simple <strong>interface</strong>. A car works like this: you use the pedals and wheel, not the linkages under the hood. Hidden data is protected from accidental corruption, and the inside of an object can be redesigned without breaking the code that uses it.</p>\n<h4>Class versus object</h4>\n<p>A <strong>class</strong> is code that describes the attributes and member functions a type of object has. It is a blueprint. It uses no memory for data by itself. An <strong>object</strong> is built from the class and holds real values. Each such object is an <strong>instance</strong> of its class. You can make many instances of one class, and each has its own copy of the attributes. Many houses can be built from one blueprint.</p>\n<h4>Reusability</h4>\n<p>An object is not a program by itself; it is used by programs. Because an object hides its inner workings behind an interface, the same class can be reused in many programs. Your code already uses objects written by others: <code>cin</code> and <code>cout</code>.</p>\n<p>C++ supports both styles. In this unit you only need classes with data and member functions. No inheritance, pointers or operator overloading.</p>"
+    },
+    {
+     "id": "u9-l2",
+     "title": "Declaring a class",
+     "book": "Section 13.2, pages 757 to 763",
+     "html": "<p>A class declaration describes the members of the new type. Here is a class for a bank account:</p>\n<pre><code>class Account\n{\nprivate:\n    double balance;\n    double rate;\npublic:\n    void setBalance(double);\n    void setRate(double);\n    double getBalance() const;\n    double getRate() const;\n    double getInterest() const;\n};     // semicolon required</code></pre>\n<h4>Rules</h4>\n<ul>\n<li>The key word <code>class</code>, the class name, a body in braces, and a <strong>semicolon after the closing brace</strong>. Forgetting that semicolon is a classic error.</li>\n<li>Class names conventionally start with an uppercase letter.</li>\n<li>An <strong>access specifier</strong> controls who may use the members that follow it. <code>private:</code> members can be used only by member functions of the class. <code>public:</code> members can be used by any code. With no specifier written, a <code>class</code> treats its members as <strong>private</strong>. It is good style to write the specifier anyway.</li>\n<li>A <code>struct</code> is almost the same as a class; the difference is that struct members are <strong>public</strong> by default.</li>\n<li>Private and public sections may come in any order and may repeat; grouping them is style, not a rule.</li>\n<li>Since C++11 a member variable may get a starting value in its declaration, <code>double balance = 0.0;</code> (<strong>in-place initialization</strong>). Otherwise set it with a constructor or a mutator.</li></ul>\n<h4>Defining member functions</h4>\n<p>The class declares a function's prototype. The body can be written outside the class with the <strong>scope resolution operator</strong> <code>::</code> after the class name. Without <code>Account::</code> the compiler would think it is an ordinary function.</p>\n<pre><code>void Account::setBalance(double b)\n{\n    balance = b;\n}\ndouble Account::getInterest() const\n{\n    return balance * rate;\n}</code></pre>\n<p>Inside a member function you use the member names directly: no dot is needed. A function written entirely inside the class body is also legal (an inline member function).</p>\n<h4>const member functions</h4>\n<p>When <code>const</code> appears after the parameter list, the function promises not to change the object's member variables. The compiler rejects an attempt to modify one. <code>const</code> must appear in both the declaration and the definition. Use it for functions that only look at the data.</p>\n<pre><code>double Account::getBalance() const   // legal: only reads\n{ return balance; }\nvoid Counter::bump() const           // ERROR if it changes a member\n{ n++; }</code></pre>"
+    },
+    {
+     "id": "u9-l3",
+     "title": "Creating and using objects",
+     "book": "Section 13.3, pages 763 to 777",
+     "html": "<p>A class declaration creates no objects. You define an object (an <strong>instance</strong>) the same way you define a variable, with the class name as the type. Defining an object is called <strong>instantiation</strong>.</p>\n<pre><code>Account acct;            // one instance\nAccount a, b;            // two instances</code></pre>\n<p>Each instance has its own copy of the member variables. Changing <code>a</code> does not change <code>b</code>.</p>\n<h4>The dot operator</h4>\n<p>To reach a public member of an object from outside the class, write the object name, a dot, and the member: the <strong>dot operator</strong>.</p>\n<pre><code>acct.setBalance(1000);\nacct.setRate(0.05);\ncout &lt;&lt; acct.getInterest();     // 50\nacct.balance = 4;               // ERROR: balance is private</code></pre>\n<p>A call such as <code>a.getInterest()</code> runs the function on <em>a's</em> data; <code>b.getInterest()</code> runs it on <em>b's</em> data. The object before the dot decides whose member variables are used; inside the member function the members are written by bare name, with no dot. The data an object holds at a given moment is its <strong>state</strong>. You already use objects this way: <code>name.length()</code> calls a member function of a <code>string</code> object.</p>\n<h4>Accessors and mutators</h4>\n<p>An <strong>accessor</strong> (getter) retrieves a value from an object without changing it; accessors are marked <code>const</code>. A <strong>mutator</strong> (setter) stores a value in a member variable or otherwise changes it. In the class above, <code>getBalance</code> and <code>getInterest</code> are accessors; <code>setBalance</code> and <code>setRate</code> are mutators.</p>\n<h4>Assignment and copies</h4>\n<p>Assigning one object of a class to another copies the member variables one by one. Afterward they are independent copies.</p>\n<pre><code>Account p, q;\np.setBalance(300);\nq = p;              // q now has balance 300\np.setBalance(900);  // q still 300</code></pre>\n<h4>Traps</h4>\n<ul><li>Using a class before it is declared, or leaving out the semicolon after the class.</li>\n<li>Member variables are not automatically set to 0. In an object defined inside a function they hold garbage until something stores a value (a constructor, covered below, solves this).</li>\n<li>Do not store a value that can be calculated from other members (such as the interest owed): it goes <strong>stale</strong> when those members change. Calculate it in a member function instead.</li>\n<li>Calling a non-const function through a const object is an error.</li></ul>"
+    },
+    {
+     "id": "u9-l4",
+     "title": "Why have private members?",
+     "book": "Section 13.4, pages 777 and 778",
+     "html": "<p>If member variables were public, any code could assign them directly, including nonsense such as a negative age or a width of zero that later causes a divide-by-zero. The author of the class would have no control over what the data holds.</p>\n<h4>Making data private</h4>\n<p>Make the member variables <strong>private</strong> and provide <strong>public member functions</strong> as the <strong>interface</strong>. All outside access then goes through functions the class author wrote. This gives you:</p>\n<ul>\n<li><strong>Protection</strong>: a mutator can check its argument and refuse bad values.</li>\n<li><strong>Freedom to change the inside</strong>: if the class stored an angle in degrees and now stores it in radians, only the member functions change. Code that calls <code>setAngle(90)</code> keeps working.</li>\n<li><strong>Consistency</strong>: related members stay in step. If an object stores both a radius and a diameter, one mutator can update both.</li></ul>\n<pre><code>void Person::setAge(int a)\n{\n    if (a &gt;= 0)\n        age = a;      // ignore a bad value\n}</code></pre>\n<p>With public data this check could not be enforced. The usual design: data private, interface public. Helper functions that only the class itself needs can also be private.</p>\n<h4>Exam phrasing</h4>\n<p>\"Why should member variables be private?\" Best answer: so that they can be accessed or changed only through the class's member functions, which can validate the data and hide how it is stored.</p>"
+    },
+    {
+     "id": "u9-l5",
+     "title": "Constructors and the default constructor",
+     "book": "Sections 13.7 and 13.8, pages 786 to 798",
+     "html": "<p>A <strong>constructor</strong> is a special member function that <strong>runs on its own at the moment an object comes into existence</strong>. Its job is to give the object's member variables their starting values.</p>\n<h4>Rules</h4>\n<ul><li>The constructor's name is <strong>identical to the class name</strong>.</li>\n<li>It has <strong>no return type</strong>, not even <code>void</code>.</li>\n<li>It is normally public.</li>\n<li>It runs once for each object created, before anything else is done with the object.</li></ul>\n<pre><code>class Box\n{\nprivate:\n    double width, height;\npublic:\n    Box();                 // default constructor\n    Box(double, double);   // takes arguments\n    double getArea() const;\n};\nBox::Box()                 { width = 1; height = 1; }\nBox::Box(double w, double h) { width = w; height = h; }</code></pre>\n<h4>Passing arguments</h4>\n<p>Put the arguments in parentheses after the object name:</p>\n<pre><code>Box a;            // runs Box()        : area 1\nBox b(3, 4);      // runs Box(double, double) : area 12</code></pre>\n<h4>The default constructor</h4>\n<p>A <strong>default constructor</strong> is any constructor you can call without supplying arguments: either it has no parameters, or all its parameters have default values. It runs for <code>Box a;</code>.</p>\n<ul><li>If you write <strong>no</strong> constructors at all, the compiler supplies a default constructor that does nothing useful to the member variables.</li>\n<li>If you write <strong>any</strong> constructor, the compiler no longer supplies one. A class with only <code>Box(double, double)</code> cannot be defined as <code>Box a;</code>: a compile error.</li>\n<li>Default arguments can combine several versions: <code>Box(double w = 1, double h = 1);</code> works for <code>Box a;</code>, <code>Box a(5);</code> (height 1) and <code>Box a(5, 6);</code>.</li>\n<li>A class cannot contain two default constructors. If it has both <code>Box()</code> and <code>Box(double w = 1)</code>, then <code>Box a;</code> is ambiguous and will not compile.</li>\n<li>Trap: <code>Box a();</code> does not create an object. It declares a function. Leave off the parentheses to use the default constructor.</li></ul>\n<h4>Member initialization list</h4>\n<p>A constructor can initialize members after a colon, before its body runs: <code>Box::Box() : width(1), height(1) { }</code>. The effect here is the same as assigning in the body.</p>"
+    },
+    {
+     "id": "u9-l6",
+     "title": "More class features (first look)",
+     "book": "Sections 13.5, 13.6, 13.9, 13.11, 13.12 and 13.15, pages 777 to 786, 799 to 802, 807 to 812 and 824 to 826",
+     "html": "<p>These topics come up in the same chapter. Know the basic rule for each.</p>\n<h4>Inline member functions</h4>\n<p>A member function whose body is written inside the class declaration is an <strong>inline</strong> member function. It needs no <code>ClassName::</code>. Short accessors are often written this way:</p>\n<pre><code>double getBalance() const { return balance; }</code></pre>\n<h4>Separate files</h4>\n<p>By convention the class declaration goes in a header file named after the class, <code>Account.h</code> (the <strong>specification file</strong>), and the member function definitions go in <code>Account.cpp</code> (the <strong>implementation file</strong>). A program that uses the class writes <code>#include \"Account.h\"</code>, and Account.cpp is compiled and linked with it.</p>\n<h4>Destructors</h4>\n<p>A <strong>destructor</strong> runs automatically when an object is destroyed (for a local object, when its function ends). Its name is a tilde plus the class name, <code>~Account()</code>. Like a constructor it has no return type; unlike a constructor it takes no arguments, so a class has only one destructor.</p>\n<h4>Private member functions</h4>\n<p>A member function declared under <code>private:</code> can be called only by other member functions of the same class. Use it for an internal helper that outside code should never call.</p>\n<h4>Arrays of objects</h4>\n<p><code>Account accts[3];</code> creates three objects and runs the default constructor for <em>each</em> one. If the class has no default constructor, every element needs an initializer. Call a member function on one element with <code>accts[1].getInterest()</code>.</p>\n<h4>UML class diagrams</h4>\n<p>A UML class diagram is a box in three parts: the class name, the member variables, the member functions. A <code>-</code> before a member means private and <code>+</code> means public; types are written after a colon, as in <code>- balance : double</code> and <code>+ getInterest() : double</code>.</p>\n<h4>Input and output in a class</h4>\n<p>Member functions usually return values rather than using <code>cin</code> or <code>cout</code>, so that each program using the class can decide how to get input and show results. That keeps the class reusable.</p>"
+    }
+   ],
+   "questions": [
+    {
+     "id": "u9-q001",
+     "lesson": "u9-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which statement describes procedural programming?",
+     "choices": [
+      "The program is built around objects that contain their own data and functions",
+      "The program has no functions, only classes",
+      "The program is built around functions, and the data is kept in separate variables passed to them",
+      "The data is always hidden from every function"
+     ],
+     "answer": 2,
+     "explain": "Procedural programming centers on procedures; data and code are separate. Bundling them is the object-oriented approach."
+    },
+    {
+     "id": "u9-q002",
+     "lesson": "u9-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Combining data and the functions that operate on it into a single object is called ___.",
+     "answer": "encapsulation",
+     "accept": [
+      "encapsulation"
+     ],
+     "explain": "Encapsulation is bundling; data hiding is restricting outside access to the bundled data."
+    },
+    {
+     "id": "u9-q003",
+     "lesson": "u9-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is data hiding?",
+     "choices": [
+      "Encrypting the object's data when it is stored on disk",
+      "Deleting variables that are no longer used",
+      "Giving member variables short, unclear names",
+      "Keeping an object's data out of direct reach of code outside the object, so only member functions can use it"
+     ],
+     "answer": 3,
+     "explain": "Data hiding means outside code goes through member functions. It protects data from accidental corruption."
+    },
+    {
+     "id": "u9-q004",
+     "lesson": "u9-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which statement about classes and objects is correct?",
+     "choices": [
+      "A class is a blueprint; an object is an instance made from it",
+      "A class is an instance of an object",
+      "An object is a blueprint; a class is made from it",
+      "A class holds the data values; an object only holds functions"
+     ],
+     "answer": 0,
+     "explain": "One class can produce many objects, each with its own values. The class itself is only the description."
+    },
+    {
+     "id": "u9-q005",
+     "lesson": "u9-l1",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "In OOP terms, the data in an object are its attributes and the procedures it performs are its member functions.",
+     "answer": true,
+     "explain": "In C++ the attributes are member variables. Other languages call member functions methods."
+    },
+    {
+     "id": "u9-q006",
+     "lesson": "u9-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A class declaration contains the members below with no access specifier written. What is their access?",
+     "code": "class Gadget\n{\n    int level;\n    void reset();\n};",
+     "choices": [
+      "public",
+      "private",
+      "protected, which is visible to all code in the file",
+      "None; it is a compile error"
+     ],
+     "answer": 1,
+     "explain": "When a class declaration names no access specifier, its members are private. A struct is the opposite and defaults to public."
+    },
+    {
+     "id": "u9-q007",
+     "lesson": "u9-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "The access specifier that lets code outside the class use a member is ___.",
+     "answer": "public",
+     "accept": [
+      "public",
+      "public:"
+     ],
+     "explain": "public members form the interface. private members are reachable only from the class's own member functions."
+    },
+    {
+     "id": "u9-q008",
+     "lesson": "u9-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What does const after the parameter list of a member function mean?",
+     "code": "double getArea() const;",
+     "choices": [
+      "The function can only be called once",
+      "The function returns a constant value",
+      "The function may not modify the object's member variables",
+      "The member variables become public"
+     ],
+     "answer": 2,
+     "explain": "const member functions only read data. The compiler gives an error if they assign to a member."
+    },
+    {
+     "id": "u9-q009",
+     "lesson": "u9-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "The compiler accepts the class declaration below, which is followed directly by `main`.",
+     "answer": false,
+     "explain": "A class declaration must end with a semicolon after its closing brace. Without it the compiler reports an error, usually pointing at the next line.",
+     "code": "class Pet\n{\npublic:\n    int age;\n}\n\nint main()\n{\n    return 0;\n}"
+    },
+    {
+     "id": "u9-q010",
+     "lesson": "u9-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which is the correct header for defining the const member function getInterest of class Account outside the class?",
+     "choices": [
+      "double getInterest() const",
+      "double Account.getInterest() const",
+      "double Account:getInterest() const",
+      "double Account::getInterest() const"
+     ],
+     "answer": 3,
+     "explain": "Use the class name and the scope resolution operator ::. A dot is for objects, and a single colon is not an operator here."
+    },
+    {
+     "id": "u9-q011",
+     "lesson": "u9-l2",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "When a member function is defined outside its class, the class name is followed by the ___ operator (written ::).",
+     "answer": "scope resolution",
+     "accept": [
+      "scope resolution",
+      "scope resolution operator",
+      "::",
+      "scope-resolution"
+     ],
+     "explain": "The scope resolution operator ties the definition to the class so the compiler knows which class's function it is."
+    },
+    {
+     "id": "u9-q012",
+     "lesson": "u9-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Why does this class fail to compile?",
+     "code": "class Counter\n{\nprivate:\n    int n;\npublic:\n    void bump() const { n++; }\n};",
+     "choices": [
+      "bump is const but modifies the member variable n",
+      "n is private so bump cannot use it",
+      "A class may not have a function named bump",
+      "The class is missing a return type for bump"
+     ],
+     "answer": 0,
+     "explain": "Member functions can always use private members. A const member function, though, may not change them."
+    },
+    {
+     "id": "u9-q013",
+     "lesson": "u9-l3",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "The operator used to access a member of an object, as in box.getArea(), is the ___ operator.",
+     "answer": "dot",
+     "accept": [
+      "dot",
+      "dot operator",
+      "member access operator",
+      "member selection operator",
+      "."
+     ],
+     "explain": "The dot operator joins an object name and one of its public members."
+    },
+    {
+     "id": "u9-q014",
+     "lesson": "u9-l3",
+     "type": "output",
+     "difficulty": 1,
+     "prompt": "What does this program print?",
+     "code": "class Tally\n{\nprivate:\n    int count;\npublic:\n    void setCount(int c) { count = c; }\n    void add(int n) { count += n; }\n    int getCount() const { return count; }\n};\n\nint main()\n{\n    Tally t;\n    t.setCount(5);\n    t.add(3);\n    t.add(4);\n    cout << t.getCount() << endl;\n    return 0;\n}",
+     "program": "#include <iostream>\nusing namespace std;\n\nclass Tally\n{\nprivate:\n    int count;\npublic:\n    void setCount(int c) { count = c; }\n    void add(int n) { count += n; }\n    int getCount() const { return count; }\n};\n\nint main()\n{\n    Tally t;\n    t.setCount(5);\n    t.add(3);\n    t.add(4);\n    cout << t.getCount() << endl;\n    return 0;\n}\n",
+     "answer": "12",
+     "explain": "setCount stores 5, then two add calls make 5 + 3 + 4 = 12."
+    },
+    {
+     "id": "u9-q015",
+     "lesson": "u9-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this program print?",
+     "code": "class Box\n{\nprivate:\n    double width;\n    double height;\npublic:\n    void setWidth(double w) { width = w; }\n    void setHeight(double h) { height = h; }\n    double getArea() const { return width * height; }\n};\n\nint main()\n{\n    Box a, b;\n    a.setWidth(2);\n    a.setHeight(3);\n    b.setWidth(4);\n    b.setHeight(5);\n    cout << a.getArea() << \" \" << b.getArea() << endl;\n    return 0;\n}",
+     "program": "#include <iostream>\nusing namespace std;\n\nclass Box\n{\nprivate:\n    double width;\n    double height;\npublic:\n    void setWidth(double w) { width = w; }\n    void setHeight(double h) { height = h; }\n    double getArea() const { return width * height; }\n};\n\nint main()\n{\n    Box a, b;\n    a.setWidth(2);\n    a.setHeight(3);\n    b.setWidth(4);\n    b.setHeight(5);\n    cout << a.getArea() << \" \" << b.getArea() << endl;\n    return 0;\n}\n",
+     "answer": "6 20",
+     "explain": "Each Box object has its own width and height. a is 2 by 3 and b is 4 by 5."
+    },
+    {
+     "id": "u9-q016",
+     "lesson": "u9-l3",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "A member function that stores a value in a member variable is called a(n) ___.",
+     "choices": [
+      "accessor",
+      "mutator",
+      "constructor",
+      "stub"
+     ],
+     "answer": 1,
+     "explain": "Mutators (setters) change data. Accessors (getters) only return it."
+    },
+    {
+     "id": "u9-q017",
+     "lesson": "u9-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "The class Account has a private member balance and public functions deposit, getBalance and setOwner. Which statement in main causes a compile error?",
+     "code": "Account acct;\nacct.deposit(50);\ncout << acct.getBalance();\nacct.balance = 100;\nacct.setOwner(\"Lee\");",
+     "choices": [
+      "acct.deposit(50);",
+      "cout << acct.getBalance();",
+      "acct.balance = 100;",
+      "acct.setOwner(\"Lee\");"
+     ],
+     "answer": 2,
+     "explain": "balance is private, so code outside the class cannot use it with the dot operator. The public member functions are fine."
+    },
+    {
+     "id": "u9-q018",
+     "lesson": "u9-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this program print?",
+     "code": "class Tally\n{\nprivate:\n    int count;\npublic:\n    void setCount(int c) { count = c; }\n    void add(int n) { count += n; }\n    int getCount() const { return count; }\n};\n\nint main()\n{\n    Tally p, q;\n    p.setCount(5);\n    q = p;\n    p.add(3);\n    cout << p.getCount() << \" \" << q.getCount() << endl;\n    return 0;\n}",
+     "program": "#include <iostream>\nusing namespace std;\n\nclass Tally\n{\nprivate:\n    int count;\npublic:\n    void setCount(int c) { count = c; }\n    void add(int n) { count += n; }\n    int getCount() const { return count; }\n};\n\nint main()\n{\n    Tally p, q;\n    p.setCount(5);\n    q = p;\n    p.add(3);\n    cout << p.getCount() << \" \" << q.getCount() << endl;\n    return 0;\n}\n",
+     "answer": "8 5",
+     "explain": "q = p copies the members. After that p and q are separate objects, so adding 3 to p does not change q."
+    },
+    {
+     "id": "u9-q019",
+     "lesson": "u9-l3",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Two objects of the same class share a single copy of the member variables.",
+     "answer": false,
+     "explain": "Each object has its own copy of every ordinary (non-static) member variable. Only the member function code is shared."
+    },
+    {
+     "id": "u9-q020",
+     "lesson": "u9-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is the main benefit of making member variables private and providing public mutators?",
+     "choices": [
+      "The program runs faster",
+      "The variables use less memory",
+      "No member functions are needed",
+      "Mutators can check values before storing them, and the inside of the class can change without breaking other code"
+     ],
+     "answer": 3,
+     "explain": "Private data forces all changes through functions that can validate, and hides the data layout. It does not affect speed or memory."
+    },
+    {
+     "id": "u9-q021",
+     "lesson": "u9-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this program print?",
+     "code": "class Person\n{\nprivate:\n    int age;\npublic:\n    void setAge(int a)\n    {\n        if (a >= 0)\n            age = a;\n    }\n    int getAge() const { return age; }\n};\n\nint main()\n{\n    Person p;\n    p.setAge(20);\n    p.setAge(-5);\n    cout << p.getAge() << endl;\n    return 0;\n}",
+     "program": "#include <iostream>\nusing namespace std;\n\nclass Person\n{\nprivate:\n    int age;\npublic:\n    void setAge(int a)\n    {\n        if (a >= 0)\n            age = a;\n    }\n    int getAge() const { return age; }\n};\n\nint main()\n{\n    Person p;\n    p.setAge(20);\n    p.setAge(-5);\n    cout << p.getAge() << endl;\n    return 0;\n}\n",
+     "answer": "20",
+     "explain": "setAge ignores a negative argument, so the age stays 20 after the second call. With a public variable this protection would not exist."
+    },
+    {
+     "id": "u9-q022",
+     "lesson": "u9-l4",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "If a class keeps its data private, its internal storage can be redesigned without changing the code that calls its public member functions.",
+     "answer": true,
+     "explain": "The public functions are the interface. As long as they behave the same, callers do not care how the data is stored."
+    },
+    {
+     "id": "u9-q023",
+     "lesson": "u9-l4",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "The public member functions through which outside code works with an object are called its ___.",
+     "answer": "interface",
+     "accept": [
+      "interface",
+      "public interface"
+     ],
+     "explain": "A simple interface hides the complicated internals, like the pedals and steering wheel of a car."
+    },
+    {
+     "id": "u9-q024",
+     "lesson": "u9-l5",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A member function that is called automatically when an object is created is a ___.",
+     "answer": "constructor",
+     "accept": [
+      "constructor",
+      "a constructor"
+     ],
+     "explain": "The constructor initializes the object. It runs once per object, when the object is defined."
+    },
+    {
+     "id": "u9-q025",
+     "lesson": "u9-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which is a valid declaration of a constructor taking one double for the class Account?",
+     "choices": [
+      "Account(double b);",
+      "void Account(double b);",
+      "account(double b);",
+      "Account(double b) const;"
+     ],
+     "answer": 0,
+     "explain": "A constructor has the class's exact name and no return type, not even void. Constructors are not const."
+    },
+    {
+     "id": "u9-q026",
+     "lesson": "u9-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this program print?",
+     "code": "class Box\n{\nprivate:\n    double width, height;\npublic:\n    Box() { width = 1; height = 1; }\n    Box(double w, double h) { width = w; height = h; }\n    double getArea() const { return width * height; }\n};\n\nint main()\n{\n    Box a;\n    Box b(3, 4);\n    cout << a.getArea() << \" \" << b.getArea() << endl;\n    return 0;\n}",
+     "program": "#include <iostream>\nusing namespace std;\n\nclass Box\n{\nprivate:\n    double width, height;\npublic:\n    Box() { width = 1; height = 1; }\n    Box(double w, double h) { width = w; height = h; }\n    double getArea() const { return width * height; }\n};\n\nint main()\n{\n    Box a;\n    Box b(3, 4);\n    cout << a.getArea() << \" \" << b.getArea() << endl;\n    return 0;\n}\n",
+     "answer": "1 12",
+     "explain": "Box a uses the default constructor (1 by 1, area 1). Box b(3, 4) uses the two-argument constructor."
+    },
+    {
+     "id": "u9-q027",
+     "lesson": "u9-l5",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "What is a default constructor?",
+     "choices": [
+      "The constructor that runs when the program ends",
+      "A constructor that can be called with no arguments",
+      "A constructor that has a void return type",
+      "The only constructor a class is allowed to have"
+     ],
+     "answer": 1,
+     "explain": "A default constructor has no parameters (or all parameters have defaults) and runs for a definition like Box a;."
+    },
+    {
+     "id": "u9-q028",
+     "lesson": "u9-l5",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Why does this code fail to compile?",
+     "code": "class Rect\n{\nprivate:\n    double w, h;\npublic:\n    Rect(double a, double b) { w = a; h = b; }\n};\n\nint main()\n{\n    Rect r;\n}",
+     "choices": [
+      "Constructors cannot have parameters",
+      "Rect r; needs parentheses: Rect r();",
+      "The class has a constructor with parameters, so the compiler supplies no default constructor for Rect r;",
+      "The constructor must return a value"
+     ],
+     "answer": 2,
+     "explain": "Writing any constructor cancels the automatic default one. Add Rect() or give the parameters default values. Rect r(); would declare a function."
+    },
+    {
+     "id": "u9-q029",
+     "lesson": "u9-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this program print?",
+     "code": "class Pt\n{\nprivate:\n    int x, y;\npublic:\n    Pt(int a = 0, int b = 0) { x = a; y = b; }\n    void show() const { cout << x << \",\" << y << endl; }\n};\n\nint main()\n{\n    Pt a;\n    Pt b(5);\n    Pt c(5, 6);\n    a.show();\n    b.show();\n    c.show();\n    return 0;\n}",
+     "program": "#include <iostream>\nusing namespace std;\n\nclass Pt\n{\nprivate:\n    int x, y;\npublic:\n    Pt(int a = 0, int b = 0) { x = a; y = b; }\n    void show() const { cout << x << \",\" << y << endl; }\n};\n\nint main()\n{\n    Pt a;\n    Pt b(5);\n    Pt c(5, 6);\n    a.show();\n    b.show();\n    c.show();\n    return 0;\n}\n",
+     "answer": "0,0\n5,0\n5,6",
+     "explain": "The default arguments fill in missing values: Pt a uses 0 and 0, Pt b(5) uses y = 0, and Pt c(5, 6) uses both arguments."
+    },
+    {
+     "id": "u9-q030",
+     "lesson": "u9-l5",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "A constructor is declared with the return type void.",
+     "answer": false,
+     "explain": "A constructor has no return type at all, not even void."
+    },
+    {
+     "id": "u9-q031",
+     "lesson": "u9-l3",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Defining an object of a class, as in `Account acct;`, is called the ___ of the class.",
+     "answer": "instantiation",
+     "accept": [
+      "instantiation",
+      "instantiating",
+      "instantiation of the class",
+      "instantiation of a class"
+     ],
+     "explain": "The object created is an instance of the class. A class declaration alone instantiates nothing."
+    },
+    {
+     "id": "u9-q032",
+     "lesson": "u9-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "If no access specifier is written, members of a struct are public, while members of a class are private.",
+     "answer": true,
+     "explain": "That default is the main difference between the two. Otherwise classes and structs are very similar in C++."
+    },
+    {
+     "id": "u9-q033",
+     "lesson": "u9-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Look at this member function header. What is the function's name, and which class is it a member of?",
+     "code": "void Lamp::setWatts(int w)",
+     "choices": [
+      "Name Lamp, member of class setWatts",
+      "Name void, member of class Lamp",
+      "Name Lamp::setWatts, not a member of any class",
+      "Name setWatts, member of class Lamp"
+     ],
+     "answer": 3,
+     "explain": "In ReturnType ClassName::functionName(parameters), the name before :: is the class and the name after it is the function. void is the return type."
+    },
+    {
+     "id": "u9-q034",
+     "lesson": "u9-l3",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Class Lamp has a public void member function setWatts that takes an int. desk is a Lamp object. Which statement correctly calls setWatts for desk?",
+     "choices": [
+      "desk.setWatts(60);",
+      "desk::setWatts(60);",
+      "Lamp::setWatts(60);",
+      "setWatts(desk, 60);"
+     ],
+     "answer": 0,
+     "explain": "Call a member function with the object, the dot operator and the function name. :: belongs in the header of a member function definition, not in a call."
+    },
+    {
+     "id": "u9-q035",
+     "lesson": "u9-l2",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "In a class declaration, all private members must be declared before the public members.",
+     "answer": false,
+     "explain": "public and private sections may come in any order and may even appear more than once. Grouping each kind together is good style, not a rule."
+    },
+    {
+     "id": "u9-q036",
+     "lesson": "u9-l3",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Class Thermostat has these member functions. Which one is an accessor?",
+     "choices": [
+      "void setTarget(double t)",
+      "double getTarget() const",
+      "void raise(double amount)",
+      "Thermostat()"
+     ],
+     "answer": 1,
+     "explain": "An accessor returns a member's value without changing it, so it is marked const. setTarget and raise change data (mutators), and Thermostat() is a constructor."
+    },
+    {
+     "id": "u9-q037",
+     "lesson": "u9-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this program print?",
+     "code": "class Greeter\n{\npublic:\n    Greeter() { cout << \"built\" << endl; }\n};\n\nint main()\n{\n    cout << \"before\" << endl;\n    Greeter g;\n    cout << \"after\" << endl;\n    return 0;\n}",
+     "program": "#include <iostream>\nusing namespace std;\n\nclass Greeter\n{\npublic:\n    Greeter() { cout << \"built\" << endl; }\n};\n\nint main()\n{\n    cout << \"before\" << endl;\n    Greeter g;\n    cout << \"after\" << endl;\n    return 0;\n}\n",
+     "answer": "before\nbuilt\nafter",
+     "explain": "A constructor runs automatically at the moment the object is defined. g is defined between the two cout statements, so its message appears between them."
+    },
+    {
+     "id": "u9-q038",
+     "lesson": "u9-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Class Account has private double members balance and rate and no constructor. Inside main, `Account acct;` is defined. What do balance and rate hold right after this statement?",
+     "choices": [
+      "0 and 0, because member variables start at zero",
+      "1 and 1",
+      "Nothing, because the statement is a compile error",
+      "Unpredictable garbage values, until something stores values in them"
+     ],
+     "answer": 3,
+     "explain": "Member variables are not automatically set to 0. Using them before storing a value gives garbage, which is why a constructor that sets them is a good idea."
+    },
+    {
+     "id": "u9-q039",
+     "lesson": "u9-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Account stores balance and rate but has no interest member; getInterest() calculates balance * rate each time it is called. Why is that the better design?",
+     "choices": [
+      "Multiplication is not allowed inside a member variable declaration",
+      "A stored interest figure would go stale: it would be wrong as soon as balance or rate changed",
+      "A class may not have more than two member variables",
+      "getInterest would have to be private if the interest were stored"
+     ],
+     "answer": 1,
+     "explain": "Data that depends on other data becomes stale when the other data changes and it does not. Calculating the value on request always gives the current answer."
+    },
+    {
+     "id": "u9-q040",
+     "lesson": "u9-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Inside the definition of Account::getInterest, how does the code refer to the calling object's balance member?",
+     "choices": [
+      "acct.balance",
+      "Account.balance",
+      "balance",
+      "getInterest.balance"
+     ],
+     "answer": 2,
+     "explain": "A member function has direct access to the members of the object that called it, so it uses the bare name. For acct.getInterest() that is acct's balance; for another object's call it is that object's balance."
+    },
+    {
+     "id": "u9-q041",
+     "lesson": "u9-l1",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "string is a class, and word is an object of it. What does this code print? Assume the code is inside main(), with iostream and string included and using namespace std; in effect.",
+     "code": "string word = \"tree\";\nword.append(\"house\");\ncout << word << \" \" << word.length() << endl;",
+     "program": "#include <iostream>\n#include <string>\nusing namespace std;\nint main()\n{\n    string word = \"tree\";\n    word.append(\"house\");\n    cout << word << \" \" << word.length() << endl;\n    return 0;\n}\n",
+     "answer": "treehouse 9",
+     "explain": "append and length are member functions called through the object with the dot operator. append adds \"house\" to the stored text, and length returns its 9 characters."
+    },
+    {
+     "id": "u9-q042",
+     "lesson": "u9-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this program print?",
+     "code": "class Timer\n{\nprivate:\n    int secs;\npublic:\n    Timer() : secs(30) { }\n    Timer(int s) : secs(s) { }\n    int getSecs() const { return secs; }\n};\n\nint main()\n{\n    Timer a;\n    Timer b(90);\n    cout << a.getSecs() << \" \" << b.getSecs() << endl;\n    return 0;\n}",
+     "program": "#include <iostream>\nusing namespace std;\n\nclass Timer\n{\nprivate:\n    int secs;\npublic:\n    Timer() : secs(30) { }\n    Timer(int s) : secs(s) { }\n    int getSecs() const { return secs; }\n};\n\nint main()\n{\n    Timer a;\n    Timer b(90);\n    cout << a.getSecs() << \" \" << b.getSecs() << endl;\n    return 0;\n}\n",
+     "answer": "30 90",
+     "explain": "The part after the colon is a member initialization list: secs(30) sets secs before the empty body runs. Timer a uses the default constructor and Timer b(90) the one that takes an int."
+    },
+    {
+     "id": "u9-q043",
+     "lesson": "u9-l5",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Why does `Lamp desk;` fail to compile with this class?",
+     "code": "class Lamp\n{\nprivate:\n    int watts;\npublic:\n    Lamp() { watts = 40; }\n    Lamp(int w = 60) { watts = w; }\n};",
+     "choices": [
+      "A constructor cannot have a default argument",
+      "Both constructors can be called with no arguments, so the call is ambiguous; a class cannot have two default constructors",
+      "Lamp desk; needs empty parentheses: Lamp desk();",
+      "watts must be public for a constructor to set it"
+     ],
+     "answer": 1,
+     "explain": "A constructor whose parameters all have defaults is also a default constructor, so the compiler cannot choose. Lamp desk(75); would compile, because only the second constructor takes one argument."
+    },
+    {
+     "id": "u9-q044",
+     "lesson": "u9-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Since C++11, a member variable may be given an initial value in its declaration inside the class, as in `double rate = 0.05;`.",
+     "answer": true,
+     "explain": "This is in-place initialization. Before C++11 a constructor (or its member initialization list) had to set starting values."
+    },
+    {
+     "id": "u9-q045",
+     "lesson": "u9-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which statement about a destructor is true?",
+     "choices": [
+      "It is named with a tilde and the class name, has no return type and no parameters, and runs automatically when the object is destroyed",
+      "It can take any number of arguments, like a constructor",
+      "It must be called explicitly at the end of main",
+      "It returns true when the object was destroyed successfully"
+     ],
+     "answer": 0,
+     "explain": "For class Lamp the destructor is ~Lamp(). It cannot return a value or take arguments, so a class has only one destructor."
+    },
+    {
+     "id": "u9-q046",
+     "lesson": "u9-l6",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this program print?",
+     "code": "class Star\n{\npublic:\n    Star() { cout << \"*\"; }\n};\n\nint main()\n{\n    Star sky[4];\n    cout << endl;\n    return 0;\n}",
+     "program": "#include <iostream>\nusing namespace std;\n\nclass Star\n{\npublic:\n    Star() { cout << \"*\"; }\n};\n\nint main()\n{\n    Star sky[4];\n    cout << endl;\n    return 0;\n}\n",
+     "answer": "****",
+     "explain": "Defining an array of objects runs the default constructor once for each element, not only for the first one."
+    },
+    {
+     "id": "u9-q047",
+     "lesson": "u9-l6",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A member function whose body is written inside the class declaration is called an ___ member function.",
+     "answer": "inline",
+     "accept": [
+      "inline",
+      "in-line",
+      "inline function",
+      "inline member function"
+     ],
+     "explain": "Short functions such as accessors are often written this way. A body written outside the class needs ClassName:: in its header."
+    },
+    {
+     "id": "u9-q048",
+     "lesson": "u9-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "By the usual convention, where are the declaration of class Kettle and the definitions of its member functions stored?",
+     "choices": [
+      "Both in the file that contains main",
+      "The declaration in Kettle.cpp and the member function definitions in Kettle.h",
+      "The declaration in Kettle.h (the specification file) and the member function definitions in Kettle.cpp (the implementation file)",
+      "The declaration in Kettle.exe and the definitions in Kettle.obj"
+     ],
+     "answer": 2,
+     "explain": "A program that uses the class includes Kettle.h, and Kettle.cpp is compiled and linked with it. Small examples may keep everything in one file, but this split is the convention."
+    },
+    {
+     "id": "u9-q049",
+     "lesson": "u9-l6",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "In a UML class diagram, what does a minus sign (-) in front of a member name mean?",
+     "choices": [
+      "The member is private",
+      "The member is public",
+      "The member is a constructor",
+      "The member returns a negative value"
+     ],
+     "answer": 0,
+     "explain": "UML marks private members with - and public members with +. The diagram's three parts hold the class name, the member variables and the member functions."
+    },
+    {
+     "id": "u9-q050",
+     "lesson": "u9-l6",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Code in main can call a private member function of a class, as long as it uses an object and the dot operator.",
+     "answer": false,
+     "explain": "A private member function can be called only by other member functions of the same class. Make a function private when it is an internal helper that outside code should not call."
+    },
+    {
+     "id": "u9-q051",
+     "lesson": "u9-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Which list names every error in this class declaration?",
+     "code": "class Lamp:\n{\nprivate\n    int watts;\npublic\n    setWatts(int);\n}",
+     "choices": [
+      "Only the missing semicolon after the closing brace",
+      "The colon after Lamp, the missing colons after private and public, no return type on setWatts, and no semicolon after the closing brace",
+      "watts must be public, and the key word must be written Class",
+      "The colon after Lamp and the missing semicolon; everything else is legal"
+     ],
+     "answer": 1,
+     "explain": "The header is just class Lamp, each access specifier ends in a colon, every member function other than a constructor or destructor needs a return type (void here), and the declaration ends with };."
+    },
+    {
+     "id": "u9-q052",
+     "lesson": "u9-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "This code fails to compile. What is wrong?",
+     "code": "class Scale\n{\nprivate:\n    int kg;\npublic:\n    void setKg(int);\n};\n\nvoid setKg(int k)\n{\n    kg = k;\n}",
+     "choices": [
+      "kg must be public for setKg to use it",
+      "setKg cannot take a parameter",
+      "A class may not have a member named kg",
+      "The definition header lacks Scale::, so it defines an ordinary function that cannot see kg"
+     ],
+     "answer": 3,
+     "explain": "Without Scale:: the function is not the member, so the name kg means nothing inside it. The header should be void Scale::setKg(int k)."
+    },
+    {
+     "id": "u9-q053",
+     "lesson": "u9-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Why do class designers usually avoid putting cin and cout statements inside member functions such as setWidth or getArea?",
+     "choices": [
+      "cin and cout cannot be used inside a class",
+      "Member functions run before main, when the screen is not ready",
+      "The class would be tied to one way of doing input and output, making it harder to reuse; the program using the class should handle the I/O",
+      "It would make the member variables public"
+     ],
+     "answer": 2,
+     "explain": "A class that prompts or prints on its own forces that behavior on every program that uses it. Returning values and letting the calling program display them keeps the class reusable."
+    },
+    {
+     "id": "u9-q054",
+     "lesson": "u9-l3",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "What is an object's state?",
+     "choices": [
+      "The data stored in its member variables at a given moment",
+      "The list of member functions its class declares",
+      "Whether its class is public or private",
+      "The file in which its class is declared"
+     ],
+     "answer": 0,
+     "explain": "Calling mutators changes an object's state. Two objects of the same class usually have different states."
+    }
+   ],
+   "programs": [
+    {
+     "id": "u9-p1",
+     "title": "Rectangle class",
+     "task": "Write a class named Room with private double members length and width. Provide public member functions: setLength(double), setWidth(double), getArea() const and getPerimeter() const. In main, read a length and a width from the user (no prompts), store them in a Room object using the mutators, and display the area and perimeter on separate lines in the form \"Area: 60\" and \"Perimeter: 34\".",
+     "stdin": "12 5",
+     "sampleOutput": "Area: 60\nPerimeter: 34",
+     "solution": "#include <iostream>\nusing namespace std;\n\nclass Room\n{\nprivate:\n    double length;\n    double width;\npublic:\n    void setLength(double);\n    void setWidth(double);\n    double getArea() const;\n    double getPerimeter() const;\n};\n\nvoid Room::setLength(double len)\n{\n    length = len;\n}\n\nvoid Room::setWidth(double w)\n{\n    width = w;\n}\n\ndouble Room::getArea() const\n{\n    return length * width;\n}\n\ndouble Room::getPerimeter() const\n{\n    return 2 * (length + width);\n}\n\nint main()\n{\n    double l, w;\n    Room room;\n\n    cin >> l >> w;\n    room.setLength(l);\n    room.setWidth(w);\n\n    cout << \"Area: \" << room.getArea() << endl;\n    cout << \"Perimeter: \" << room.getPerimeter() << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u9-p2",
+     "title": "Account class with constructors",
+     "task": "Write a class named Account with a private double member balance.\n- A default constructor sets the balance to 0.\n- A constructor taking one double sets the starting balance.\n- deposit(double amount) adds the amount only if it is greater than 0.\n- withdraw(double amount) returns bool: it subtracts the amount and returns true only if the amount is greater than 0 and not more than the balance; otherwise it changes nothing and returns false.\n- getBalance() const returns the balance.\nIn main: create Account a(100) and Account b (default). Read three numbers from the user: a deposit, then two withdrawals. Deposit into a, then attempt the first withdrawal; if it fails display \"Withdrawal of X refused\" (X is the amount). Then make the second withdrawal. Display \"Balance: \" and a's balance, then \"Empty account: \" and b's balance, one per line.",
+     "stdin": "50 500 30",
+     "sampleOutput": "Withdrawal of 500 refused\nBalance: 120\nEmpty account: 0",
+     "solution": "#include <iostream>\nusing namespace std;\n\nclass Account\n{\nprivate:\n    double balance;\npublic:\n    Account();\n    Account(double);\n    void deposit(double);\n    bool withdraw(double);\n    double getBalance() const;\n};\n\nAccount::Account()\n{\n    balance = 0;\n}\n\nAccount::Account(double start)\n{\n    balance = start;\n}\n\nvoid Account::deposit(double amount)\n{\n    if (amount > 0)\n        balance += amount;\n}\n\nbool Account::withdraw(double amount)\n{\n    if (amount > 0 && amount <= balance)\n    {\n        balance -= amount;\n        return true;\n    }\n    return false;\n}\n\ndouble Account::getBalance() const\n{\n    return balance;\n}\n\nint main()\n{\n    Account a(100);\n    Account b;\n    double dep, w1, w2;\n\n    cin >> dep >> w1 >> w2;\n    a.deposit(dep);\n    if (!a.withdraw(w1))\n        cout << \"Withdrawal of \" << w1 << \" refused\" << endl;\n    a.withdraw(w2);\n\n    cout << \"Balance: \" << a.getBalance() << endl;\n    cout << \"Empty account: \" << b.getBalance() << endl;\n    return 0;\n}\n"
+    }
+   ]
+  }
+ ]
+}

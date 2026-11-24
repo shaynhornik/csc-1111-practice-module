@@ -1,0 +1,1240 @@
+{
+ "units": [
+  {
+   "id": "u7",
+   "title": "Arrays",
+   "summary": "One-dimensional arrays (declaring, subscripts, initialization, loops, range-based for, processing, parallel arrays, array parameters), plus an introduction to two-dimensional arrays and the STL vector.",
+   "lessons": [
+    {
+     "id": "u7-l1",
+     "title": "Declaring arrays, subscripts, and no bounds checking",
+     "book": "Sections 7.1 to 7.3, pages 387 to 403",
+     "html": "<p>An <strong>array</strong> is a named block of consecutive memory that holds several values of the <em>same</em> data type. Each value is an <strong>element</strong>. The definition gives the type, the name, and the <strong>size declarator</strong> in square brackets.</p>\n<pre><code>const int DAYS = 7;\nint steps[DAYS];      // 7 ints\ndouble temps[24];     // 24 doubles\nstring names[5];      // 5 strings</code></pre>\n<p>The size declarator has to be a positive whole number that the compiler can work out itself: a literal, a <code>const</code> integer, or an expression built only from those. A plain variable (even one the user just typed in) is not allowed by the standard, because the compiler must know the size before the program runs (g++ accepts it as an extension, but that is not standard C++). Memory used = number of elements times the size of one element: with 4-byte ints, <code>int a[10];</code> uses 40 bytes.</p>\n<h4>Subscripts</h4>\n<p>An element is reached with a <strong>subscript</strong> (also called an index): <code>steps[3]</code>. Subscripts start at <strong>0</strong>. An array with N elements has valid subscripts 0 through N-1, so <code>steps[0]</code> is the first element and <code>steps[6]</code> is the last. The subscript can be any integer expression, such as <code>steps[i + 1]</code>.</p>\n<p>Watch the double meaning of the number in brackets. In a <em>definition</em> (<code>int a[5];</code>) it is the size declarator and means \"5 elements\". In a <em>statement</em> (<code>a[4] = 9;</code>) it is a subscript and picks one element. <code>a[5]</code> in a statement is one past the end.</p>\n<p>Each element behaves like an ordinary variable of the element type: you can assign to it, read it, use it in expressions, pass it to <code>cin</code>, and so on. Arrays defined inside a function and not initialized contain garbage, so initialize them (or fill them) before reading.</p>\n<h4>No bounds checking</h4>\n<p>C++ does <strong>not</strong> check that a subscript is within the array. Writing <code>a[5] = 9;</code> to a 5-element array compiles, and at run time it overwrites whatever memory lies after the array. That can corrupt other variables or crash the program, and the behavior is undefined. Reading past the end is just as bad.</p>\n<p>The classic cause is an <strong>off-by-one</strong> loop:</p>\n<pre><code>int a[6];\nfor (int i = 0; i &lt;= 6; i++)   // wrong: should be i &lt; 6\n    a[i] = 0;                  // last pass touches a[6]</code></pre>\n<p>The loop test <code>i &lt; SIZE</code> is the correct pattern; <code>i &lt;= SIZE</code> is the bug. The compiler will not catch it reliably.</p>\n<ul><li>An array name alone (no brackets) is not one value; you cannot assign, compare or print a whole int array with <code>=</code>, <code>==</code> or <code>&lt;&lt;</code> as if it were a single number.</li></ul>"
+    },
+    {
+     "id": "u7-l2",
+     "title": "Initialization, char arrays, range-based for, structured bindings",
+     "book": "Section 7.2 (pages 394 to 400), Section 7.4 (pages 404 to 408), and structured bindings in Section 7.5 (page 416)",
+     "html": "<h4>Initialization lists</h4>\n<p>A brace-enclosed <strong>initialization list</strong> gives values at definition:</p>\n<pre><code>int a[5] = {10, 20, 30, 40, 50};\nint b[]  = {3, 6, 9};          // implicit sizing: 3 elements\nint c[6] = {4, 8};             // partial: c is 4 8 0 0 0 0\nint d[4] = {};                 // all zeros</code></pre>\n<p><strong>Partial initialization</strong>: if the list has fewer values than elements, the listed ones fill the front and every remaining element is set to 0 (or the empty string, for strings). You cannot skip the front and fill the back. <strong>Implicit sizing</strong>: if you omit the size declarator, the compiler counts the list. A list with <em>more</em> values than the size declarator is a compile error. The list form works only in the definition; later you cannot write <code>a = {1,2,3};</code> for an array. The braces are required (<code>int h[3] = 8, 12, 16;</code> is an error), and an array with no size and no list (<code>double r[];</code>) is an error. With no list at all, a global array starts as all zeros and a local array holds garbage.</p>\n<h4>Character arrays</h4>\n<p>A <code>char</code> array can hold a C-string. The string ends with the <strong>null character</strong> <code>'\\0'</code>, so the array needs one more element than the number of visible characters: <code>char w[] = \"cat\";</code> has 4 elements. <code>cout &lt;&lt; w;</code> prints characters up to the null. Defining <code>char w[3] = \"cat\";</code> is an error because there is no room for the null. A list of single characters, <code>char w[] = {'H', 'i'};</code>, adds no null, so <code>cout &lt;&lt; w;</code> runs past the end.</p>\n<h4>The range-based for loop</h4>\n<p>It visits every element in order, with no subscript and no chance of an off-by-one. The loop variable is called the <strong>range variable</strong>. When you need the subscripts themselves (to copy into the same position of another array, or to print positions), use a regular counting for loop.</p>\n<pre><code>for (int x : a)  cout &lt;&lt; x &lt;&lt; \" \";      // x is a COPY\nfor (int &amp;x : a) x = x * 2;              // x is a reference: changes a</code></pre>\n<p>A plain range variable is a <em>copy</em>; to modify the elements, make it a reference (<code>&amp;</code>). <code>auto</code> may replace the type. It needs an array whose size the compiler knows, so it does not work on an array parameter (lesson 5).</p>\n<h4>Structured binding declarations (C++17)</h4>\n<pre><code>int p[3] = {7, 8, 9};\nauto [x, y, z] = p;   // x=7, y=8, z=9</code></pre>\n<p>This unpacks the array into new variables. The number of names must equal the number of elements (otherwise a compile error), and the variables are copies: changing <code>y</code> leaves <code>p[1]</code> alone.</p>"
+    },
+    {
+     "id": "u7-l3",
+     "title": "Processing array contents",
+     "book": "Section 7.5, pages 408 to 416",
+     "html": "<p>Most array code is a loop plus one of a few patterns. Each element works like an ordinary variable, but watch the difference between <code>a[k]--</code> (changes the element) and <code>a[k--]</code> (uses the element, then changes k). <code>cout &lt;&lt; a;</code> prints the array's address, not its contents.</p>\n<h4>Totals and averages</h4>\n<pre><code>int total = 0;                    // must start at 0\nfor (int i = 0; i &lt; n; i++)\n    total += a[i];\ndouble avg = static_cast&lt;double&gt;(total) / n;</code></pre>\n<p>Forgetting to initialize <code>total</code> (or to reset it to 0 before summing a second array), or dividing two ints, are the usual traps. Integer division truncates: 22 / 4 is 5, but 22 / 4.0 is 5.5.</p>\n<h4>Highest and lowest</h4>\n<p>Start with the <em>first element</em>, not with 0, and then compare the rest:</p>\n<pre><code>int hi = a[0], pos = 0;\nfor (int i = 1; i &lt; n; i++)\n    if (a[i] &gt; hi) { hi = a[i]; pos = i; }</code></pre>\n<p>If every value is positive, starting <code>lo</code> at 0 would report 0 as the lowest, which is wrong. With strict <code>&gt;</code>, the <em>first</em> of equal maximums keeps the position; with <code>&gt;=</code>, the <em>last</em> wins.</p>\n<h4>Counting and searching</h4>\n<p>Count with a counter that starts at 0 and goes up when the test is true. A search stops (or records the subscript) when it finds the target; use -1 as a \"not found\" marker because -1 is never a valid subscript.</p>\n<h4>Copying and comparing arrays</h4>\n<p>You cannot copy with <code>b = a;</code> (compile error for arrays), and <code>if (a == b)</code> compiles but compares the <em>addresses</em> of the arrays, which are never equal for two different arrays. Do both with a loop:</p>\n<pre><code>for (int i = 0; i &lt; SIZE; i++) b[i] = a[i];     // copy\nbool same = true;\nfor (int i = 0; i &lt; SIZE; i++)\n    if (a[i] != b[i]) same = false;               // compare</code></pre>\n<p>When shifting values inside one array, the direction matters. <code>for (i = 1; i &lt; n; i++) a[i] = a[i-1];</code> smears a[0] across the whole array, because each step reads the value just written.</p>\n<h4>Partially filled arrays</h4>\n<p>Often you do not know how many values you will get. Define the array at its maximum size and keep an <code>int count</code> of how many elements are actually in use. Loops must run to <code>count</code>, not to the array size, because the rest is unused:</p>\n<pre><code>int data[100]; int count = 0;\nwhile (count &lt; 100 &amp;&amp; cin &gt;&gt; v) data[count++] = v;\nfor (int i = 0; i &lt; count; i++) cout &lt;&lt; data[i];</code></pre>\n<p>Test <code>count &lt; 100</code> first so you never store past the end.</p>"
+    },
+    {
+     "id": "u7-l4",
+     "title": "Parallel arrays",
+     "book": "Section 7.6, pages 417 to 419",
+     "html": "<p><strong>Parallel arrays</strong> are two or more arrays that hold related data, linked by using the <em>same subscript</em>. Element <code>k</code> of each array describes the same real-world item. The arrays may have different data types, but they should have the same number of elements.</p>\n<pre><code>string name[3] = {\"Ana\", \"Bo\", \"Cy\"};\nint    pts[3]  = {70, 95, 88};\n// name[1] and pts[1] describe the same person: Bo has 95</code></pre>\n<p>The language does not know the arrays are related; the relationship exists only in your code. That has consequences:</p>\n<ul>\n<li>To find an item, search one array, remember the subscript, then use that subscript in the other arrays.</li>\n<li>If you sort or swap elements in one array, you must make the identical swap in every parallel array, or the pairs are scrambled.</li>\n<li>A loop that processes the group uses one subscript variable for all arrays.</li>\n</ul>\n<pre><code>int best = 0;\nfor (int i = 1; i &lt; 3; i++)\n    if (pts[i] &gt; pts[best]) best = i;\ncout &lt;&lt; name[best] &lt;&lt; \" \" &lt;&lt; pts[best];   // Bo 95</code></pre>\n<p>Here <code>best</code> holds a <em>subscript</em>, not a score. Comparing <code>pts[i] &gt; pts[best]</code> and then printing <code>name[best]</code> is the typical pattern. A lookup by value works the same way:</p>\n<pre><code>int found = -1;\nfor (int i = 0; i &lt; 3 &amp;&amp; found == -1; i++)\n    if (id[i] == want) found = i;\nif (found != -1) cout &lt;&lt; price[found];</code></pre>\n<p>Always check for the -1 \"not found\" case before using the subscript. Parallel arrays are a stepping stone; later, a <code>struct</code> or class would keep the related fields together so they cannot get out of step.</p>\n<p>Exam angle: you may be asked to name the term, to say what breaks if only one array is rearranged, or to trace which name goes with which value.</p>"
+    },
+    {
+     "id": "u7-l5",
+     "title": "Arrays as function arguments",
+     "book": "Section 7.7, pages 420 to 430, and the case study in Section 7.10, pages 440 to 441",
+     "html": "<p>To pass a whole array, write its name (no brackets) in the call, and write empty brackets in the parameter. Pass the size as a separate argument, because the function cannot find out how big the array is.</p>\n<pre><code>void show(const int a[], int n)\n{\n    for (int i = 0; i &lt; n; i++) cout &lt;&lt; a[i] &lt;&lt; \" \";\n}\nint main() {\n    int v[4] = {5, 6, 7, 8};\n    show(v, 4);          // not show(v[], 4) and not show(v[4], 4)\n}</code></pre>\n<h4>The array is not copied</h4>\n<p>What gets passed is the <strong>address of the first element</strong>. The function works on the caller's own array, so any change the function makes to <code>a[i]</code> is a change to the original. Arrays are therefore <em>not</em> passed by value. In contrast, passing a single element such as <code>v[0]</code> passes a copy of that int, and the original stays unchanged.</p>\n<pre><code>void bump(int a[], int n) { for (int i = 0; i &lt; n; i++) a[i] += 10; }\nvoid one(int x) { x = 99; }\n// bump(v, 4) changes v;  one(v[0]) does not</code></pre>\n<h4>const array parameters</h4>\n<p>Put <code>const</code> in front of the parameter type to promise the function will not modify the array: <code>const int a[]</code>. Any attempt to assign to <code>a[i]</code> is then a compile error. Use <code>const</code> for every function that only reads the array (display, sum, search).</p>\n<h4>Consequences</h4>\n<ul>\n<li>Inside the function, the array parameter is only an address. The compiler does not know its length, so a range-based for loop over it will not compile, and neither will a structured binding declaration.</li>\n<li>The size must be passed in by the caller and trusted; the function cannot check it.</li>\n<li>Functions can still return values computed from the array (a sum, the index of the highest element), but an array cannot be returned as an ordinary value.</li>\n</ul>\n<pre><code>int indexOfMax(const int a[], int n)\n{\n    int best = 0;\n    for (int i = 1; i &lt; n; i++)\n        if (a[i] &gt; a[best]) best = i;\n    return best;\n}</code></pre>\n<p>Prototypes list the same parameter types: <code>int indexOfMax(const int[], int);</code> is legal. The case study in Section 7.10 is a function of this kind: it receives two const arrays and a size, returns false at the first position where they differ, and returns true only after checking every element.</p>"
+    },
+    {
+     "id": "u7-l6",
+     "title": "Two-dimensional arrays",
+     "book": "Sections 7.8 to 7.9, pages 431 to 439",
+     "html": "<p>A <strong>two-dimensional array</strong> is a table: the first size declarator is the number of <strong>rows</strong>, the second the number of <strong>columns</strong>. It has rows times columns elements, all of one type.</p>\n<pre><code>int grid[3][4];     // 3 rows, 4 columns, 12 elements\ngrid[0][0] = 5;     // first row, first column\ngrid[2][3] = 9;     // last row, last column</code></pre>\n<p>Subscripts are written <code>[row][column]</code>, both starting at 0. For <code>grid[3][4]</code> the row subscripts are 0 to 2 and the column subscripts 0 to 3. Two subscripts in one pair of brackets, <code>grid[2,3]</code>, is not what you want.</p>\n<h4>Initialization</h4>\n<pre><code>int m[2][3] = {{1, 2, 3}, {4, 5, 6}};   // one inner list per row\nint n[2][3] = {1, 2, 3, 4, 5, 6};       // also fills row by row\nint q[2][2] = {{1}, {2, 3}};            // q[0][1] is 0</code></pre>\n<p>Unlisted elements in an inner list become 0.</p>\n<h4>Nested loops</h4>\n<p>Traverse a table with one loop inside another. The outer loop usually walks the rows, the inner loop the columns:</p>\n<pre><code>for (int r = 0; r &lt; 2; r++) {\n    int sum = 0;\n    for (int c = 0; c &lt; 3; c++)\n        sum += m[r][c];\n    cout &lt;&lt; sum &lt;&lt; \" \";        // row totals: 6 15\n}</code></pre>\n<p>For column totals, swap the roles: the outer loop on columns, the inner on rows.</p>\n<h4>As a function parameter</h4>\n<p>The column size must be given: <code>void show(int t[][4], int rows)</code>. The row count is passed separately, as with one-dimensional arrays. <code>int t[][]</code> is an error.</p>\n<h4>Three or more dimensions</h4>\n<p>C++ allows more dimensions (<code>int cube[2][3][4]</code>), each with its own subscript and its own loop level. They are rare and the course focuses on one-dimensional arrays.</p>"
+    },
+    {
+     "id": "u7-l7",
+     "title": "Introduction to the STL vector",
+     "book": "Section 7.11, pages 442 to 456",
+     "html": "<p>The <strong>Standard Template Library</strong> (STL) supplies ready-made data types and algorithms. Its containers are either <strong>sequence containers</strong> (elements kept in order, like an array) or <strong>associative containers</strong> (elements found by key). A <strong>vector</strong> is a sequence container: array-like, but it can change size while the program runs. It needs <code>#include &lt;vector&gt;</code> and the element type in angle brackets.</p>\n<pre><code>vector&lt;int&gt; a;                 // empty\nvector&lt;int&gt; b(5);              // 5 elements, all 0\nvector&lt;int&gt; c(4, 7);           // 4 elements, all 7\nvector&lt;int&gt; d = {2, 4, 6};     // initialization list</code></pre>\n<p>Unlike an array, the size can be a variable, and a vector does not have to be given a size at all.</p>\n<h4>Common member functions</h4>\n<table><thead><tr><th>Call</th><th>Meaning</th></tr></thead><tbody>\n<tr><td><code>v.push_back(x)</code></td><td>add x as a new last element (size grows by 1)</td></tr>\n<tr><td><code>v.size()</code></td><td>number of elements</td></tr>\n<tr><td><code>v.at(i)</code></td><td>element i; checks the subscript and throws an exception if invalid</td></tr>\n<tr><td><code>v.empty()</code></td><td>true if there are no elements</td></tr>\n<tr><td><code>v.pop_back()</code></td><td>remove the last element</td></tr>\n<tr><td><code>v.clear()</code></td><td>remove all elements</td></tr>\n</tbody></table>\n<p>Elements are read and written with <code>v[i]</code> just like an array, with the same lack of bounds checking, and the same rule that valid subscripts are 0 through size-1. <code>v.at(i)</code> is the checked alternative.</p>\n<h4>The trap</h4>\n<p>A vector defined with no size has no elements, so <code>v[0] = 5;</code> is a bug, not a way to add a value. Use <code>v.push_back(5);</code>. Also, <code>v.size()</code> returns an unsigned type, so comparing it with a negative int can surprise you.</p>\n<h4>Loops and copying</h4>\n<pre><code>vector&lt;int&gt; v = {1, 2, 3};\nfor (int &amp;x : v) x = x * x;        // modify with a reference\nfor (int x : v) cout &lt;&lt; x &lt;&lt; \" \";  // 1 4 9</code></pre>\n<p>The range-based for loop works on vectors, with the same copy-versus-reference rule as for arrays. A counting loop uses <code>i &lt; v.size()</code>.</p>\n<p>Unlike arrays, one vector can be assigned to another with <code>=</code>, and the elements are copied. A vector can also be passed to a function and returned from one. A vector of vectors, <code>vector&lt;vector&lt;int&gt;&gt;</code>, is beyond this course.</p>"
+    }
+   ],
+   "questions": [
+    {
+     "id": "u7-q001",
+     "lesson": "u7-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which statement defines an array of 12 doubles named sales?",
+     "choices": [
+      "double sales[12];",
+      "double sales(12);",
+      "double[12] sales;",
+      "sales double[12];"
+     ],
+     "answer": 0,
+     "explain": "The form is type, name, then the size declarator in square brackets. `double sales(12);` compiles, but it defines one double holding 12, not an array; the other two forms do not compile."
+    },
+    {
+     "id": "u7-q002",
+     "lesson": "u7-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "For the definition `int data[8];` which range lists every valid subscript?",
+     "choices": [
+      "1 through 8",
+      "0 through 7",
+      "0 through 8",
+      "1 through 7"
+     ],
+     "answer": 1,
+     "explain": "An array of N elements has subscripts 0 to N-1. Element 8 would be one past the end."
+    },
+    {
+     "id": "u7-q003",
+     "lesson": "u7-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "In the definition `int hours[20];` the 20 is called the size ________.",
+     "answer": "declarator",
+     "accept": [
+      "declarator",
+      "size declarator"
+     ],
+     "explain": "The bracketed number in a definition is the size declarator; in later statements a bracketed number is a subscript."
+    },
+    {
+     "id": "u7-q004",
+     "lesson": "u7-l1",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "In standard C++, the size declarator of an array must be a constant expression, so a variable that holds a value typed by the user cannot be used.",
+     "answer": true,
+     "explain": "A size declarator has to be a positive whole-number constant, because the compiler fixes the size before the program runs. g++ accepts a variable size as a non-standard extension (a variable-length array), but standard C++ does not."
+    },
+    {
+     "id": "u7-q005",
+     "lesson": "u7-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Given the lines below, which array definition is NOT allowed in standard C++?",
+     "choices": [
+      "int a[M];",
+      "int b[M + 3];",
+      "int c[n];",
+      "int d[10];"
+     ],
+     "answer": 2,
+     "explain": "Only n is a non-constant variable, so `int c[n];` is not standard C++. g++ accepts it anyway as an extension (it warns only with -pedantic), but the standard is the right answer. M is a const int initialized with a literal, so M and M + 3 are constant expressions.",
+     "code": "int n = 5;\nconst int M = 5;"
+    },
+    {
+     "id": "u7-q006",
+     "lesson": "u7-l1",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "C++ automatically checks at run time that every array subscript is within the array and stops the program if it is not.",
+     "answer": false,
+     "explain": "C++ performs no bounds checking. An out-of-range subscript compiles and runs, with undefined results."
+    },
+    {
+     "id": "u7-q007",
+     "lesson": "u7-l1",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    int v[5] = {10, 20, 30, 40, 50};\n    v[1] = v[3] + 1;\n    v[4] = v[1] - v[0];\n    cout << v[1] << \" \" << v[4] << \" \" << v[2];",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int v[5] = {10, 20, 30, 40, 50};\n    v[1] = v[3] + 1;\n    v[4] = v[1] - v[0];\n    cout << v[1] << \" \" << v[4] << \" \" << v[2];\n    return 0;\n}\n",
+     "answer": "41 31 30",
+     "explain": "v[1] becomes 40 + 1 = 41. v[4] becomes 41 - 10 = 31. v[2] was never changed, so it is still 30."
+    },
+    {
+     "id": "u7-q008",
+     "lesson": "u7-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is true about this loop?",
+     "choices": [
+      "The compiler rejects it because 6 is not a valid subscript",
+      "The array grows to 7 elements automatically",
+      "The loop runs 6 times and is correct",
+      "It compiles, but the last pass stores to a[6], outside the array, which is undefined behavior"
+     ],
+     "answer": 3,
+     "explain": "The test i <= 6 lets i reach 6, but the last valid subscript is 5. C++ does not catch this, so the write goes into memory that does not belong to the array.",
+     "code": "int a[6];\nfor (int i = 0; i <= 6; i++)\n    a[i] = 0;"
+    },
+    {
+     "id": "u7-q009",
+     "lesson": "u7-l1",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "In the two lines `int a[5];` and `a[5] = 9;` the number 5 has the same meaning both times.",
+     "answer": false,
+     "explain": "In the definition 5 is the size declarator (how many elements). In the statement it is a subscript, and a[5] is one past the last element of a 5-element array."
+    },
+    {
+     "id": "u7-q010",
+     "lesson": "u7-l1",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "Using the array below, which subscript holds the value 45?",
+     "answer": "3",
+     "accept": [
+      "3"
+     ],
+     "explain": "Counting from 0: 15 is at 0, 25 at 1, 35 at 2, 45 at 3.",
+     "code": "int a[] = {15, 25, 35, 45, 55};"
+    },
+    {
+     "id": "u7-q011",
+     "lesson": "u7-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    int a[6] = {4, 8};\n    for (int i = 0; i < 6; i++)\n        cout << a[i] << ' ';",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int a[6] = {4, 8};\n    for (int i = 0; i < 6; i++)\n        cout << a[i] << ' ';\n    return 0;\n}\n",
+     "answer": "4 8 0 0 0 0",
+     "explain": "In a partial initialization the listed values fill the first elements and all remaining elements are set to 0."
+    },
+    {
+     "id": "u7-q012",
+     "lesson": "u7-l2",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "How many elements does q have?",
+     "choices": [
+      "4",
+      "5",
+      "6",
+      "The definition is an error without a size"
+     ],
+     "answer": 1,
+     "explain": "With implicit sizing the compiler counts the values in the initialization list: five.",
+     "code": "int q[] = {3, 6, 9, 12, 15};",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int q[] = {3, 6, 9, 12, 15};\n    int n = 0;\n    for (int x : q) n++;\n    cout << n;\n    return 0;\n}\n",
+     "expect": "5"
+    },
+    {
+     "id": "u7-q013",
+     "lesson": "u7-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which definition is an error?",
+     "choices": [
+      "int b[5] = {1, 2};",
+      "int c[] = {1, 2, 3};",
+      "int a[3] = {1, 2, 3, 4};",
+      "int d[4] = {};"
+     ],
+     "answer": 2,
+     "explain": "More initializers than elements is a compile error. Fewer is fine (the rest become 0), an unsized array takes its size from the list, and {} makes every element 0."
+    },
+    {
+     "id": "u7-q014",
+     "lesson": "u7-l2",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "    int n[4] = {1, 2, 3, 4};\n    for (int x : n)\n        x = x * 10;\n    for (int x : n)\n        cout << x << ' ';",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int n[4] = {1, 2, 3, 4};\n    for (int x : n)\n        x = x * 10;\n    for (int x : n)\n        cout << x << ' ';\n    return 0;\n}\n",
+     "answer": "1 2 3 4",
+     "explain": "The loop variable x is a copy of each element, so multiplying it never touches the array."
+    },
+    {
+     "id": "u7-q015",
+     "lesson": "u7-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    int n[4] = {1, 2, 3, 4};\n    for (int &x : n)\n        x = x * 10;\n    for (int x : n)\n        cout << x << ' ';",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int n[4] = {1, 2, 3, 4};\n    for (int &x : n)\n        x = x * 10;\n    for (int x : n)\n        cout << x << ' ';\n    return 0;\n}\n",
+     "answer": "10 20 30 40",
+     "explain": "Because x is a reference, each pass changes the actual array element."
+    },
+    {
+     "id": "u7-q016",
+     "lesson": "u7-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which loop doubles every element of the int array a in place?",
+     "choices": [
+      "for (int x : a) x *= 2;",
+      "for (int x : a) a *= 2;",
+      "for (x : a) x *= 2;",
+      "for (int &x : a) x *= 2;"
+     ],
+     "answer": 3,
+     "explain": "Only the reference form works on the original elements. A by-value loop variable is a copy, and the other forms do not compile or do not mean what is intended."
+    },
+    {
+     "id": "u7-q017",
+     "lesson": "u7-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Write the range-based for header, using auto and a by-value loop variable named val, that visits each element of the array scores.",
+     "answer": "for (auto val : scores)",
+     "accept": [
+      "for (auto val : scores)",
+      "for (auto val : scores) {"
+     ],
+     "explain": "The format is `for (type rangeVariable : array)`. The colon, not a semicolon, separates the range variable from the array, and auto lets the compiler use the element type."
+    },
+    {
+     "id": "u7-q018",
+     "lesson": "u7-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    int p[3] = {7, 8, 9};\n    auto [a, b, c] = p;\n    b = b + 100;\n    cout << a << \" \" << b << \" \" << c << \" \" << p[1];",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int p[3] = {7, 8, 9};\n    auto [a, b, c] = p;\n    b = b + 100;\n    cout << a << \" \" << b << \" \" << c << \" \" << p[1];\n    return 0;\n}\n",
+     "answer": "7 108 9 8",
+     "explain": "The structured binding unpacks copies: a=7, b=8, c=9. Changing b to 108 does not change p[1], which is still 8."
+    },
+    {
+     "id": "u7-q019",
+     "lesson": "u7-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What happens with this code?",
+     "choices": [
+      "Compile error, because the number of names does not match the number of elements",
+      "x gets 1, y gets 2, and 3 is ignored",
+      "x gets 1, y gets 2, and the array shrinks",
+      "It compiles and y gets 3"
+     ],
+     "answer": 0,
+     "explain": "A structured binding declaration must list exactly as many variables as the array has elements.",
+     "code": "int p[3] = {1, 2, 3};\nauto [x, y] = p;"
+    },
+    {
+     "id": "u7-q020",
+     "lesson": "u7-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "The special character with ASCII value 0 that marks the end of a C-string is called the ________ character.",
+     "answer": "null",
+     "accept": [
+      "null",
+      "null character",
+      "null terminator",
+      "nul",
+      "\\0",
+      "'\\0'"
+     ],
+     "explain": "A C-string is a char array whose last used element holds '\\0', the null character."
+    },
+    {
+     "id": "u7-q021",
+     "lesson": "u7-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "A char array is defined as `char w[] = \"plum\";`. How many elements does w have, and what does w[4] hold?",
+     "choices": [
+      "4 elements; w[4] is out of range",
+      "5 elements; w[4] holds 'm'",
+      "5 elements; w[4] holds the null character",
+      "4 elements; w[3] holds the null character"
+     ],
+     "answer": 2,
+     "explain": "The compiler sizes the array to include the null: p, l, u, m, then '\\0' at subscript 4."
+    },
+    {
+     "id": "u7-q022",
+     "lesson": "u7-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    int a[] = {4, 9, 2, 7};\n    int s = 0;\n    for (int i = 0; i < 4; i++)\n        s += a[i];\n    cout << s << \" \" << s / 4 << \" \" << s / 4.0;",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int a[] = {4, 9, 2, 7};\n    int s = 0;\n    for (int i = 0; i < 4; i++)\n        s += a[i];\n    cout << s << \" \" << s / 4 << \" \" << s / 4.0;\n    return 0;\n}\n",
+     "answer": "22 5 5.5",
+     "explain": "The sum is 22. 22 / 4 is integer division and gives 5, while 22 / 4.0 is floating point and gives 5.5."
+    },
+    {
+     "id": "u7-q023",
+     "lesson": "u7-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    int a[] = {12, 40, 7, 40, 25};\n    int hi = a[0], pos = 0;\n    for (int i = 1; i < 5; i++)\n        if (a[i] > hi) {\n            hi = a[i];\n            pos = i;\n        }\n    cout << hi << \" \" << pos;",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int a[] = {12, 40, 7, 40, 25};\n    int hi = a[0], pos = 0;\n    for (int i = 1; i < 5; i++)\n        if (a[i] > hi) {\n            hi = a[i];\n            pos = i;\n        }\n    cout << hi << \" \" << pos;\n    return 0;\n}\n",
+     "answer": "40 1",
+     "explain": "The first 40 (subscript 1) replaces 12. The later 40 is not greater than hi, so pos stays at 1."
+    },
+    {
+     "id": "u7-q024",
+     "lesson": "u7-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print? (Note the operator.)",
+     "code": "    int a[] = {12, 40, 7, 40, 25};\n    int hi = a[0], pos = 0;\n    for (int i = 1; i < 5; i++)\n        if (a[i] >= hi) {\n            hi = a[i];\n            pos = i;\n        }\n    cout << hi << \" \" << pos;",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int a[] = {12, 40, 7, 40, 25};\n    int hi = a[0], pos = 0;\n    for (int i = 1; i < 5; i++)\n        if (a[i] >= hi) {\n            hi = a[i];\n            pos = i;\n        }\n    cout << hi << \" \" << pos;\n    return 0;\n}\n",
+     "answer": "40 3",
+     "explain": "With >= the second 40 also passes the test and overwrites pos, so the last maximum wins."
+    },
+    {
+     "id": "u7-q025",
+     "lesson": "u7-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Two int arrays of the same size, a and b, hold identical values. What does `if (a == b)` do?",
+     "choices": [
+      "It compares every element and is true",
+      "It is a compile error",
+      "It compares only the first elements",
+      "It compares the addresses of the arrays, so it is false"
+     ],
+     "answer": 3,
+     "explain": "An array name used this way stands for the array's starting address. Two different arrays have different addresses, so the test is false (g++ even warns about comparing two arrays). Compare element by element in a loop."
+    },
+    {
+     "id": "u7-q026",
+     "lesson": "u7-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "    int a[5] = {1, 2, 3, 4, 5};\n    for (int i = 1; i < 5; i++)\n        a[i] = a[i - 1];\n    for (int i = 0; i < 5; i++)\n        cout << a[i] << ' ';",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int a[5] = {1, 2, 3, 4, 5};\n    for (int i = 1; i < 5; i++)\n        a[i] = a[i - 1];\n    for (int i = 0; i < 5; i++)\n        cout << a[i] << ' ';\n    return 0;\n}\n",
+     "answer": "1 1 1 1 1",
+     "explain": "Each assignment reads the element just written, so the value 1 spreads to the end."
+    },
+    {
+     "id": "u7-q027",
+     "lesson": "u7-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which code correctly copies the 8-element int array src into the 8-element int array dst?",
+     "choices": [
+      "for (int i = 0; i < 8; i++) dst[i] = src[i];",
+      "dst = src;",
+      "dst[8] = src[8];",
+      "for (int i = 0; i <= 8; i++) dst[i] = src[i];"
+     ],
+     "answer": 0,
+     "explain": "Arrays cannot be assigned with =. A loop over subscripts 0 to 7 copies each element; <= 8 runs one past the end."
+    },
+    {
+     "id": "u7-q028",
+     "lesson": "u7-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    int d[8];\n    int count = 0;\n    d[count++] = 6;\n    d[count++] = 2;\n    d[count++] = 9;\n    int s = 0;\n    for (int i = 0; i < count; i++)\n        s += d[i];\n    cout << count << \" \" << s;",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int d[8];\n    int count = 0;\n    d[count++] = 6;\n    d[count++] = 2;\n    d[count++] = 9;\n    int s = 0;\n    for (int i = 0; i < count; i++)\n        s += d[i];\n    cout << count << \" \" << s;\n    return 0;\n}\n",
+     "answer": "3 17",
+     "explain": "Each `d[count++] = value;` stores at subscript count and then adds 1 to count. Three values were stored, so count is 3 and only d[0] to d[2] are summed: 6 + 2 + 9 = 17."
+    },
+    {
+     "id": "u7-q029",
+     "lesson": "u7-l3",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "An array that is defined large enough for the maximum but currently holds fewer values, with a separate counter, is called a ________ filled array.",
+     "answer": "partially",
+     "accept": [
+      "partially",
+      "partly"
+     ],
+     "explain": "A partially filled array is paired with a variable that tells how many elements are really in use."
+    },
+    {
+     "id": "u7-q030",
+     "lesson": "u7-l3",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "All the values in the int array vals are positive. A student finds the smallest value with `int lo = 0;` and then `if (vals[i] < lo) lo = vals[i];` inside a loop over the array. What is the result?",
+     "choices": [
+      "It correctly finds the smallest value",
+      "lo stays 0, which is wrong, because 0 is smaller than every element",
+      "It finds the largest value",
+      "It finds the smallest value except the first element"
+     ],
+     "answer": 1,
+     "explain": "Initialize the running minimum to the first element, vals[0], so it starts as a value that is really in the array."
+    },
+    {
+     "id": "u7-q031",
+     "lesson": "u7-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    int a[] = {1, 2, 3, 4};\n    int b[] = {1, 9, 3, 0};\n    int diff = 0;\n    for (int i = 0; i < 4; i++)\n        if (a[i] != b[i])\n            diff++;\n    cout << diff;",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int a[] = {1, 2, 3, 4};\n    int b[] = {1, 9, 3, 0};\n    int diff = 0;\n    for (int i = 0; i < 4; i++)\n        if (a[i] != b[i])\n            diff++;\n    cout << diff;\n    return 0;\n}\n",
+     "answer": "2",
+     "explain": "Element-by-element comparison finds differences at subscripts 1 and 3."
+    },
+    {
+     "id": "u7-q032",
+     "lesson": "u7-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "An array r of 100 ints currently holds 37 valid readings, and count is 37. Which loop displays only the valid readings?",
+     "choices": [
+      "for (int i = 0; i < 100; i++) cout << r[i] << ' ';",
+      "for (int i = 0; i <= count; i++) cout << r[i] << ' ';",
+      "for (int i = 0; i < count; i++) cout << r[i] << ' ';",
+      "for (int i = 1; i < count; i++) cout << r[i] << ' ';"
+     ],
+     "answer": 2,
+     "explain": "Valid elements are subscripts 0 to count-1, so the test is i < count. Running to 100 shows unused slots; <= count shows one extra; starting at 1 skips the first."
+    },
+    {
+     "id": "u7-q033",
+     "lesson": "u7-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    string name[] = {\"Ana\", \"Bo\", \"Cy\"};\n    int pts[] = {70, 95, 88};\n    int best = 0;\n    for (int i = 1; i < 3; i++)\n        if (pts[i] > pts[best])\n            best = i;\n    cout << name[best] << \" \" << pts[best];",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    string name[] = {\"Ana\", \"Bo\", \"Cy\"};\n    int pts[] = {70, 95, 88};\n    int best = 0;\n    for (int i = 1; i < 3; i++)\n        if (pts[i] > pts[best])\n            best = i;\n    cout << name[best] << \" \" << pts[best];\n    return 0;\n}\n",
+     "answer": "Bo 95",
+     "explain": "best holds a subscript. pts[1] = 95 is the largest, so name[1] = Bo is printed with it."
+    },
+    {
+     "id": "u7-q034",
+     "lesson": "u7-l4",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which best describes parallel arrays?",
+     "choices": [
+      "Two arrays that must have the same data type",
+      "An array with two subscripts",
+      "Arrays stored next to each other in memory",
+      "Two or more arrays whose elements with the same subscript hold related data"
+     ],
+     "answer": 3,
+     "explain": "The link between parallel arrays is the shared subscript. They may have different types (for example string and int)."
+    },
+    {
+     "id": "u7-q035",
+     "lesson": "u7-l4",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "Parallel arrays must all have the same data type.",
+     "answer": false,
+     "explain": "They are related by subscript, not by type. A names array of string and a scores array of int is the normal case."
+    },
+    {
+     "id": "u7-q036",
+     "lesson": "u7-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "    int id[] = {101, 205, 309, 412};\n    double price[] = {2.5, 4.0, 6.25, 9.0};\n    int want = 309, found = -1;\n    for (int i = 0; i < 4; i++)\n        if (id[i] == want)\n            found = i;\n    cout << found << \" \" << price[found];",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int id[] = {101, 205, 309, 412};\n    double price[] = {2.5, 4.0, 6.25, 9.0};\n    int want = 309, found = -1;\n    for (int i = 0; i < 4; i++)\n        if (id[i] == want)\n            found = i;\n    cout << found << \" \" << price[found];\n    return 0;\n}\n",
+     "answer": "2 6.25",
+     "explain": "The id 309 is at subscript 2, and the same subscript in price holds 6.25."
+    },
+    {
+     "id": "u7-q037",
+     "lesson": "u7-l4",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "The arrays item and cost are parallel. A program swaps item[0] and item[1] but does nothing to cost. What is the effect?",
+     "choices": [
+      "Two items now show the wrong cost",
+      "Nothing, because the arrays are independent",
+      "The program will not compile",
+      "cost is swapped automatically"
+     ],
+     "answer": 0,
+     "explain": "C++ does not know the arrays are linked. Any reordering must be repeated in every parallel array or the pairs are scrambled."
+    },
+    {
+     "id": "u7-q038",
+     "lesson": "u7-l4",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Parallel arrays are linked by using the same ________ in each array.",
+     "answer": "subscript",
+     "accept": [
+      "subscript",
+      "index",
+      "subscript value"
+     ],
+     "explain": "Element k of every parallel array describes the same item."
+    },
+    {
+     "id": "u7-q039",
+     "lesson": "u7-l5",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "When an array name is used as a function argument, what does the function receive?",
+     "choices": [
+      "A copy of every element",
+      "The memory address of the first element",
+      "A copy of the first element only",
+      "The number of elements"
+     ],
+     "answer": 1,
+     "explain": "The array is not copied. The function works on the caller's own elements."
+    },
+    {
+     "id": "u7-q040",
+     "lesson": "u7-l5",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "Arrays are passed to functions by value, so the function always works on its own copy.",
+     "answer": false,
+     "explain": "The address is passed, so changes made through the parameter change the caller's array."
+    },
+    {
+     "id": "u7-q041",
+     "lesson": "u7-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "void bump(int a[], int n)\n{\n    for (int i = 0; i < n; i++)\n        a[i] += 10;\n}\nint main()\n{\n    int v[3] = {1, 2, 3};\n    bump(v, 3);\n    cout << v[0] << \" \" << v[1] << \" \" << v[2];\n    return 0;\n}",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nvoid bump(int a[], int n)\n{\n    for (int i = 0; i < n; i++)\n        a[i] += 10;\n}\nint main()\n{\n    int v[3] = {1, 2, 3};\n    bump(v, 3);\n    cout << v[0] << \" \" << v[1] << \" \" << v[2];\n    return 0;\n}\n",
+     "answer": "11 12 13",
+     "explain": "bump receives the address of v, so adding 10 to each a[i] changes v itself."
+    },
+    {
+     "id": "u7-q042",
+     "lesson": "u7-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which is a correct header for a function that only reads an int array and also receives the number of elements?",
+     "choices": [
+      "void show(int a[], n)",
+      "void show(const int a, int n)",
+      "void show(const int a[], int n)",
+      "void show(int[] a, int n)"
+     ],
+     "answer": 2,
+     "explain": "An array parameter is written type name[] and const protects the contents. The size is a separate, fully typed parameter."
+    },
+    {
+     "id": "u7-q043",
+     "lesson": "u7-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What happens when this function is compiled?",
+     "choices": [
+      "It compiles and sets the caller's first element to 0",
+      "It compiles and sets only a local copy",
+      "It compiles but warns at run time",
+      "Compile error: the const array parameter cannot be modified"
+     ],
+     "answer": 3,
+     "explain": "A const array parameter makes every element read-only inside the function.",
+     "code": "void clear(const int a[], int n)\n{\n    a[0] = 0;\n}"
+    },
+    {
+     "id": "u7-q044",
+     "lesson": "u7-l5",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "A function that receives an array parameter can find out the array's size by itself, so the size need not be passed.",
+     "answer": false,
+     "explain": "The parameter is only an address. The function has no way to know how many elements follow, so the size is passed separately."
+    },
+    {
+     "id": "u7-q045",
+     "lesson": "u7-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "void setOne(int x) { x = 99; }\nvoid setAll(int a[]) { a[0] = 77; }\nint main()\n{\n    int v[2] = {1, 2};\n    setOne(v[0]);\n    cout << v[0] << \" \";\n    setAll(v);\n    cout << v[0];\n    return 0;\n}",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nvoid setOne(int x) { x = 99; }\nvoid setAll(int a[]) { a[0] = 77; }\nint main()\n{\n    int v[2] = {1, 2};\n    setOne(v[0]);\n    cout << v[0] << \" \";\n    setAll(v);\n    cout << v[0];\n    return 0;\n}\n",
+     "answer": "1 77",
+     "explain": "setOne gets a copy of the element, so v[0] stays 1. setAll gets the array's address, so it changes v[0] to 77."
+    },
+    {
+     "id": "u7-q046",
+     "lesson": "u7-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "int total(const int a[], int n)\n{\n    int t = 0;\n    for (int i = 0; i < n; i++)\n        t += a[i];\n    return t;\n}\nint main()\n{\n    int w[] = {5, 10, 15, 20};\n    cout << total(w, 3);\n    return 0;\n}",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint total(const int a[], int n)\n{\n    int t = 0;\n    for (int i = 0; i < n; i++)\n        t += a[i];\n    return t;\n}\nint main()\n{\n    int w[] = {5, 10, 15, 20};\n    cout << total(w, 3);\n    return 0;\n}\n",
+     "answer": "30",
+     "explain": "Only the first three elements are added because the size argument is 3: 5 + 10 + 15 = 30."
+    },
+    {
+     "id": "u7-q047",
+     "lesson": "u7-l5",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which keyword placed before an array parameter's type prevents the function from changing the array?",
+     "answer": "const",
+     "accept": [
+      "const"
+     ],
+     "explain": "A const array parameter turns any attempt to modify the elements into a compile error."
+    },
+    {
+     "id": "u7-q048",
+     "lesson": "u7-l5",
+     "type": "tf",
+     "difficulty": 3,
+     "prompt": "Inside a function that received an array through the parameter `int a[]`, a range-based for loop over a is allowed.",
+     "answer": false,
+     "explain": "The function only has an address, not the array's size, so the range-based for loop (and a structured binding) will not compile on the parameter."
+    },
+    {
+     "id": "u7-q049",
+     "lesson": "u7-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "void flip(int a[], int n)\n{\n    for (int i = 0; i < n / 2; i++) {\n        int t = a[i];\n        a[i] = a[n - 1 - i];\n        a[n - 1 - i] = t;\n    }\n}\nint main()\n{\n    int v[5] = {1, 2, 3, 4, 5};\n    flip(v, 5);\n    for (int i = 0; i < 5; i++)\n        cout << v[i] << ' ';\n    return 0;\n}",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nvoid flip(int a[], int n)\n{\n    for (int i = 0; i < n / 2; i++) {\n        int t = a[i];\n        a[i] = a[n - 1 - i];\n        a[n - 1 - i] = t;\n    }\n}\nint main()\n{\n    int v[5] = {1, 2, 3, 4, 5};\n    flip(v, 5);\n    for (int i = 0; i < 5; i++)\n        cout << v[i] << ' ';\n    return 0;\n}\n",
+     "answer": "5 4 3 2 1",
+     "explain": "The function swaps a[0] with a[4] and a[1] with a[3]; the middle element stays. It changes the caller's array."
+    },
+    {
+     "id": "u7-q050",
+     "lesson": "u7-l6",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "How many elements does `int grid[3][4];` have?",
+     "choices": [
+      "7",
+      "12",
+      "3",
+      "4"
+     ],
+     "answer": 1,
+     "explain": "A two-dimensional array has rows times columns elements: 3 x 4 = 12."
+    },
+    {
+     "id": "u7-q051",
+     "lesson": "u7-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "In the statement `table[2][5] = 8;` what do the subscripts mean?",
+     "choices": [
+      "Column 2, row 5",
+      "Row 5, column 2",
+      "Row 2, column 5",
+      "Two elements, 2 and 5"
+     ],
+     "answer": 2,
+     "explain": "The first subscript is the row and the second is the column."
+    },
+    {
+     "id": "u7-q052",
+     "lesson": "u7-l6",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    int t[2][3];\n    for (int r = 0; r < 2; r++)\n        for (int c = 0; c < 3; c++)\n            t[r][c] = r * 3 + c;\n    cout << t[1][2] << \" \" << t[0][1];",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int t[2][3];\n    for (int r = 0; r < 2; r++)\n        for (int c = 0; c < 3; c++)\n            t[r][c] = r * 3 + c;\n    cout << t[1][2] << \" \" << t[0][1];\n    return 0;\n}\n",
+     "answer": "5 1",
+     "explain": "t[1][2] = 1*3 + 2 = 5 and t[0][1] = 0*3 + 1 = 1."
+    },
+    {
+     "id": "u7-q053",
+     "lesson": "u7-l6",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    int m[2][3] = {{1, 2, 3}, {4, 5, 6}};\n    for (int r = 0; r < 2; r++) {\n        int s = 0;\n        for (int c = 0; c < 3; c++)\n            s += m[r][c];\n        cout << s << ' ';\n    }",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int m[2][3] = {{1, 2, 3}, {4, 5, 6}};\n    for (int r = 0; r < 2; r++) {\n        int s = 0;\n        for (int c = 0; c < 3; c++)\n            s += m[r][c];\n        cout << s << ' ';\n    }\n    return 0;\n}\n",
+     "answer": "6 15",
+     "explain": "Each pass of the outer loop totals one row: 1+2+3 = 6 and 4+5+6 = 15."
+    },
+    {
+     "id": "u7-q054",
+     "lesson": "u7-l6",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "The definition `int m[2][3] = {1, 2, 3, 4, 5, 6};` is valid and fills the array row by row.",
+     "answer": true,
+     "explain": "A flat list fills the elements in row order, so m[0] is 1 2 3 and m[1] is 4 5 6."
+    },
+    {
+     "id": "u7-q055",
+     "lesson": "u7-l6",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "What is the value of a[0][1] after this definition?",
+     "choices": [
+      "1",
+      "2",
+      "3",
+      "0"
+     ],
+     "answer": 3,
+     "explain": "Each inner list initializes one row, and unlisted elements are set to 0. Row 0 is {1, 0}.",
+     "code": "int a[2][2] = {{1}, {2, 3}};"
+    },
+    {
+     "id": "u7-q056",
+     "lesson": "u7-l6",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Which is a valid prototype for a function that receives a table with 4 columns and any number of rows?",
+     "choices": [
+      "void show(int t[][4], int rows);",
+      "void show(int t[][], int rows);",
+      "void show(int t[4][], int rows);",
+      "void show(int t[], int rows, 4);"
+     ],
+     "answer": 0,
+     "explain": "For a multi-dimensional array parameter every dimension except the first must be given its size."
+    },
+    {
+     "id": "u7-q057",
+     "lesson": "u7-l6",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "C++ allows arrays with three or more dimensions.",
+     "answer": true,
+     "explain": "Each extra dimension adds another subscript, for example int cube[2][3][4]."
+    },
+    {
+     "id": "u7-q058",
+     "lesson": "u7-l7",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which header must be included to define a vector?",
+     "choices": [
+      "<array>",
+      "<vector>",
+      "<iostream>",
+      "<list>"
+     ],
+     "answer": 1,
+     "explain": "The vector class template is declared in <vector>."
+    },
+    {
+     "id": "u7-q059",
+     "lesson": "u7-l7",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What does `vector<int> v(5);` create?",
+     "choices": [
+      "An empty vector that can later hold 5 values",
+      "A vector with one element holding 5",
+      "A vector with 5 elements, all 0",
+      "A vector with 5 uninitialized elements"
+     ],
+     "answer": 2,
+     "explain": "A number in parentheses sets the starting size, and the elements are value-initialized to 0.",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    vector<int> v(5);\n    int s = 0;\n    for (int x : v) s += x;\n    cout << v.size() << \" \" << s;\n    return 0;\n}\n",
+     "expect": "5 0"
+    },
+    {
+     "id": "u7-q060",
+     "lesson": "u7-l7",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    vector<int> v;\n    v.push_back(4);\n    v.push_back(9);\n    v.push_back(1);\n    cout << v.size() << \" \" << v[1] << \" \" << v.at(2);",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    vector<int> v;\n    v.push_back(4);\n    v.push_back(9);\n    v.push_back(1);\n    cout << v.size() << \" \" << v[1] << \" \" << v.at(2);\n    return 0;\n}\n",
+     "answer": "3 9 1",
+     "explain": "Three push_back calls give size 3. Subscript 1 holds 9 and at(2) returns the third element, 1."
+    },
+    {
+     "id": "u7-q061",
+     "lesson": "u7-l7",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    vector<int> v = {1, 2, 3};\n    for (int &x : v)\n        x = x * x;\n    for (int x : v)\n        cout << x << ' ';",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    vector<int> v = {1, 2, 3};\n    for (int &x : v)\n        x = x * x;\n    for (int x : v)\n        cout << x << ' ';\n    return 0;\n}\n",
+     "answer": "1 4 9",
+     "explain": "The reference loop variable squares each element in place."
+    },
+    {
+     "id": "u7-q062",
+     "lesson": "u7-l7",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "What is wrong with this code?",
+     "choices": [
+      "A vector cannot hold ints",
+      "There is no error; v grows to hold the 5",
+      "push_back must be called with no arguments",
+      "v has no elements, so v[0] is invalid; push_back should be used"
+     ],
+     "answer": 3,
+     "explain": "A vector defined with no size is empty. Subscripts only reach existing elements; push_back is how a new one is added.",
+     "code": "vector<int> v;\nv[0] = 5;"
+    },
+    {
+     "id": "u7-q063",
+     "lesson": "u7-l7",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "The at member function checks the subscript and signals an error for an invalid one, while the [] operator does not check.",
+     "answer": true,
+     "explain": "v.at(i) throws an exception if i is out of range. v[i] does no checking, like an array."
+    },
+    {
+     "id": "u7-q064",
+     "lesson": "u7-l7",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Given `vector<int> v = {4, 5, 6};`, you want v to become {4, 5, 6, 9} without knowing its size in advance. Which member function (name only) appends the 9?",
+     "answer": "push_back",
+     "accept": [
+      "push_back",
+      "push_back()",
+      "v.push_back"
+     ],
+     "explain": "push_back(value) creates a new last element holding value, growing the size by one."
+    },
+    {
+     "id": "u7-q065",
+     "lesson": "u7-l7",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "Unlike an array, a vector can change its size while the program is running.",
+     "answer": true,
+     "explain": "Members such as push_back, pop_back and resize change the number of elements."
+    },
+    {
+     "id": "u7-q066",
+     "lesson": "u7-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "On a system where an int uses 4 bytes, how much memory does `int values[10];` use?",
+     "choices": [
+      "40 bytes",
+      "10 bytes",
+      "14 bytes",
+      "44 bytes"
+     ],
+     "answer": 0,
+     "explain": "An array's memory is the number of elements times the size of one element: 10 x 4 = 40 bytes. The size declarator counts elements, not bytes."
+    },
+    {
+     "id": "u7-q067",
+     "lesson": "u7-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "What is wrong with the definition `int counts[-5];`?",
+     "choices": [
+      "Nothing; it creates 5 elements with subscripts -1 to -5",
+      "The size declarator must be greater than zero",
+      "An int array must have an initialization list",
+      "Array names cannot contain lowercase letters"
+     ],
+     "answer": 1,
+     "explain": "The declared size has to be a positive whole-number constant. A negative size does not compile, and subscripts always run from 0 to size - 1."
+    },
+    {
+     "id": "u7-q068",
+     "lesson": "u7-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A loop such as `for (int i = 1; i <= SIZE; i++) nums[i] = 0;` skips element 0 and writes one element past the end. This common mistake is called a(n) ____ error.",
+     "answer": "off-by-one",
+     "accept": [
+      "off-by-one",
+      "off by one",
+      "off-by-one error",
+      "off by one error"
+     ],
+     "explain": "Subscripts run from 0 to SIZE - 1, so the correct loop is `for (int i = 0; i < SIZE; i++)`. C++ does no bounds checking, so the extra write is not caught."
+    },
+    {
+     "id": "u7-q069",
+     "lesson": "u7-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "An int array defined globally (outside all functions) with no initialization list has every element set to 0.",
+     "answer": true,
+     "explain": "Global arrays, like global variables, are zero-initialized automatically. A local array with no initialization list holds garbage.",
+     "program": "#include <iostream>\nusing namespace std;\nint g[3];\nint main()\n{\n    cout << g[0] << g[1] << g[2] << endl;\n    return 0;\n}\n",
+     "expect": "000"
+    },
+    {
+     "id": "u7-q070",
+     "lesson": "u7-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    string colors[4] = {\"red\", \"blue\"};\n    for (int i = 0; i < 4; i++)\n        cout << \"[\" << colors[i] << \"]\";",
+     "answer": "[red][blue][][]",
+     "explain": "In a partially initialized string array the elements without a value become empty strings, not \"0\" and not garbage.",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    string colors[4] = {\"red\", \"blue\"};\n    for (int i = 0; i < 4; i++)\n        cout << \"[\" << colors[i] << \"]\";\n    return 0;\n}\n"
+    },
+    {
+     "id": "u7-q071",
+     "lesson": "u7-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which array definition is legal?",
+     "choices": [
+      "int hours[3] = 8, 12, 16;",
+      "int nums[6] = {2, 4, , 8};",
+      "double rates[];",
+      "double rates[] = {1.5, 2.5};"
+     ],
+     "answer": 3,
+     "explain": "An initialization list needs braces and cannot skip elements. An array with no size declarator needs an initialization list so the compiler can count it; with one, rates gets 2 elements."
+    },
+    {
+     "id": "u7-q072",
+     "lesson": "u7-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "In the loop `for (int v : scores)`, the variable v, which receives each element of scores in turn, is called the ____ variable.",
+     "answer": "range",
+     "accept": [
+      "range",
+      "range variable"
+     ],
+     "explain": "The range variable gets a copy of element 0, then element 1, and so on. Declare it as a reference (`int &v`) if the loop must change the elements."
+    },
+    {
+     "id": "u7-q073",
+     "lesson": "u7-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A range-based for loop gives you each element but never its subscript. Which task needs the subscripts, so a regular counting for loop should be used?",
+     "choices": [
+      "Copying each element of array a into the same position of array b",
+      "Adding up all the elements of an array",
+      "Displaying every element of an array",
+      "Doubling every element of an array in place"
+     ],
+     "answer": 0,
+     "explain": "To store into b[i] you need i. Summing and displaying only need the values, and doubling in place works with a reference range variable (`for (int &x : a) x *= 2;`)."
+    },
+    {
+     "id": "u7-q074",
+     "lesson": "u7-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "scores is an int array of 5 elements. What does `cout << scores << endl;` display?",
+     "choices": [
+      "All five elements separated by spaces",
+      "Only the first element",
+      "The array's beginning memory address",
+      "Nothing; it is a compile error"
+     ],
+     "answer": 2,
+     "explain": "An array name without brackets stands for the array's starting address, so cout prints an address. Use a loop to display the elements. (A char array holding a C-string is the exception: cout prints its characters.)"
+    },
+    {
+     "id": "u7-q075",
+     "lesson": "u7-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "    int a[] = {5, 8, 2};\n    int k = 1;\n    a[k]--;\n    cout << a[1] << \" \" << k << endl;\n    int v = a[k--];\n    cout << v << \" \" << k << \" \" << a[1] << endl;\n    cout << ++a[2] << endl;",
+     "answer": "7 1\n7 0 7\n3",
+     "explain": "`a[k]--` decrements the element (8 to 7). `a[k--]` reads a[1] and then decrements k, leaving the array alone. `++a[2]` increments the element before it is printed.",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int a[] = {5, 8, 2};\n    int k = 1;\n    a[k]--;\n    cout << a[1] << \" \" << k << endl;\n    int v = a[k--];\n    cout << v << \" \" << k << \" \" << a[1] << endl;\n    cout << ++a[2] << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u7-q076",
+     "lesson": "u7-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "The code is meant to total each array separately. What does it print?",
+     "code": "    int first[3] = {1, 2, 3};\n    int second[3] = {10, 20, 30};\n    int total = 0;\n    for (int i = 0; i < 3; i++)\n        total += first[i];\n    cout << \"First: \" << total << endl;\n    for (int i = 0; i < 3; i++)\n        total += second[i];\n    cout << \"Second: \" << total << endl;",
+     "answer": "First: 6\nSecond: 66",
+     "explain": "total is never set back to 0, so the second figure also includes the first array's 6. Reset the accumulator (`total = 0;`) before summing the second array.",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int first[3] = {1, 2, 3};\n    int second[3] = {10, 20, 30};\n    int total = 0;\n    for (int i = 0; i < 3; i++)\n        total += first[i];\n    cout << \"First: \" << total << endl;\n    for (int i = 0; i < 3; i++)\n        total += second[i];\n    cout << \"Second: \" << total << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u7-q077",
+     "lesson": "u7-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "The user types 4 7 1 -1. What does this print?",
+     "code": "    const int SIZE = 5;\n    int nums[SIZE];\n    int count = 0;\n    int n;\n    cin >> n;\n    while (n != -1 && count < SIZE)\n    {\n        nums[count] = n;\n        count++;\n        cin >> n;\n    }\n    for (int i = count - 1; i >= 0; i--)\n        cout << nums[i] << \" \";\n    cout << endl << count << endl;",
+     "stdin": "4 7 1 -1\n",
+     "answer": "1 7 4\n3",
+     "explain": "-1 is the sentinel and is not stored, so the partially filled array holds 3 values and count is 3. The second loop walks only the used elements, from subscript 2 down to 0.",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    const int SIZE = 5;\n    int nums[SIZE];\n    int count = 0;\n    int n;\n    cin >> n;\n    while (n != -1 && count < SIZE)\n    {\n        nums[count] = n;\n        count++;\n        cin >> n;\n    }\n    for (int i = count - 1; i >= 0; i--)\n        cout << nums[i] << \" \";\n    cout << endl << count << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u7-q078",
+     "lesson": "u7-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A program fills `int data[50];` from the keyboard with `while (cin >> v && v != -1) { data[count] = v; count++; }`, where count starts at 0. What is wrong?",
+     "choices": [
+      "Nothing stops count from reaching 50, so a 51st value would be stored past the end of the array",
+      "count should start at 1",
+      "The -1 sentinel is stored in the array",
+      "cin cannot be used inside a loop condition"
+     ],
+     "answer": 0,
+     "explain": "A loop that fills a partially filled array must also test `count < 50`. C++ does no bounds checking, so extra input would overwrite memory beyond the array. The -1 is not stored, because the test fails before the body runs."
+    },
+    {
+     "id": "u7-q079",
+     "lesson": "u7-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    int ids[] = {42, 17, 88, 17, 63};\n    int target = 17;\n    int pos = -1;\n    int i = 0;\n    while (i < 5 && pos == -1)\n    {\n        if (ids[i] == target)\n            pos = i;\n        i++;\n    }\n    cout << pos << \" \" << i << endl;",
+     "answer": "1 2",
+     "explain": "The search stops as soon as it finds the first 17, at subscript 1; i had already been incremented to 2 at the end of that pass. The second 17 is never examined.",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    int ids[] = {42, 17, 88, 17, 63};\n    int target = 17;\n    int pos = -1;\n    int i = 0;\n    while (i < 5 && pos == -1)\n    {\n        if (ids[i] == target)\n            pos = i;\n        i++;\n    }\n    cout << pos << \" \" << i << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u7-q080",
+     "lesson": "u7-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    string name[4] = {\"Ana\", \"Bo\", \"Cy\", \"Dee\"};\n    int grade[4] = {93, 78, 90, 85};\n    for (int i = 0; i < 4; i++)\n        if (grade[i] >= 90)\n            cout << name[i] << \" \" << grade[i] << endl;",
+     "answer": "Ana 93\nCy 90",
+     "explain": "One subscript walks both parallel arrays, so each name is printed beside its own grade. Only subscripts 0 and 2 pass the test.",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    string name[4] = {\"Ana\", \"Bo\", \"Cy\", \"Dee\"};\n    int grade[4] = {93, 78, 90, 85};\n    for (int i = 0; i < 4; i++)\n        if (grade[i] >= 90)\n            cout << name[i] << \" \" << grade[i] << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u7-q081",
+     "lesson": "u7-l5",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "scores is an int array of 10 elements. Which statement correctly passes it to `void show(const int a[], int n)`?",
+     "choices": [
+      "show(scores[], 10);",
+      "show(scores, 10);",
+      "show(scores[10], 10);",
+      "show(int scores[], 10);"
+     ],
+     "answer": 1,
+     "explain": "Pass the array name alone. `scores[10]` would be one (nonexistent) element, and brackets or types do not belong in a call."
+    },
+    {
+     "id": "u7-q082",
+     "lesson": "u7-l5",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "When you write a parameter that will receive a one-dimensional array, you may leave the brackets empty, as in `int a[]`.",
+     "answer": true,
+     "explain": "The parameter receives only the array's address, so no size declarator is needed. The number of elements is passed as a separate argument."
+    },
+    {
+     "id": "u7-q083",
+     "lesson": "u7-l5",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "Write the prototype for a function named average that returns a double and receives a const int array and an int size. Leave out the parameter names.",
+     "answer": "double average(const int[], int);",
+     "accept": [
+      "double average(const int[], int);",
+      "double average(const int a[], int n);",
+      "double average(const int arr[], int size);"
+     ],
+     "explain": "An array parameter in a prototype is written as the type followed by empty brackets. const promises the function will not change the array."
+    },
+    {
+     "id": "u7-q084",
+     "lesson": "u7-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "int countAbove(const int a[], int n, int limit)\n{\n    int c = 0;\n    for (int i = 0; i < n; i++)\n        if (a[i] > limit)\n            c++;\n    return c;\n}\nint main()\n{\n    int t[6] = {55, 72, 90, 60, 72, 81};\n    cout << countAbove(t, 6, 72) << \" \" << countAbove(t, 3, 50) << endl;\n    return 0;\n}",
+     "answer": "2 3",
+     "explain": "Strictly greater than 72 leaves out both 72s, so only 90 and 81 count. The second call looks at only the first 3 elements because n is 3, and all of them exceed 50.",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint countAbove(const int a[], int n, int limit)\n{\n    int c = 0;\n    for (int i = 0; i < n; i++)\n        if (a[i] > limit)\n            c++;\n    return c;\n}\nint main()\n{\n    int t[6] = {55, 72, 90, 60, 72, 81};\n    cout << countAbove(t, 6, 72) << \" \" << countAbove(t, 3, 50) << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u7-q085",
+     "lesson": "u7-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "bool sameCode(const int a[], const int b[], int size)\n{\n    for (int i = 0; i < size; i++)\n        if (a[i] != b[i])\n            return false;\n    return true;\n}\nint main()\n{\n    int entered[4] = {3, 1, 4, 1};\n    int stored[4] = {3, 1, 4, 2};\n    cout << sameCode(entered, stored, 4) << \" \";\n    cout << sameCode(entered, stored, 3) << endl;\n    return 0;\n}",
+     "answer": "0 1",
+     "explain": "The function returns false at the first position that differs and returns true only after checking every position. The arrays differ at subscript 3, which the second call never examines. bool prints as 0 or 1.",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nbool sameCode(const int a[], const int b[], int size)\n{\n    for (int i = 0; i < size; i++)\n        if (a[i] != b[i])\n            return false;\n    return true;\n}\nint main()\n{\n    int entered[4] = {3, 1, 4, 1};\n    int stored[4] = {3, 1, 4, 2};\n    cout << sameCode(entered, stored, 4) << \" \";\n    cout << sameCode(entered, stored, 3) << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u7-q086",
+     "lesson": "u7-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "double total(const double s[], int n)\n{\n    double t = 0;\n    for (int i = 0; i < n; i++)\n        t += s[i];\n    return t;\n}\ndouble lowest(const double s[], int n)\n{\n    double lo = s[0];\n    for (int i = 1; i < n; i++)\n        if (s[i] < lo)\n            lo = s[i];\n    return lo;\n}\nint main()\n{\n    double scores[4] = {80, 65, 90, 95};\n    double avg = (total(scores, 4) - lowest(scores, 4)) / 3;\n    cout << avg << endl;\n    return 0;\n}",
+     "answer": "88.3333",
+     "explain": "The total is 330 and the lowest score is 65. Dropping it leaves 265 over 3 scores, 88.333..., which cout shows with its default 6 significant digits as 88.3333.",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\ndouble total(const double s[], int n)\n{\n    double t = 0;\n    for (int i = 0; i < n; i++)\n        t += s[i];\n    return t;\n}\ndouble lowest(const double s[], int n)\n{\n    double lo = s[0];\n    for (int i = 1; i < n; i++)\n        if (s[i] < lo)\n            lo = s[i];\n    return lo;\n}\nint main()\n{\n    double scores[4] = {80, 65, 90, 95};\n    double avg = (total(scores, 4) - lowest(scores, 4)) / 3;\n    cout << avg << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u7-q087",
+     "lesson": "u7-l7",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "    vector<int> v = {3, 6, 9};\n    v.pop_back();\n    v.push_back(4);\n    cout << v.size() << \" \" << v[2] << endl;\n    v.clear();\n    cout << v.size() << \" \" << v.empty() << endl;",
+     "answer": "3 4\n0 1",
+     "explain": "pop_back removes the 9 and push_back adds 4 at the end, so v is 3 6 4. clear removes every element, leaving size 0, and empty returns true, which prints as 1.",
+     "program": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\nint main()\n{\n    vector<int> v = {3, 6, 9};\n    v.pop_back();\n    v.push_back(4);\n    cout << v.size() << \" \" << v[2] << endl;\n    v.clear();\n    cout << v.size() << \" \" << v.empty() << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u7-q088",
+     "lesson": "u7-l7",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "A vector, one of the data types in the Standard Template Library (STL), is an associative container.",
+     "answer": false,
+     "explain": "The STL's two kinds of containers are sequence containers, which keep elements in order like an array, and associative containers, which find elements by key. vector is a sequence container."
+    },
+    {
+     "id": "u7-q089",
+     "lesson": "u7-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "What is the problem with this code?",
+     "code": "char word[] = {'H', 'i'};\ncout << word;",
+     "choices": [
+      "word has no null terminator, so cout keeps printing past the end of the array",
+      "Nothing; it prints Hi",
+      "A char array cannot be initialized with a list of single characters",
+      "cout cannot display a char array"
+     ],
+     "answer": 0,
+     "explain": "cout displays a char array up to the '\\0' that ends a C-string. A list of single characters adds no '\\0', so the output runs into whatever memory follows (undefined behavior). `char word[] = \"Hi\";` would add the null character."
+    },
+    {
+     "id": "u7-q090",
+     "lesson": "u7-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "In `int a[4] = {2, 4, 6, 8};` the values in braces are called the array's ____ list.",
+     "answer": "initialization",
+     "accept": [
+      "initialization",
+      "initialization list",
+      "initializer",
+      "initializer list"
+     ],
+     "explain": "The initialization list stores its values in the elements in order, starting at subscript 0. It can be shorter than the array (the rest become 0) but never longer."
+    }
+   ],
+   "programs": [
+    {
+     "id": "u7-p1",
+     "title": "Array statistics",
+     "task": "Read an integer n (1 to 20), then read n integers into an array. Using loops, display the sum, the average to 2 decimal places, the highest value and the subscript where it first appears, the lowest value and the subscript where it first appears, and how many values are above the average. Use the exact labels shown in the sample output.",
+     "stdin": "8\n14 7 22 9 22 3 18 11\n",
+     "solution": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <vector>\nusing namespace std;\n\nint main()\n{\n    const int MAX = 20;\n    int a[MAX];\n    int n;\n    cin >> n;\n    for (int i = 0; i < n; i++)\n        cin >> a[i];\n\n    int sum = 0, hi = a[0], hiPos = 0, lo = a[0], loPos = 0;\n    for (int i = 0; i < n; i++) {\n        sum += a[i];\n        if (a[i] > hi) { hi = a[i]; hiPos = i; }\n        if (a[i] < lo) { lo = a[i]; loPos = i; }\n    }\n    double avg = static_cast<double>(sum) / n;\n    int above = 0;\n    for (int i = 0; i < n; i++)\n        if (a[i] > avg)\n            above++;\n\n    cout << fixed << setprecision(2);\n    cout << \"Sum: \" << sum << endl;\n    cout << \"Average: \" << avg << endl;\n    cout << \"Highest: \" << hi << \" at \" << hiPos << endl;\n    cout << \"Lowest: \" << lo << \" at \" << loPos << endl;\n    cout << \"Above average: \" << above << endl;\n    return 0;\n}\n",
+     "sampleOutput": "Sum: 106\nAverage: 13.25\nHighest: 22 at 2\nLowest: 3 at 5\nAbove average: 4"
+    },
+    {
+     "id": "u7-p2",
+     "title": "Parallel arrays: best student",
+     "task": "Read an integer n (1 to 10), then n pairs, each a one-word name followed by an integer score, into two parallel arrays. Display each student as 'name: score', then display the name and score of the student with the highest score, then the number of students who scored 80 or more. Assume no ties for the highest score.",
+     "stdin": "5\nAna 72\nBo 95\nCy 88\nDee 64\nEli 80\n",
+     "solution": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <vector>\nusing namespace std;\n\nint main()\n{\n    const int MAX = 10;\n    string name[MAX];\n    int score[MAX];\n    int n;\n    cin >> n;\n    for (int i = 0; i < n; i++)\n        cin >> name[i] >> score[i];\n\n    int best = 0, passing = 0;\n    for (int i = 0; i < n; i++) {\n        cout << name[i] << \": \" << score[i] << endl;\n        if (score[i] > score[best])\n            best = i;\n        if (score[i] >= 80)\n            passing++;\n    }\n    cout << \"Top: \" << name[best] << \" \" << score[best] << endl;\n    cout << \"At least 80: \" << passing << endl;\n    return 0;\n}\n",
+     "sampleOutput": "Ana: 72\nBo: 95\nCy: 88\nDee: 64\nEli: 80\nTop: Bo 95\nAt least 80: 3"
+    },
+    {
+     "id": "u7-p3",
+     "title": "Array functions: reverse and count evens",
+     "task": "Write two functions. countEven(const int a[], int n) returns how many elements are even. reverseArray(int a[], int n) reverses the array in place. In main, read 6 integers into an array, display the count of even values, call reverseArray, then display the reversed array with the values separated by single spaces.",
+     "stdin": "3 8 5 12 7 4\n",
+     "solution": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <vector>\nusing namespace std;\n\nint countEven(const int a[], int n)\n{\n    int c = 0;\n    for (int i = 0; i < n; i++)\n        if (a[i] % 2 == 0)\n            c++;\n    return c;\n}\n\nvoid reverseArray(int a[], int n)\n{\n    for (int i = 0; i < n / 2; i++) {\n        int t = a[i];\n        a[i] = a[n - 1 - i];\n        a[n - 1 - i] = t;\n    }\n}\n\nint main()\n{\n    const int SIZE = 6;\n    int v[SIZE];\n    for (int i = 0; i < SIZE; i++)\n        cin >> v[i];\n    cout << \"Even values: \" << countEven(v, SIZE) << endl;\n    reverseArray(v, SIZE);\n    cout << \"Reversed:\";\n    for (int i = 0; i < SIZE; i++)\n        cout << \" \" << v[i];\n    cout << endl;\n    return 0;\n}\n",
+     "sampleOutput": "Even values: 3\nReversed: 4 7 12 5 8 3"
+    },
+    {
+     "id": "u7-p4",
+     "title": "Two-dimensional array: row and column totals",
+     "task": "Read a table of weekly sales for 3 stores (rows) over 4 weeks (columns) into a 3 by 4 int array, row by row. Display the total for each store as 'Store k: total' (k starting at 1), then the total for each week as 'Week k: total', using nested loops.",
+     "stdin": "10 20 30 40\n5 15 25 35\n7 7 7 7\n",
+     "solution": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <vector>\nusing namespace std;\n\nint main()\n{\n    const int ROWS = 3, COLS = 4;\n    int sales[ROWS][COLS];\n    for (int r = 0; r < ROWS; r++)\n        for (int c = 0; c < COLS; c++)\n            cin >> sales[r][c];\n\n    for (int r = 0; r < ROWS; r++) {\n        int total = 0;\n        for (int c = 0; c < COLS; c++)\n            total += sales[r][c];\n        cout << \"Store \" << r + 1 << \": \" << total << endl;\n    }\n    for (int c = 0; c < COLS; c++) {\n        int total = 0;\n        for (int r = 0; r < ROWS; r++)\n            total += sales[r][c];\n        cout << \"Week \" << c + 1 << \": \" << total << endl;\n    }\n    return 0;\n}\n",
+     "sampleOutput": "Store 1: 100\nStore 2: 80\nStore 3: 28\nWeek 1: 22\nWeek 2: 42\nWeek 3: 62\nWeek 4: 82"
+    },
+    {
+     "id": "u7-p5",
+     "title": "Vector: read until zero",
+     "task": "Read integers into a vector using push_back until the value 0 is entered (do not store the 0). Display how many values were stored, then display them in reverse order separated by single spaces, then multiply every element by 2 using a range-based for loop with a reference and display the doubled values in original order separated by single spaces.",
+     "stdin": "6 11 4 9 0\n",
+     "solution": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <vector>\nusing namespace std;\n\nint main()\n{\n    vector<int> v;\n    int x;\n    cin >> x;\n    while (x != 0) {\n        v.push_back(x);\n        cin >> x;\n    }\n    cout << \"Count: \" << v.size() << endl;\n    cout << \"Reverse:\";\n    for (int i = static_cast<int>(v.size()) - 1; i >= 0; i--)\n        cout << \" \" << v[i];\n    cout << endl;\n    for (int &e : v)\n        e *= 2;\n    cout << \"Doubled:\";\n    for (int e : v)\n        cout << \" \" << e;\n    cout << endl;\n    return 0;\n}\n",
+     "sampleOutput": "Count: 4\nReverse: 9 4 11 6\nDoubled: 12 22 8 18"
+    }
+   ]
+  }
+ ]
+}

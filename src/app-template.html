@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSC 1111 Test-Out Course</title>
+<style>
+/* Layout: fixed left rail of units, one working column on the right. Everything runs offline from this single file. */
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --surface-2: #eef2f7; --fg: #18212f; --muted: #5b6678; --line: #d5dce6;
+  --accent: #1d5bbf; --accent-soft: #e3ecfb; --good: #14733a; --good-soft: #e2f4e8; --bad: #b3261e; --bad-soft: #fbe6e4;
+  --warn: #8a5300; --warn-soft: #fcf0d9; --code-bg: #edf1f6;
+  --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", Consolas, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #11151c; --surface: #1a2029; --surface-2: #212936; --fg: #e7ebf1; --muted: #9aa6b8; --line: #2d3644;
+  --accent: #82b1f7; --accent-soft: #1c2b45; --good: #6fd08f; --good-soft: #17301f; --bad: #f29b94; --bad-soft: #3a1c1a;
+  --warn: #eeb768; --warn-soft: #33270f; --code-bg: #232b37; color-scheme: dark; } }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.55; }
+.app { display: grid; grid-template-columns: 270px minmax(0, 1fr); min-height: 100%; }
+nav { background: var(--surface); border-right: 1px solid var(--line); padding: 18px 14px; display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+nav h1 { font-size: 1.05rem; margin: 0 6px 10px; line-height: 1.25; }
+nav button { all: unset; cursor: pointer; display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 7px; font-size: 0.93rem; }
+nav button:hover { background: var(--surface-2); }
+nav button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav button:focus-visible, .btn:focus-visible, .choice:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+nav .pct { font-variant-numeric: tabular-nums; font-size: 0.8rem; color: var(--muted); }
+nav .sep { height: 1px; background: var(--line); margin: 8px 4px; }
+main { padding: 28px clamp(16px, 4vw, 48px) 80px; min-width: 0; }
+.col { max-width: 54rem; display: flex; flex-direction: column; gap: 20px; }
+h2 { font-size: 1.55rem; margin: 0; line-height: 1.2; }
+h3 { font-size: 1.1rem; margin: 0; }
+h4 { font-size: 1rem; margin: 14px 0 4px; }
+p { margin: 0 0 10px; }
+.muted { color: var(--muted); }
+.small { font-size: 0.88rem; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+.btn { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 8px 14px; border-radius: 7px; }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); font-weight: 600; }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn[disabled] { opacity: 0.5; cursor: default; }
+.bar { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+.bar.good > i { background: var(--good); }
+code, pre, textarea.code { font-family: var(--mono); font-size: 0.88rem; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; margin: 0 0 10px; line-height: 1.5; white-space: pre; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; width: 100%; margin: 0 0 10px; font-size: 0.93rem; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.lesson ul, .lesson ol { margin: 0 0 10px; padding-left: 1.3rem; }
+.lesson li { margin-bottom: 4px; }
+.tag { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 99px; background: var(--surface-2); color: var(--muted); }
+.tag.good { background: var(--good-soft); color: var(--good); }
+.tag.bad { background: var(--bad-soft); color: var(--bad); }
+.tag.warn { background: var(--warn-soft); color: var(--warn); }
+.choices { display: flex; flex-direction: column; gap: 8px; }
+.choice { font: inherit; text-align: left; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 10px 14px; border-radius: 8px; display: flex; gap: 12px; align-items: flex-start; }
+.choice:hover:not([disabled]) { background: var(--surface-2); }
+.choice .k { font-family: var(--mono); color: var(--muted); flex: none; }
+.choice .t { min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.choice.right { border-color: var(--good); background: var(--good-soft); }
+.choice.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.choice.picked { border-color: var(--accent); background: var(--accent-soft); }
+.choice[disabled] { cursor: default; }
+textarea.code, input.fill { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 8px; padding: 10px 12px; font-size: 0.95rem; }
+input.fill { font-family: var(--mono); }
+textarea.code { min-height: 110px; resize: vertical; white-space: pre; }
+.verdict { border-radius: 8px; padding: 12px 14px; }
+.verdict.right { background: var(--good-soft); color: var(--good); }
+.verdict.wrong { background: var(--bad-soft); color: var(--bad); }
+.verdict .why { color: var(--fg); margin-top: 6px; }
+.qmeta { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.big { font-size: 2.4rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.checklist li { display: flex; gap: 10px; align-items: baseline; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); flex: none; transform: translateY(1px); }
+.dot.on { background: var(--good); }
+details { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+details > summary { cursor: pointer; padding: 9px 14px; color: var(--accent); font-weight: 600; }
+details > div { padding: 0 14px 12px; }
+.timer { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+@media (max-width: 820px) {
+  .app { grid-template-columns: 1fr; }
+  nav { position: static; height: auto; flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--line); }
+  nav h1 { width: 100%; } nav .sep { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav id="nav" aria-label="Course"></nav>
+  <main><div class="col" id="view"></div></main>
+</div>
+<script id="course-data" type="application/json">__COURSE_DATA__</script>
+<script>
+(function () {
+'use strict';
+var DATA = JSON.parse(document.getElementById('course-data').textContent);
+var ORDER = ['u1', 'u2', 'u3', 'u4', 'u5', 'u6', 'u7', 'u9', 'u8'];
+var UNITS = ORDER.map(function (id) { return DATA.units.filter(function (u) { return u.id === id; })[0]; }).filter(Boolean);
+DATA.units.forEach(function (u) { if (UNITS.indexOf(u) < 0) UNITS.push(u); });
+var QBY = {}, UNIT_OF = {}, LESSON_OF = {};
+UNITS.forEach(function (u) {
+  u.lessons.forEach(function (l) { LESSON_OF[l.id] = l; });
+  u.questions.forEach(function (q) { QBY[q.id] = q; UNIT_OF[q.id] = u; });
+});
+var ALLQ = Object.keys(QBY).map(function (k) { return QBY[k]; });
+var KEY = 'csc1111-course-v1';
+var S = { q: {}, read: {}, prog: {}, exams: [] };
+try { var raw = localStorage.getItem(KEY); if (raw) { var p = JSON.parse(raw); if (p && p.q) S = p; } } catch (e) {}
+S.q = S.q || {}; S.read = S.read || {}; S.prog = S.prog || {}; S.exams = S.exams || [];
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function rich(s) { // plain text with `inline code`
+  return esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\n/g, '<br>');
+}
+function el(html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstElementChild; }
+function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function st(q) { return S.q[q.id] || { seen: 0, right: 0, streak: 0, last: null }; }
+function mastered(q) { var s = st(q); return s.last === 'right'; }
+function solid(q) { return st(q).streak >= 2; }
+function missed(q) { var s = st(q); return s.seen > 0 && s.last === 'wrong'; }
+function record(q, ok) {
+  var s = S.q[q.id] || { seen: 0, right: 0, streak: 0, last: null };
+  s.seen++; if (ok) { s.right++; s.streak++; s.last = 'right'; } else { s.streak = 0; s.last = 'wrong'; }
+  s.at = Date.now(); S.q[q.id] = s; save();
+}
+function unitStats(u) {
+  var n = u.questions.length, m = u.questions.filter(mastered).length, so = u.questions.filter(solid).length;
+  var mi = u.questions.filter(missed).length, seen = u.questions.filter(function (q) { return st(q).seen > 0; }).length;
+  var lr = u.lessons.filter(function (l) { return S.read[l.id]; }).length;
+  return { n: n, mastered: m, solid: so, missed: mi, seen: seen, read: lr, lessons: u.lessons.length, pct: n ? Math.round(100 * m / n) : 0 };
+}
+function overall() {
+  var n = ALLQ.length, m = ALLQ.filter(mastered).length;
+  return { n: n, mastered: m, pct: n ? Math.round(100 * m / n) : 0, missed: ALLQ.filter(missed).length, unseen: ALLQ.filter(function (q) { return st(q).seen === 0; }).length };
+}
+function normOut(s) { return String(s).replace(/\r/g, '').split('\n').map(function (l) { return l.replace(/\s+$/, ''); }).join('\n').replace(/^\n+|\n+$/g, ''); }
+function normFill(s) { return String(s).trim().toLowerCase().replace(/\s+/g, ' '); }
+function squash(s) { return String(s).toLowerCase().replace(/\s+/g, ''); }
+function grade(q, given) {
+  if (q.type === 'mc') return given === q.answer;
+  if (q.type === 'tf') return given === q.answer;
+  if (q.type === 'output') return normOut(given) === normOut(q.answer);
+  if (q.type === 'fill') {
+    var g = normFill(given), gs = squash(given);
+    if (!g) return false;
+    return q.accept.some(function (a) { return normFill(a) === g || squash(a) === gs || squash(a).replace(/;$/, '') === gs.replace(/;$/, ''); });
+  }
+  return false;
+}
+function answerText(q) {
+  if (q.type === 'mc') return q.choices[q.answer];
+  if (q.type === 'tf') return q.answer ? 'True' : 'False';
+  return q.answer;
+}
+
+var view = document.getElementById('view'), nav = document.getElementById('nav');
+var route = { name: 'home' };
+function go(r) { route = r; render(); window.scrollTo(0, 0); }
+
+function renderNav() {
+  var o = overall(), h = '<h1>CSC 1111<br><span class="muted small">Test-out course</span></h1>';
+  h += '<button data-r="home" class="' + (route.name === 'home' ? 'on' : '') + '"><span>Dashboard</span><span class="pct">' + o.pct + '%</span></button>';
+  h += '<div class="sep"></div>';
+  UNITS.forEach(function (u, i) {
+    var s = unitStats(u), on = (route.unit === u.id) ? 'on' : '';
+    h += '<button data-r="unit" data-u="' + u.id + '" class="' + on + '"><span>' + (i + 1) + '. ' + esc(u.title) + '</span><span class="pct">' + s.pct + '%</span></button>';
+  });
+  h += '<div class="sep"></div>';
+  h += '<button data-r="review" class="' + (route.name === 'quiz' && route.kind === 'review' ? 'on' : '') + '"><span>Review my misses</span><span class="pct">' + o.missed + '</span></button>';
+  h += '<button data-r="exam" class="' + (route.name === 'examsetup' || route.name === 'exam' ? 'on' : '') + '"><span>Mock exam</span><span class="pct">' + S.exams.length + ' taken</span></button>';
+  h += '<button data-r="programs" class="' + (route.name === 'programs' ? 'on' : '') + '"><span>Programs to write</span><span class="pct"></span></button>';
+  h += '<button data-r="help" class="' + (route.name === 'help' ? 'on' : '') + '"><span>How this works</span><span class="pct"></span></button>';
+  nav.innerHTML = h;
+  Array.prototype.forEach.call(nav.querySelectorAll('button'), function (b) {
+    b.addEventListener('click', function () {
+      var r = b.getAttribute('data-r');
+      if (r === 'home') go({ name: 'home' });
+      else if (r === 'unit') go({ name: 'unit', unit: b.getAttribute('data-u') });
+      else if (r === 'review') startQuiz('review', ALLQ.filter(missed), 'Review my misses');
+      else if (r === 'exam') go({ name: 'examsetup' });
+      else if (r === 'programs') go({ name: 'programs' });
+      else if (r === 'help') go({ name: 'help' });
+    });
+  });
+}
+
+function readiness() {
+  var units95 = UNITS.filter(function (u) { return unitStats(u).pct >= 95; }).length;
+  var good = S.exams.filter(function (e) { return e.pct >= 93; }).length;
+  var progs = 0, progN = 0; UNITS.forEach(function (u) { u.programs.forEach(function (p) { progN++; if (S.prog[p.id]) progs++; }); });
+  var last2 = S.exams.slice(-2), last2ok = last2.length === 2 && last2.every(function (e) { return e.pct >= 93; });
+  return { units95: units95, unitN: UNITS.length, goodExams: good, last2ok: last2ok, progs: progs, progN: progN, noMisses: overall().missed === 0 && overall().unseen === 0 };
+}
+
+function home() {
+  var o = overall(), r = readiness();
+  var h = '<h2>Dashboard</h2>';
+  h += '<div class="card"><div class="row" style="justify-content:space-between"><div><div class="big">' + o.pct + '%</div><div class="muted small">' + o.mastered + ' of ' + o.n + ' questions answered correctly on your latest try</div></div>';
+  h += '<div class="row"><button class="btn primary" id="cont">' + (o.unseen ? 'Continue where I left off' : 'Drill my weakest questions') + '</button><button class="btn" id="rev"' + (o.missed ? '' : ' disabled') + '>Review my misses (' + o.missed + ')</button><button class="btn" id="mock">Take a mock exam</button></div></div>';
+  h += '<div class="bar"><i style="width:' + o.pct + '%"></i></div></div>';
+  h += '<div class="card"><h3>Ready for an A when all four are green</h3><ul class="checklist">';
+  h += '<li><span class="dot ' + (r.units95 === r.unitN ? 'on' : '') + '"></span><span>Every unit at 95% or better <span class="muted">(' + r.units95 + ' of ' + r.unitN + ')</span></span></li>';
+  h += '<li><span class="dot ' + (r.noMisses ? 'on' : '') + '"></span><span>Every question seen, and no misses left in review <span class="muted">(' + o.unseen + ' unseen, ' + o.missed + ' missed)</span></span></li>';
+  h += '<li><span class="dot ' + (r.last2ok ? 'on' : '') + '"></span><span>Your last two mock exams both at 93% or better <span class="muted">(' + r.goodExams + ' so far at that level)</span></span></li>';
+  h += '<li><span class="dot ' + (r.progs === r.progN ? 'on' : '') + '"></span><span>Every program written and compiled yourself <span class="muted">(' + r.progs + ' of ' + r.progN + ')</span></span></li>';
+  h += '</ul></div>';
+  h += '<div class="grid">';
+  UNITS.forEach(function (u, i) {
+    var s = unitStats(u);
+    h += '<div class="card"><div class="row" style="justify-content:space-between"><h3>' + (i + 1) + '. ' + esc(u.title) + '</h3><span class="tag ' + (s.pct >= 95 ? 'good' : (s.missed ? 'bad' : '')) + '">' + s.pct + '%</span></div>';
+    h += '<div class="bar ' + (s.pct >= 95 ? 'good' : '') + '"><i style="width:' + s.pct + '%"></i></div>';
+    h += '<div class="muted small">' + s.read + ' of ' + s.lessons + ' lessons read · ' + s.mastered + ' of ' + s.n + ' questions · ' + s.missed + ' to review</div>';
+    h += '<div class="row"><button class="btn" data-open="' + u.id + '">Open</button><button class="btn" data-drill="' + u.id + '">Practice</button></div></div>';
+  });
+  h += '</div>';
+  if (S.exams.length) {
+    h += '<div class="card"><h3>Mock exam history</h3><table><thead><tr><th>When</th><th>Score</th><th>Grade</th><th>Questions</th></tr></thead><tbody>';
+    S.exams.slice().reverse().forEach(function (e) { h += '<tr><td>' + esc(new Date(e.at).toLocaleString()) + '</td><td>' + e.pct + '%</td><td>' + letter(e.pct) + '</td><td>' + e.right + ' of ' + e.total + '</td></tr>'; });
+    h += '</tbody></table></div>';
+  }
+  view.innerHTML = h;
+  document.getElementById('cont').onclick = continueNext;
+  document.getElementById('rev').onclick = function () { startQuiz('review', ALLQ.filter(missed), 'Review my misses'); };
+  document.getElementById('mock').onclick = function () { go({ name: 'examsetup' }); };
+  Array.prototype.forEach.call(view.querySelectorAll('[data-open]'), function (b) { b.onclick = function () { go({ name: 'unit', unit: b.getAttribute('data-open') }); }; });
+  Array.prototype.forEach.call(view.querySelectorAll('[data-drill]'), function (b) { b.onclick = function () { drillUnit(b.getAttribute('data-drill')); }; });
+}
+function unitById(id) { return UNITS.filter(function (u) { return u.id === id; })[0]; }
+function continueNext() {
+  for (var i = 0; i < UNITS.length; i++) {
+    var u = UNITS[i];
+    for (var j = 0; j < u.lessons.length; j++) {
+      var l = u.lessons[j];
+      var qs = u.questions.filter(function (q) { return q.lesson === l.id; });
+      if (!S.read[l.id] || qs.some(function (q) { return st(q).seen === 0; })) { go({ name: 'lesson', unit: u.id, lesson: l.id }); return; }
+    }
+  }
+  var weak = ALLQ.slice().sort(function (a, b) { return (st(a).streak - st(b).streak) || ((st(a).at || 0) - (st(b).at || 0)); }).slice(0, 25);
+  startQuiz('weak', weak, 'Weakest 25 questions');
+}
+function drillUnit(id) {
+  var u = unitById(id);
+  var pool = u.questions.filter(function (q) { return !solid(q); });
+  if (!pool.length) pool = u.questions;
+  startQuiz('unit', pool, u.title, { unit: id });
+}
+
+function unitView() {
+  var u = unitById(route.unit), s = unitStats(u), idx = UNITS.indexOf(u) + 1;
+  var h = '<h2>' + idx + '. ' + esc(u.title) + '</h2><p class="muted">' + esc(u.summary) + '</p>';
+  h += '<div class="card"><div class="row" style="justify-content:space-between"><div class="muted small">' + s.mastered + ' of ' + s.n + ' questions correct on the latest try · ' + s.solid + ' correct twice running · ' + s.missed + ' to review</div><div class="row"><button class="btn primary" id="drill">Practice this unit</button><button class="btn" id="all">All ' + s.n + ' questions</button></div></div><div class="bar ' + (s.pct >= 95 ? 'good' : '') + '"><i style="width:' + s.pct + '%"></i></div></div>';
+  h += '<div class="card"><h3>Lessons</h3><table><thead><tr><th>Lesson</th><th>In the book</th><th>Questions</th><th></th></tr></thead><tbody>';
+  u.lessons.forEach(function (l, i) {
+    var qs = u.questions.filter(function (q) { return q.lesson === l.id; }), m = qs.filter(mastered).length;
+    h += '<tr><td><strong>' + (i + 1) + '. ' + esc(l.title) + '</strong> ' + (S.read[l.id] ? '<span class="tag good">read</span>' : '') + '</td><td class="muted small">' + esc(l.book) + '</td><td>' + m + ' / ' + qs.length + '</td><td><button class="btn" data-l="' + l.id + '">Open</button></td></tr>';
+  });
+  h += '</tbody></table></div>';
+  if (u.programs.length) {
+    h += '<div class="card"><h3>Programs to write</h3><ul class="checklist">';
+    u.programs.forEach(function (p) { h += '<li><span class="dot ' + (S.prog[p.id] ? 'on' : '') + '"></span><span>' + esc(p.title) + '</span></li>'; });
+    h += '</ul><div><button class="btn" id="progs">Open programs</button></div></div>';
+  }
+  view.innerHTML = h;
+  document.getElementById('drill').onclick = function () { drillUnit(u.id); };
+  document.getElementById('all').onclick = function () { startQuiz('unit', u.questions, u.title + ' (all questions)', { unit: u.id }); };
+  var pb = document.getElementById('progs'); if (pb) pb.onclick = function () { go({ name: 'programs', unit: u.id }); };
+  Array.prototype.forEach.call(view.querySelectorAll('[data-l]'), function (b) { b.onclick = function () { go({ name: 'lesson', unit: u.id, lesson: b.getAttribute('data-l') }); }; });
+}
+
+function lessonView() {
+  var u = unitById(route.unit), l = LESSON_OF[route.lesson];
+  var qs = u.questions.filter(function (q) { return q.lesson === l.id; });
+  var i = u.lessons.indexOf(l);
+  var h = '<div class="muted small">' + esc(u.title) + ' · lesson ' + (i + 1) + ' of ' + u.lessons.length + '</div><h2>' + esc(l.title) + '</h2><div class="muted small">In the book: ' + esc(l.book) + '</div>';
+  h += '<div class="card lesson">' + l.html + '</div>';
+  h += '<div class="row"><button class="btn primary" id="prac">Practice this lesson (' + qs.length + ' questions)</button><button class="btn" id="back">Back to unit</button></div>';
+  view.innerHTML = h;
+  document.getElementById('prac').onclick = function () { S.read[l.id] = true; save(); startQuiz('lesson', qs, l.title, { unit: u.id, lesson: l.id }); };
+  document.getElementById('back').onclick = function () { go({ name: 'unit', unit: u.id }); };
+}
+
+// ---------- quiz engine ----------
+var Q = null;
+function startQuiz(kind, pool, title, ctx) {
+  if (!pool.length) { go({ name: 'home' }); return; }
+  var order = kind === 'lesson' ? pool.slice() : shuffle(pool);
+  Q = { kind: kind, title: title, ctx: ctx || {}, queue: order.map(function (q) { return q.id; }), total: order.length, done: 0, firstRight: 0, missedIds: [], asked: {}, cur: null, answered: false };
+  go({ name: 'quiz', kind: kind, unit: (ctx || {}).unit });
+}
+function quizView() {
+  if (!Q) { go({ name: 'home' }); return; }
+  if (!Q.cur) {
+    if (!Q.queue.length) return quizDone();
+    Q.cur = QBY[Q.queue.shift()]; Q.answered = false; Q.order = null;
+  }
+  var q = Q.cur, u = UNIT_OF[q.id], repeat = Q.asked[q.id];
+  var h = '<div class="qmeta"><div class="muted small">' + esc(Q.title) + '</div><div class="muted small">' + Q.done + ' of ' + Q.total + ' done · ' + Q.queue.length + ' left in the queue</div></div>';
+  h += '<div class="bar"><i style="width:' + Math.round(100 * Q.done / Q.total) + '%"></i></div>';
+  h += '<div class="card" id="qcard"><div class="row"><span class="tag">' + esc(u.title) + '</span><span class="tag">' + ['', 'warm-up', 'exam level', 'tricky'][q.difficulty] + '</span>' + (repeat ? '<span class="tag warn">again, you missed this one</span>' : '') + '</div>';
+  h += '<div>' + rich(q.prompt) + '</div>';
+  if (q.code) h += '<pre><code>' + esc(q.code) + '</code></pre>';
+  h += '<div id="ans"></div><div id="fb"></div></div>';
+  h += '<div class="row"><button class="btn" id="quit">End session</button></div>';
+  view.innerHTML = h;
+  document.getElementById('quit').onclick = quizDone;
+  renderAnswerUI(q, function (ok, given) { finishQuestion(q, ok); });
+}
+function renderAnswerUI(q, onDone, opts) {
+  opts = opts || {};
+  var box = document.getElementById('ans'), fb = document.getElementById('fb');
+  function verdict(ok) {
+    if (opts.silent) return;
+    var h = '<div class="verdict ' + (ok ? 'right' : 'wrong') + '"><strong>' + (ok ? 'Correct.' : 'Not quite.') + '</strong>';
+    if (!ok && (q.type === 'output' || q.type === 'fill')) h += '<div class="why">Expected:</div><pre><code>' + esc(q.answer) + '</code></pre>';
+    else if (!ok) h += '<div class="why">Answer: ' + rich(answerText(q)) + '</div>';
+    h += '<div class="why">' + rich(q.explain) + '</div></div><div class="row" style="margin-top:12px"><button class="btn primary" id="next">Next (Enter)</button></div>';
+    fb.innerHTML = h;
+    var nb = document.getElementById('next'); nb.onclick = function () { nextQuestion(); }; nb.focus();
+  }
+  if (q.type === 'mc' || q.type === 'tf') {
+    var items = q.type === 'mc' ? q.choices.map(function (c, i) { return { label: c, val: i }; }) : [{ label: 'True', val: true }, { label: 'False', val: false }];
+    if (q.type === 'mc') items = shuffle(items);
+    var h = '<div class="choices">';
+    items.forEach(function (it, i) { h += '<button class="choice" data-i="' + i + '"><span class="k">' + (q.type === 'mc' ? (i + 1) : (it.val ? 'T' : 'F')) + '</span><span class="t">' + rich(it.label) + '</span></button>'; });
+    h += '</div>';
+    box.innerHTML = h;
+    var btns = box.querySelectorAll('.choice');
+    var pick = function (i) {
+      if (box.getAttribute('data-done')) return;
+      var given = items[i].val, ok = grade(q, given);
+      if (opts.silent) { Array.prototype.forEach.call(btns, function (b) { b.classList.remove('picked'); }); btns[i].classList.add('picked'); onDone(ok, given); return; }
+      box.setAttribute('data-done', '1');
+      Array.prototype.forEach.call(btns, function (b, j) { b.disabled = true; if (items[j].val === q.answer) b.classList.add('right'); else if (j === i) b.classList.add('wrong'); });
+      verdict(ok); onDone(ok, given);
+    };
+    Array.prototype.forEach.call(btns, function (b, i) { b.onclick = function () { pick(i); }; });
+    if (opts.selected !== undefined && opts.selected !== null) Array.prototype.forEach.call(btns, function (b, j) { if (items[j].val === opts.selected) b.classList.add('picked'); });
+    box._pick = pick; box._n = items.length; box._tf = q.type === 'tf';
+  } else {
+    var isOut = q.type === 'output';
+    box.innerHTML = (isOut ? '<div class="muted small">Type exactly what the program prints. Line breaks and spaces inside a line count.</div><textarea class="code" id="inp" spellcheck="false" autocomplete="off"></textarea>' : '<input class="fill" id="inp" spellcheck="false" autocomplete="off" placeholder="Type your answer">') + '<div class="row" style="margin-top:10px"><button class="btn primary" id="chk">' + (opts.silent ? 'Save answer' : 'Check') + (isOut ? ' (Ctrl+Enter)' : ' (Enter)') + '</button></div>';
+    var inp = document.getElementById('inp'), chk = document.getElementById('chk');
+    if (opts.prefill != null) inp.value = opts.prefill;
+    var submit = function () {
+      if (box.getAttribute('data-done')) return;
+      var given = inp.value, ok = grade(q, given);
+      if (opts.silent) { chk.textContent = 'Saved'; onDone(ok, given); return; }
+      box.setAttribute('data-done', '1'); inp.readOnly = true; chk.disabled = true;
+      verdict(ok); onDone(ok, given);
+    };
+    chk.onclick = submit;
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter' && (!isOut || e.ctrlKey)) { e.preventDefault(); e.stopPropagation(); submit(); } });
+    if (!opts.silent || opts.focus) inp.focus();
+  }
+}
+function finishQuestion(q, ok) {
+  Q.answered = true;
+  var first = !Q.asked[q.id];
+  record(q, ok);
+  if (first) { if (ok) Q.firstRight++; else Q.missedIds.push(q.id); }
+  Q.asked[q.id] = true;
+  if (ok) Q.done++;
+  else Q.queue.splice(Math.min(Q.queue.length, 4), 0, q.id);
+  renderNav();
+}
+function nextQuestion() { if (!Q || !Q.answered) return; Q.cur = null; quizView(); window.scrollTo(0, 0); }
+function quizDone() {
+  var q = Q; if (!q) { go({ name: 'home' }); return; }
+  var asked = Object.keys(q.asked).length;
+  var h = '<h2>Session finished</h2><div class="card"><div class="big">' + q.firstRight + ' / ' + asked + '</div><div class="muted">right on the first try' + (asked < q.total ? ' (' + (q.total - asked) + ' not reached)' : '') + '</div></div>';
+  if (q.missedIds.length) {
+    h += '<div class="card"><h3>Missed on the first try</h3><ul>';
+    q.missedIds.forEach(function (id) { var x = QBY[id]; h += '<li>' + rich(x.prompt.length > 140 ? x.prompt.slice(0, 140) + '…' : x.prompt) + ' <span class="tag ' + (mastered(x) ? 'good' : 'bad') + '">' + (mastered(x) ? 'fixed' : 'still open') + '</span></li>'; });
+    h += '</ul></div>';
+  }
+  h += '<div class="row"><button class="btn primary" id="cont">Continue the course</button>' + (q.missedIds.length ? '<button class="btn" id="again">Redo the ones I missed</button>' : '') + '<button class="btn" id="home">Dashboard</button></div>';
+  Q = null; route = { name: 'done' }; renderNav(); view.innerHTML = h;
+  document.getElementById('cont').onclick = continueNext;
+  document.getElementById('home').onclick = function () { go({ name: 'home' }); };
+  var ag = document.getElementById('again'); if (ag) ag.onclick = function () { startQuiz('review', q.missedIds.map(function (id) { return QBY[id]; }), 'Redo'); };
+}
+
+// ---------- mock exam ----------
+function letter(p) { return p >= 90 ? 'A' : p >= 80 ? 'B' : p >= 70 ? 'C' : p >= 60 ? 'D' : 'F'; }
+var X = null;
+function examSetup() {
+  var h = '<h2>Mock exam</h2><div class="card"><p>Questions are drawn from every unit in proportion to its size, leaning toward exam-level and tricky ones. You get no feedback until the end, like the real thing.</p><p class="muted small">Sinclair does not publish the real exam\'s length or format. Treat 93% here as the bar, since an A is the goal and you only get one attempt.</p>';
+  h += '<div class="row"><button class="btn primary" data-n="50" data-m="60">50 questions, 60 minutes</button><button class="btn" data-n="25" data-m="30">25 questions, 30 minutes</button><button class="btn" data-n="100" data-m="120">100 questions, 120 minutes</button></div></div>';
+  view.innerHTML = h;
+  Array.prototype.forEach.call(view.querySelectorAll('[data-n]'), function (b) { b.onclick = function () { startExam(+b.getAttribute('data-n'), +b.getAttribute('data-m')); }; });
+}
+function startExam(n, minutes) {
+  var picked = [], total = ALLQ.length;
+  UNITS.forEach(function (u) {
+    var k = Math.max(2, Math.round(n * u.questions.length / total));
+    var pool = shuffle(u.questions).sort(function (a, b) { return (Math.random() * (b.difficulty === 1 ? 0.6 : b.difficulty === 2 ? 1 : 1.2)) - (Math.random() * (a.difficulty === 1 ? 0.6 : a.difficulty === 2 ? 1 : 1.2)); });
+    picked = picked.concat(pool.slice(0, k));
+  });
+  picked = shuffle(picked).slice(0, n);
+  X = { qs: picked.map(function (q) { return q.id; }), ans: {}, i: 0, end: Date.now() + minutes * 60000, minutes: minutes, timer: null };
+  go({ name: 'exam' });
+}
+function fmt(ms) { var s = Math.max(0, Math.floor(ms / 1000)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+function examView() {
+  if (!X) { go({ name: 'examsetup' }); return; }
+  var q = QBY[X.qs[X.i]], answered = Object.keys(X.ans).length;
+  var h = '<div class="qmeta"><div class="muted small">Mock exam · question ' + (X.i + 1) + ' of ' + X.qs.length + ' · ' + answered + ' answered</div><div class="timer" id="clock"></div></div>';
+  h += '<div class="bar"><i style="width:' + Math.round(100 * answered / X.qs.length) + '%"></i></div>';
+  h += '<div class="card"><div>' + rich(q.prompt) + '</div>' + (q.code ? '<pre><code>' + esc(q.code) + '</code></pre>' : '') + '<div id="ans"></div><div id="fb"></div></div>';
+  h += '<div class="row"><button class="btn" id="prev"' + (X.i ? '' : ' disabled') + '>Previous</button><button class="btn primary" id="nx">' + (X.i < X.qs.length - 1 ? 'Next' : 'Review and finish') + '</button><button class="btn" id="fin">Finish now</button></div>';
+  view.innerHTML = h;
+  var prev = X.ans[q.id];
+  renderAnswerUI(q, function (ok, given) { X.ans[q.id] = { ok: ok, given: given }; }, { silent: true, prefill: prev && (q.type === 'output' || q.type === 'fill') ? prev.given : null, selected: prev && (q.type === 'mc' || q.type === 'tf') ? prev.given : undefined, focus: true });
+  function saveTyped() { var inp = document.getElementById('inp'); if (inp && inp.value !== '') X.ans[q.id] = { ok: grade(q, inp.value), given: inp.value }; }
+  document.getElementById('prev').onclick = function () { saveTyped(); X.i--; examView(); };
+  document.getElementById('nx').onclick = function () { saveTyped(); if (X.i < X.qs.length - 1) { X.i++; examView(); } else examConfirm(); };
+  document.getElementById('fin').onclick = function () { saveTyped(); examConfirm(); };
+  tick();
+  if (!X.timer) X.timer = setInterval(tick, 1000);
+}
+function tick() {
+  if (!X) return;
+  var c = document.getElementById('clock'), left = X.end - Date.now();
+  if (c) c.textContent = 'Time left ' + fmt(left);
+  if (left <= 0) examFinish();
+}
+function examConfirm() {
+  var un = X.qs.filter(function (id) { return !X.ans[id]; }).length;
+  view.innerHTML = '<h2>Finish the exam?</h2><div class="card"><p>' + (un ? 'You have ' + un + ' unanswered question' + (un === 1 ? '' : 's') + '. Unanswered counts as wrong.' : 'Every question is answered.') + '</p><div class="row"><button class="btn primary" id="yes">Finish and grade</button><button class="btn" id="no">Go back</button></div></div>';
+  document.getElementById('yes').onclick = examFinish;
+  document.getElementById('no').onclick = function () { var first = X.qs.findIndex(function (id) { return !X.ans[id]; }); X.i = first < 0 ? X.qs.length - 1 : first; examView(); };
+}
+function examFinish() {
+  if (!X) return;
+  clearInterval(X.timer);
+  var right = 0, by = {}, rows = [];
+  X.qs.forEach(function (id) {
+    var q = QBY[id], a = X.ans[id], ok = !!(a && a.ok), u = UNIT_OF[id];
+    record(q, ok); if (ok) right++;
+    by[u.id] = by[u.id] || { r: 0, n: 0, t: u.title }; by[u.id].n++; if (ok) by[u.id].r++;
+    if (!ok) rows.push({ q: q, a: a });
+  });
+  var pct = Math.round(100 * right / X.qs.length);
+  S.exams.push({ at: Date.now(), pct: pct, right: right, total: X.qs.length }); save();
+  var h = '<h2>Mock exam result</h2><div class="card"><div class="row" style="justify-content:space-between"><div><div class="big">' + pct + '%</div><div class="muted">' + right + ' of ' + X.qs.length + ' · grade ' + letter(pct) + '</div></div><span class="tag ' + (pct >= 93 ? 'good' : pct >= 90 ? 'warn' : 'bad') + '">' + (pct >= 93 ? 'At the bar' : pct >= 90 ? 'An A, but no margin' : 'Below an A') + '</span></div></div>';
+  h += '<div class="card"><h3>By unit</h3><table><thead><tr><th>Unit</th><th>Right</th><th></th></tr></thead><tbody>';
+  UNITS.forEach(function (u) { var b = by[u.id]; if (b) h += '<tr><td>' + esc(b.t) + '</td><td>' + b.r + ' of ' + b.n + '</td><td>' + (b.r === b.n ? '<span class="tag good">clean</span>' : '<span class="tag bad">review</span>') + '</td></tr>'; });
+  h += '</tbody></table></div>';
+  if (rows.length) {
+    h += '<div class="card"><h3>What you missed</h3>';
+    rows.forEach(function (r) {
+      h += '<details><summary>' + rich(r.q.prompt.length > 110 ? r.q.prompt.slice(0, 110) + '…' : r.q.prompt) + '</summary><div>' + (r.q.code ? '<pre><code>' + esc(r.q.code) + '</code></pre>' : '') + '<p><strong>Your answer:</strong> ' + (r.a ? (r.q.type === 'mc' ? rich(String(r.q.choices[r.a.given])) : r.q.type === 'tf' ? (r.a.given ? 'True' : 'False') : '</p><pre><code>' + esc(r.a.given) + '</code></pre><p>') : 'none') + '</p><p><strong>Correct:</strong> ' + (r.q.type === 'output' || r.q.type === 'fill' ? '</p><pre><code>' + esc(r.q.answer) + '</code></pre><p>' : rich(answerText(r.q))) + '</p><p>' + rich(r.q.explain) + '</p></div></details>';
+    });
+    h += '</div>';
+  }
+  h += '<div class="row"><button class="btn primary" id="rv"' + (rows.length ? '' : ' disabled') + '>Drill what I missed</button><button class="btn" id="hm">Dashboard</button></div>';
+  var missedQs = rows.map(function (r) { return r.q; });
+  X = null; route = { name: 'examdone' }; renderNav(); view.innerHTML = h; window.scrollTo(0, 0);
+  document.getElementById('rv').onclick = function () { startQuiz('review', missedQs, 'Exam misses'); };
+  document.getElementById('hm').onclick = function () { go({ name: 'home' }); };
+}
+
+// ---------- programs ----------
+function programsView() {
+  var h = '<h2>Programs to write</h2><div class="card"><p>Write each one from a blank file before you open the solution. In your Ubuntu terminal:</p><pre><code>g++ -std=c++17 -Wall prog.cpp -o prog &amp;&amp; ./prog</code></pre><p class="muted small">Tick a program only after your own version compiled cleanly and matched the sample output.</p></div>';
+  UNITS.forEach(function (u, i) {
+    if (!u.programs.length || (route.unit && route.unit !== u.id)) return;
+    h += '<h3>' + (i + 1) + '. ' + esc(u.title) + '</h3>';
+    u.programs.forEach(function (p) {
+      h += '<div class="card"><div class="row" style="justify-content:space-between"><strong>' + esc(p.title) + '</strong><label class="small"><input type="checkbox" data-p="' + p.id + '"' + (S.prog[p.id] ? ' checked' : '') + '> I wrote it and it matched</label></div><div>' + rich(p.task) + '</div>';
+      if (p.stdin) h += '<div class="muted small">Input used for the sample run:</div><pre><code>' + esc(p.stdin) + '</code></pre>';
+      h += '<div class="muted small">Expected output:</div><pre><code>' + esc(p.sampleOutput) + '</code></pre>';
+      h += '<details><summary>Show the solution</summary><div><pre><code>' + esc(p.solution) + '</code></pre></div></details></div>';
+    });
+  });
+  if (route.unit) h += '<div><button class="btn" id="allp">Show every unit</button></div>';
+  view.innerHTML = h;
+  Array.prototype.forEach.call(view.querySelectorAll('[data-p]'), function (c) { c.onchange = function () { S.prog[c.getAttribute('data-p')] = c.checked; save(); renderNav(); }; });
+  var ap = document.getElementById('allp'); if (ap) ap.onclick = function () { go({ name: 'programs' }); };
+}
+
+function helpView() {
+  var o = overall(), np = 0; UNITS.forEach(function (u) { np += u.programs.length; });
+  var h = '<h2>How this works</h2><div class="card lesson"><p>This course covers every topic on Sinclair\'s CSC 1111 master syllabus, using the sections of the course textbook (Gaddis, <em>Starting Out with C++</em>, 10th edition) as the checklist. It holds ' + UNITS.length + ' units, ' + o.n + ' questions and ' + np + ' programs to write. Every code question was compiled and run to confirm its answer.</p>';
+  h += '<h4>The loop</h4><ol><li>Open a unit and read a lesson. Each one names the book sections it covers.</li><li>Practice the lesson. You get the answer and the reason after every question.</li><li>Anything you miss comes back a few questions later, and again in "Review my misses", until you get it right.</li><li>Write the unit\'s programs yourself and compile them.</li><li>When the units are green, take mock exams until two in a row are 93% or better.</li></ol>';
+  h += '<h4>What counts</h4><ul><li>A question counts toward a unit\'s percentage when your most recent answer to it was correct.</li><li>Output questions want exactly what the program prints. Trailing spaces and a final blank line are ignored; everything else counts.</li><li>Fill-in answers ignore capital letters and spacing.</li></ul>';
+  h += '<h4>What this cannot promise</h4><p>Sinclair does not publish the exam, its length or its format. This bank is built from the syllabus and the textbook, so it should cover what can be asked, but it is not the exam itself. Ask the Prior Learning office (937-512-3000) whether the test is written, a coding project, or both, and whether a compiler is allowed.</p>';
+  h += '<h4>Keys</h4><p><code>1</code> to <code>4</code> pick a choice, <code>T</code> and <code>F</code> answer true/false, <code>Enter</code> checks a fill-in or moves to the next question, <code>Ctrl+Enter</code> checks an output answer.</p></div>';
+  h += '<div class="card"><h3>Your progress</h3><p class="muted small">Progress is saved in this browser on this computer. It does not sync anywhere.</p><div class="row"><button class="btn" id="reset">Erase all progress</button><span id="rc"></span></div></div>';
+  view.innerHTML = h;
+  document.getElementById('reset').onclick = function () {
+    var rc = document.getElementById('rc');
+    rc.innerHTML = '<button class="btn" id="ry">Yes, erase everything</button> <button class="btn" id="rn">Cancel</button>';
+    document.getElementById('ry').onclick = function () { S = { q: {}, read: {}, prog: {}, exams: [] }; save(); go({ name: 'home' }); };
+    document.getElementById('rn').onclick = function () { rc.innerHTML = ''; };
+  };
+}
+
+function render() {
+  renderNav();
+  if (route.name === 'home') home();
+  else if (route.name === 'unit') unitView();
+  else if (route.name === 'lesson') lessonView();
+  else if (route.name === 'quiz') quizView();
+  else if (route.name === 'examsetup') examSetup();
+  else if (route.name === 'exam') examView();
+  else if (route.name === 'programs') programsView();
+  else if (route.name === 'help') helpView();
+}
+document.addEventListener('keydown', function (e) {
+  if (route.name !== 'quiz' || !Q) return;
+  var tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'textarea' || tag === 'input') return;
+  var box = document.getElementById('ans');
+  if (Q.answered) { if (e.key === 'Enter') { e.preventDefault(); nextQuestion(); } return; }
+  if (!box || !box._pick) return;
+  if (box._tf) { if (e.key === 't' || e.key === 'T') box._pick(0); else if (e.key === 'f' || e.key === 'F') box._pick(1); }
+  else { var n = parseInt(e.key, 10); if (n >= 1 && n <= box._n) box._pick(n - 1); }
+});
+render();
+window.__course = { units: UNITS.length, questions: ALLQ.length };
+})();
+</script>
+</body>
+</html>

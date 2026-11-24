@@ -1,0 +1,2313 @@
+{
+ "units": [
+  {
+   "id": "u2",
+   "title": "C++ basics",
+   "summary": "The parts of a C++ program, output with cout, variables and data types, assignment, scope, arithmetic, comments and named constants.",
+   "lessons": [
+    {
+     "id": "u2-l1",
+     "title": "Program parts, cout and #include",
+     "book": "Sections 2.1 to 2.3, pages 27 to 39",
+     "html": "<p>A C++ program is built from a few standard pieces. Lines beginning with <code>#</code> are <strong>preprocessor directives</strong>, carried out by the preprocessor <em>before</em> the compiler runs; <code>#include &lt;iostream&gt;</code> pastes in the header file that declares <code>cout</code> and <code>cin</code>. <code>using namespace std;</code> lets you write <code>cout</code> instead of <code>std::cout</code>. Every program has exactly one function named <code>main</code>; <strong>execution always begins in <code>main</code></strong>. Braces <code>{ }</code> enclose the body, and <code>return 0;</code> reports success to the operating system.</p><pre><code>#include &lt;iostream&gt;\nusing namespace std;\n\nint main()\n{\n    cout &lt;&lt; \"Hello\" &lt;&lt; endl;\n    return 0;\n}</code></pre><p>Each <strong>statement</strong> ends in a semicolon. Directives (<code>#include</code>) are not statements and take no semicolon. Whitespace and line breaks between tokens are ignored, so one statement may span several lines. <strong>Key words</strong> (<code>int</code>, <code>return</code>, <code>const</code>) are reserved; <strong>programmer-defined names</strong> are ones you invent; <strong>literals</strong> (<code>5</code>, <code>\"Hi\"</code>) are values typed directly in the code; <strong>operators</strong> (<code>&lt;&lt;</code>, <code>+</code>) do work; <strong>punctuation</strong> (<code>;</code>, <code>{</code>, <code>,</code>) separates things.</p><h4>The cout object</h4><p><code>cout</code> is the standard output stream object. <code>&lt;&lt;</code> is the <strong>stream insertion operator</strong>: it sends the value on its right into the stream on its left. Insertions chain left to right: <code>cout &lt;&lt; \"x = \" &lt;&lt; x &lt;&lt; endl;</code>. Output is exactly what you insert; nothing adds spaces or line breaks for you. A string literal goes between double quotes and cannot span source lines.</p><p><code>endl</code> ends the line <strong>and flushes</strong> the output buffer. The escape sequence <code>\\n</code> inside a string only ends the line. An escape sequence is typed as a backslash plus a character but is stored as <strong>one</strong> character, so <code>\"a\\tb\"</code> holds 3 characters:</p><table><thead><tr><th>Sequence</th><th>Meaning</th></tr></thead><tbody><tr><td><code>\\n</code></td><td>newline</td></tr><tr><td><code>\\t</code></td><td>horizontal tab</td></tr><tr><td><code>\\\\</code></td><td>one backslash</td></tr><tr><td><code>\\\"</code></td><td>a double quote</td></tr><tr><td><code>\\'</code></td><td>a single quote</td></tr><tr><td><code>\\a</code></td><td>alert (bell)</td></tr><tr><td><code>\\r</code></td><td>carriage return</td></tr></tbody></table><p>10th edition addition: a <strong>raw string literal</strong> is written <code>R\"(text)\"</code>. Everything between <code>(</code> and <code>)</code> is taken literally, backslashes included, and it may span several lines. <code>R\"(C:\\temp\\new)\"</code> prints <code>C:\\temp\\new</code> with no tab or newline. Trap: forgetting a semicolon, writing <code>cout &gt;&gt; x</code>, or leaving out <code>#include &lt;iostream&gt;</code> all fail to compile. Writing <code>/n</code> with a forward slash is not an escape sequence: cout prints a slash and an n.</p>"
+    },
+    {
+     "id": "u2-l2",
+     "title": "Variables, literals, assignment and identifiers",
+     "book": "Sections 2.4 and 2.5, pages 39 to 44",
+     "html": "<p>A <strong>variable</strong> is a named location in memory that holds a value of one data type. It must be <strong>defined</strong> before use: <code>int count;</code> gives it a name, a type and storage. A value is placed in it by an <strong>assignment statement</strong>: <code>count = 12;</code>. The <code>=</code> operator copies the value of the right side into the variable on the left, so the left side must be a variable; <code>12 = count;</code> is an error. Assignment is not an equation: <code>x = x + 1;</code> is legal and adds one.</p><pre><code>int a = 5;\nint b = a;   // copy: b is 5\na = 9;       // b is still 5</code></pre><p>A <strong>literal</strong> is a value written directly in code: <code>42</code> (integer), <code>3.5</code> (floating point), <code>'z'</code> (character), <code>\"zebra\"</code> (string). A name that stands for a value is not a literal.</p><h4>Identifiers</h4><p>An <strong>identifier</strong> is a name the programmer chooses. Rules: letters, digits and underscore only; it must <strong>not start with a digit</strong>; no spaces or punctuation such as <code>-</code>, <code>$</code>, <code>.</code>; it cannot be a reserved key word; and it is <strong>case sensitive</strong>, so <code>Sales</code>, <code>sales</code> and <code>SALES</code> are three different names.</p><table><thead><tr><th>Name</th><th>Legal?</th><th>Why</th></tr></thead><tbody><tr><td><code>total_2</code></td><td>yes</td><td></td></tr><tr><td><code>_hold</code></td><td>yes</td><td>underscore may lead</td></tr><tr><td><code>2nd</code></td><td>no</td><td>starts with a digit</td></tr><tr><td><code>my total</code></td><td>no</td><td>contains a space</td></tr><tr><td><code>net-pay</code></td><td>no</td><td>hyphen is the minus operator</td></tr><tr><td><code>double</code></td><td>no</td><td>key word</td></tr><tr><td><code>Count</code></td><td>yes</td><td>differs from <code>count</code></td></tr></tbody></table><p>Good names describe their purpose (<code>monthlyPay</code>, not <code>x</code>), which makes the program <strong>self-documenting</strong>. Common styles are camelCase and snake_case; pick one and keep it. Exam traps: an identifier that is legal but misspelled differently on a later line is a different, undefined variable; and a variable defined twice in the same scope is an error.</p>"
+    },
+    {
+     "id": "u2-l3",
+     "title": "Integer types and char",
+     "book": "Sections 2.6 and 2.7, pages 44 to 54",
+     "html": "<p>Integer types hold whole numbers. In increasing size: <code>short</code>, <code>int</code>, <code>long</code>, <code>long long</code>. The standard guarantees only the ordering <code>short &lt;= int &lt;= long &lt;= long long</code>; exact byte counts depend on the system (commonly 2, 4, 4 or 8, 8). <code>unsigned</code> before a type uses the same storage for non-negative values only, which roughly doubles the largest positive value it can hold. Each type has a minimum and maximum; going outside it is <strong>overflow</strong> (Chapter 3).</p><h4>Integer literals</h4><ul><li><code>25</code> is decimal; a leading 0 makes <strong>octal</strong>, so <code>012</code> is 10; <code>0x1F</code> is hexadecimal (31).</li><li>10th edition: <code>0b1010</code> is a <strong>binary literal</strong> (value 10).</li><li>10th edition: a single quote may separate digits for readability: <code>1'000'000</code> equals <code>1000000</code>. The separators do not change the value.</li><li>Suffixes on whole numbers: <code>L</code> long (<code>32L</code>), <code>LL</code> long long, <code>U</code> unsigned. <code>unsigned</code> alone means <code>unsigned int</code>.</li></ul><h4>The char type</h4><p><code>char</code> holds one character, stored as a small integer code (ASCII on most systems; <code>'A'</code> is 65, <code>'a'</code> is 97, <code>'0'</code> is 48). A <strong>character literal</strong> uses single quotes: <code>'A'</code>. A <strong>string literal</strong> uses double quotes: <code>\"A\"</code>. They are different: <code>\"A\"</code> is two bytes, the letter plus a hidden <strong>null terminator</strong> (<code>\\0</code>, code 0) that C++ stores at the end of every string literal, so <code>\"Dayton\"</code> occupies 7 bytes. A string literal cannot be stored in a <code>char</code>: <code>char c = \"Z\";</code> does not compile.</p><pre><code>char c = 'a';\nc = c + 2;            // c is now 'c'\ncout &lt;&lt; c &lt;&lt; endl;    // prints c</code></pre><p>Because <code>char</code> is a number, you can do arithmetic on it. <code>cout</code> prints a <code>char</code> as a character but an <code>int</code> as a number. Trap: <code>'ab'</code> is not a valid <code>char</code> literal (a <code>char</code> holds one character), and <code>'\\n'</code> is one character even though it is written with two symbols.</p>"
+    },
+    {
+     "id": "u2-l4",
+     "title": "string, floating point, bool and sizeof",
+     "book": "Sections 2.8 to 2.11, pages 54 to 61",
+     "html": "<p>The <strong>string class</strong> needs <code>#include &lt;string&gt;</code>. A <code>string</code> object holds text of any length: <code>string city = \"Dayton\";</code>. Useful members: <code>city.length()</code> (6), <code>city[0]</code> (<code>'D'</code>, indexes start at 0), and <code>+</code> to <strong>concatenate</strong>: <code>city + \", OH\"</code>. Trap: you cannot add two string literals (<code>\"a\" + \"b\"</code> fails); at least one side must be a <code>string</code> object.</p><h4>Floating point</h4><p><code>float</code>, <code>double</code> and <code>long double</code> store numbers with fractional parts, in increasing precision and range. <code>double</code> is the default for literals like <code>3.14</code>; <code>3.14f</code> (or <code>F</code>) is a <code>float</code> and <code>3.14L</code> a <code>long double</code>. There are <strong>no unsigned floating-point types</strong>. <strong>E notation</strong> writes a power of ten: <code>3.2E4</code> is 32000 and <code>2.5e-2</code> is 0.025. The part before the E is the <strong>mantissa</strong>; the part after is the power of 10. To convert, move the point until one digit is left of it: 0.0072 is <code>7.2E-3</code>. By default <code>cout</code> shows at most 6 significant digits and drops trailing zeros, so <code>5.0</code> prints <code>5</code>.</p><h4>bool</h4><p><code>bool</code> holds <code>true</code> or <code>false</code>; an expression whose value is true or false is a <strong>Boolean expression</strong>. Internally true is 1 and false is 0, and <code>cout</code> prints them as 1 and 0. Any non-zero value stored in a <code>bool</code> becomes true: <code>bool f = 5;</code> stores 1.</p><h4>sizeof</h4><p><code>sizeof</code> is an operator giving the number of bytes a type or variable occupies, for example <code>sizeof(int)</code>. Sizes vary between systems, so never assume a fixed answer. Only the ordering rules above are guaranteed.</p><table><thead><tr><th>Type</th><th>Holds</th></tr></thead><tbody><tr><td><code>int</code></td><td>whole number</td></tr><tr><td><code>double</code></td><td>fractional number, about 15 digits</td></tr><tr><td><code>char</code></td><td>one character</td></tr><tr><td><code>string</code></td><td>text (library class)</td></tr><tr><td><code>bool</code></td><td>true or false</td></tr></tbody></table>"
+    },
+    {
+     "id": "u2-l5",
+     "title": "Initialization, scope and arithmetic",
+     "book": "Sections 2.12 to 2.14, pages 61 to 72",
+     "html": "<p>You can <strong>initialize</strong> a variable when defining it: <code>int n = 4;</code>, <code>int n(4);</code> or, in C++11 and later, <strong>brace initialization</strong> <code>int n{4};</code>. Brace initialization rejects <strong>narrowing</strong>: <code>int n{9.99};</code> is an error, whereas <code>int n = 9.99;</code> compiles and stores 9 (the fraction is truncated, not rounded). <code>auto</code> lets the compiler deduce the type from the initializer: <code>auto r = 5.0 / 2;</code> makes <code>r</code> a <code>double</code>. A value assigned in a chain, <code>a = b = 7;</code>, is evaluated right to left. In <code>int w = 8, h, d = 3;</code> only <code>w</code> and <code>d</code> are initialized: each initializer belongs to one name. The left operand of <code>=</code> must be an <strong>lvalue</strong> (it names a memory location that can change, usually a variable); the right side is an <strong>rvalue</strong>, any expression that has a value.</p><h4>Scope</h4><p>A variable's <strong>scope</strong> is the part of the program where its name is visible: from its definition to the closing brace of the block that holds it. Using a variable on a line <strong>before</strong> its definition is a compile error, because the compiler reads top to bottom. A variable defined in <code>main</code> cannot be seen in another function. An inner block may define a name that <strong>shadows</strong> an outer one; the inner one wins inside its braces.</p><pre><code>int x = 1;\n{\n    int x = 2;\n    cout &lt;&lt; x &lt;&lt; \" \";   // 2\n}\ncout &lt;&lt; x;              // 1</code></pre><h4>Arithmetic</h4><p>The values an operator works on are its <strong>operands</strong>. A <strong>unary</strong> operator takes one (negation, <code>-x</code>), a <strong>binary</strong> operator two (<code>+</code>, <code>=</code>), and C++ has one <strong>ternary</strong> operator, taking three (Chapter 4).</p><table><thead><tr><th>Operator</th><th>Meaning</th></tr></thead><tbody><tr><td><code>+  -  *</code></td><td>add, subtract, multiply</td></tr><tr><td><code>/</code></td><td>divide</td></tr><tr><td><code>%</code></td><td>remainder (integers only)</td></tr></tbody></table><ul><li>If <strong>both operands are integers</strong>, <code>/</code> discards the fraction: <code>17 / 5</code> is 3, and <code>7 / 2</code> is 3 even when stored in a <code>double</code>. Make one operand floating point (<code>7 / 2.0</code>) to get 3.5.</li><li><code>17 % 5</code> is 2. <code>%</code> does not compile with a <code>double</code> operand. <code>n % 10</code> is the rightmost digit of n and <code>n / 10</code> drops it. <code>%</code> never means percent: 15 percent of price is <code>price * 0.15</code>.</li><li>Precedence: <code>*  /  %</code> before <code>+  -</code>; equal precedence goes left to right. <code>2 + 3 * 4 - 8 / 2 % 3</code> is <code>2 + 12 - 1</code> = 13.</li><li>Parentheses override precedence.</li></ul><p>The traps are always the same: integer division inside a <code>double</code> assignment, and forgetting that <code>%</code> and <code>/</code> share a level with <code>*</code>.</p>"
+    },
+    {
+     "id": "u2-l6",
+     "title": "Comments, named constants and style",
+     "book": "Sections 2.15 to 2.17, pages 72 to 78",
+     "html": "<p><strong>Comments</strong> are ignored by the compiler and explain the code to people. <code>// text</code> runs to the end of the line. <code>/* text */</code> can span many lines and cannot be nested. Reversing the symbols (<code>*/ ... /*</code>) or forgetting the closing <code>*/</code> stops the program from compiling. Put a header comment at the top of each program (purpose, author, date) and brief notes before tricky steps. A comment that merely repeats the code adds nothing.</p><pre><code>// computes pay for one week\n/* the next line is disabled\n   cout &lt;&lt; \"debug\";\n*/</code></pre><p>A <strong>named constant</strong> is a variable that cannot change after it is set. Define it with <code>const</code> and you must initialize it in the same statement: <code>const double TAX_RATE = 0.07;</code>. Assigning to it later is a compile error, and <code>const int LIMIT;</code> with no value is also an error. By convention (not a rule) the names are written in capitals.</p><p>A raw number in the middle of a calculation is a <strong>magic number</strong>: its meaning is not obvious and changing it means hunting through the program. A named constant documents the meaning and lets you change it in one place.</p><p><strong>Programming style</strong> is how code is laid out: consistent indentation (each nested block indented a few spaces), braces lined up, one statement per line, blank lines between logical sections, and meaningful names. Style never changes how the program runs, since the compiler ignores whitespace, but it decides whether other people (and you in a month) can read it.</p>"
+    }
+   ],
+   "questions": [
+    {
+     "lesson": "u2-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which line of a C++ program is a preprocessor directive?",
+     "choices": [
+      "#include <iostream>",
+      "using namespace std;",
+      "int main()",
+      "return 0;"
+     ],
+     "answer": 0,
+     "explain": "Preprocessor directives begin with # and are handled before compilation. The other lines are a using directive, a function header and a statement.",
+     "id": "u2-q001"
+    },
+    {
+     "lesson": "u2-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "In the statement cout << x;, what is the name of the << operator?",
+     "choices": [
+      "stream extraction operator",
+      "stream insertion operator",
+      "assignment operator",
+      "scope resolution operator"
+     ],
+     "answer": 1,
+     "explain": "<< inserts data into the output stream. The extraction operator >> is the one used with cin.",
+     "id": "u2-q002"
+    },
+    {
+     "lesson": "u2-l1",
+     "type": "output",
+     "difficulty": 1,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << \"A\\nB\" << endl << \"C\" << \"D\\n\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << \"A\\nB\" << endl << \"C\" << \"D\\n\";\n    return 0;\n}\n",
+     "answer": "A\nB\nCD",
+     "explain": "\\n inside the string and endl both end a line. C and D are printed with nothing between them.",
+     "id": "u2-q003"
+    },
+    {
+     "lesson": "u2-l1",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << \"Say \\\"hi\\\"\\\\done\\n\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << \"Say \\\"hi\\\"\\\\done\\n\";\n    return 0;\n}\n",
+     "answer": "Say \"hi\"\\done",
+     "explain": "\\\" prints a double quote and \\\\ prints a single backslash.",
+     "id": "u2-q004"
+    },
+    {
+     "lesson": "u2-l1",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Both endl and the \\n escape sequence move the cursor to the next line, but endl also flushes the output buffer.",
+     "answer": true,
+     "explain": "That is the difference. \\n only inserts a newline character; endl inserts it and forces buffered output out.",
+     "id": "u2-q005"
+    },
+    {
+     "lesson": "u2-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Every complete C++ statement ends with which punctuation character? (Name it or type it.)",
+     "answer": ";",
+     "accept": [
+      ";",
+      "semicolon",
+      "a semicolon",
+      "semi-colon"
+     ],
+     "explain": "The semicolon terminates a statement. Preprocessor directives and function headers do not take one.",
+     "id": "u2-q006"
+    },
+    {
+     "lesson": "u2-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which statement displays Hi and then moves to a new line?",
+     "choices": [
+      "cout >> \"Hi\" << endl;",
+      "cout << Hi << endl;",
+      "cout << \"Hi\" << endl;",
+      "cout << \"Hi\" << endl"
+     ],
+     "answer": 2,
+     "explain": "The correct form uses << and a quoted literal and ends with a semicolon. The others use the wrong operator, treat Hi as an undeclared variable, or omit the semicolon.",
+     "id": "u2-q007"
+    },
+    {
+     "lesson": "u2-l1",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? Raw string literals are a 10th edition feature. (Assume the usual includes and using namespace std;.)",
+     "code": "cout << R\"(C:\\temp\\new)\" << endl;\ncout << R\"(He said \"no\")\" << endl;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << R\"(C:\\temp\\new)\" << endl;\ncout << R\"(He said \"no\")\" << endl;\n    return 0;\n}\n",
+     "answer": "C:\\temp\\new\nHe said \"no\"",
+     "explain": "In a raw string literal R\"(...)\" backslashes are ordinary characters and quotes need no escaping, so the text is printed exactly as written.",
+     "id": "u2-q008"
+    },
+    {
+     "lesson": "u2-l1",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "In the raw string literal R\"(a\\nb)\", the \\n is treated as a newline character.",
+     "answer": false,
+     "explain": "Raw strings do not process escape sequences. The backslash and the n are two ordinary characters, so a\\nb is printed literally.",
+     "id": "u2-q009"
+    },
+    {
+     "lesson": "u2-l1",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << 2 + 3 << \"5\" << 2 * 3;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << 2 + 3 << \"5\" << 2 * 3;\n    return 0;\n}\n",
+     "answer": "556",
+     "explain": "The expressions are evaluated first: 2 + 3 is 5, the literal \"5\" is text, 2 * 3 is 6. No spaces are inserted, so the output runs together as 556.",
+     "id": "u2-q010"
+    },
+    {
+     "lesson": "u2-l2",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which of these is a legal C++ variable name?",
+     "choices": [
+      "2ndTotal",
+      "my total",
+      "total-2",
+      "_total2"
+     ],
+     "answer": 3,
+     "explain": "Names may begin with a letter or underscore but not a digit, and may not contain spaces or hyphens.",
+     "id": "u2-q011"
+    },
+    {
+     "lesson": "u2-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which of these cannot be used as a variable name?",
+     "choices": [
+      "int",
+      "Total",
+      "total_1",
+      "_x"
+     ],
+     "answer": 0,
+     "explain": "int is a reserved key word. Total, total_1 and _x are all legal.",
+     "id": "u2-q012"
+    },
+    {
+     "lesson": "u2-l2",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "In C++, the names Sales and sales refer to two different variables.",
+     "answer": true,
+     "explain": "Identifiers are case sensitive, so differing capitalization makes different names.",
+     "id": "u2-q013"
+    },
+    {
+     "lesson": "u2-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "What is the term for a value typed directly into a program, such as 42 or \"hello\"?",
+     "answer": "literal",
+     "accept": [
+      "literal",
+      "literals",
+      "a literal",
+      "constant",
+      "constants",
+      "a constant",
+      "literal constant",
+      "constant literal"
+     ],
+     "explain": "A literal is a value written in the source code itself, as opposed to a name that stands for a value. The textbook notes that literals are also called constants.",
+     "id": "u2-q014"
+    },
+    {
+     "lesson": "u2-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "int x = 5;\nint y = x;\nx = 9;\ncout << y << \" \" << x;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint x = 5;\nint y = x;\nx = 9;\ncout << y << \" \" << x;\n    return 0;\n}\n",
+     "answer": "5 9",
+     "explain": "y received a copy of x's value when it was initialized, so changing x later does not affect y.",
+     "id": "u2-q015"
+    },
+    {
+     "lesson": "u2-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "int a = 4, b = 10;\na = b;\nb = a + 1;\ncout << a << \" \" << b;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint a = 4, b = 10;\na = b;\nb = a + 1;\ncout << a << \" \" << b;\n    return 0;\n}\n",
+     "answer": "10 11",
+     "explain": "After a = b, a is 10. Then b becomes the new a plus 1, which is 11.",
+     "id": "u2-q016"
+    },
+    {
+     "lesson": "u2-l2",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which assignment statement will NOT compile?",
+     "choices": [
+      "a = b;",
+      "5 = a;",
+      "a = 5;",
+      "a = a + 1;"
+     ],
+     "answer": 1,
+     "explain": "The left operand of = must be an lvalue: something, usually a variable, that names a memory location whose contents can change. A literal such as 5 cannot be assigned to. The other three are legal; a = a + 1 adds one to a.",
+     "id": "u2-q017"
+    },
+    {
+     "lesson": "u2-l2",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "A C++ variable name is allowed to begin with an underscore.",
+     "answer": true,
+     "explain": "Identifiers may start with a letter or underscore. They may not start with a digit.",
+     "id": "u2-q018"
+    },
+    {
+     "lesson": "u2-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which statement about integer type sizes does the C++ standard guarantee?",
+     "choices": [
+      "An int is always exactly 4 bytes",
+      "A long is always exactly 8 bytes",
+      "sizeof(short) <= sizeof(int) <= sizeof(long)",
+      "A short is always exactly 2 bytes"
+     ],
+     "answer": 2,
+     "explain": "Only the ordering is guaranteed. Exact sizes depend on the compiler and system.",
+     "id": "u2-q019"
+    },
+    {
+     "lesson": "u2-l3",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "An unsigned int variable can store negative numbers as long as they are small.",
+     "answer": false,
+     "explain": "unsigned means the type holds only zero and positive values; the freed sign bit gives a larger positive range instead.",
+     "id": "u2-q020"
+    },
+    {
+     "lesson": "u2-l3",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which data type holds exactly one character?",
+     "answer": "char",
+     "accept": [
+      "char",
+      "a char"
+     ],
+     "explain": "char stores a single character as a small integer code.",
+     "id": "u2-q021"
+    },
+    {
+     "lesson": "u2-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? Assume the ASCII character set. (Assume the usual #include lines and using namespace std;.)",
+     "code": "char ch = 'a';\nch = ch + 2;\ncout << ch;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nchar ch = 'a';\nch = ch + 2;\ncout << ch;\n    return 0;\n}\n",
+     "answer": "c",
+     "explain": "A char is a small integer, so adding 2 to the ASCII code for a (97) gives 99, the code for c. cout prints a char variable as a character.",
+     "id": "u2-q022"
+    },
+    {
+     "lesson": "u2-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is the difference between 'A' and \"A\" in C++?",
+     "choices": [
+      "They are identical",
+      "'A' is a string literal and \"A\" is a char literal",
+      "Single quotes are for numbers and double quotes are for letters",
+      "'A' is a char literal; \"A\" is a string literal that also holds a null terminator"
+     ],
+     "answer": 3,
+     "explain": "Single quotes make one char; double quotes make a string literal (a character array including the invisible null terminator).",
+     "id": "u2-q023"
+    },
+    {
+     "lesson": "u2-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "int a = 0b1010;\nint b = 1'000;\ncout << a << \" \" << b + 1;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint a = 0b1010;\nint b = 1'000;\ncout << a << \" \" << b + 1;\n    return 0;\n}\n",
+     "answer": "10 1001",
+     "explain": "0b1010 is binary for 10. The digit separator in 1'000 is ignored, so b is 1000 and b + 1 is 1001. (Binary literals and digit separators are C++14/10th edition features.)",
+     "id": "u2-q024"
+    },
+    {
+     "lesson": "u2-l3",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "The literals 1'000'000 and 1000000 have the same value.",
+     "answer": true,
+     "explain": "A digit separator is only for readability and does not change the value.",
+     "id": "u2-q025"
+    },
+    {
+     "lesson": "u2-l3",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "What value is stored by int x = 012; ?",
+     "choices": [
+      "10",
+      "12",
+      "8",
+      "The line is a compile error"
+     ],
+     "answer": 0,
+     "explain": "A leading 0 makes the literal octal. Octal 12 is 1*8 + 2 = 10.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint x = 012;\ncout << x;\n    return 0;\n}\n",
+     "expect": "10",
+     "code": "int x = 012;\ncout << x;",
+     "id": "u2-q026"
+    },
+    {
+     "lesson": "u2-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What does placing the word unsigned before an integer type do?",
+     "choices": [
+      "It doubles the number of bytes used",
+      "Same storage size, no negative values, and a larger maximum positive value",
+      "It allows decimal fractions",
+      "It makes the variable constant"
+     ],
+     "answer": 1,
+     "explain": "unsigned reuses the sign bit as part of the magnitude, so the range runs from 0 up to roughly twice the signed maximum.",
+     "id": "u2-q027"
+    },
+    {
+     "lesson": "u2-l4",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which header must be included to use the string class?",
+     "choices": [
+      "<cstring>",
+      "<strings>",
+      "<string>",
+      "<chars>"
+     ],
+     "answer": 2,
+     "explain": "The string class lives in <string>. <cstring> is the old C-style string library, a different thing.",
+     "id": "u2-q028"
+    },
+    {
+     "lesson": "u2-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "string a = \"net\";\nstring b = \"work\";\nstring c = a + b;\ncout << c << \" \" << c.length();",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nstring a = \"net\";\nstring b = \"work\";\nstring c = a + b;\ncout << c << \" \" << c.length();\n    return 0;\n}\n",
+     "answer": "network 7",
+     "explain": "+ concatenates strings to give network, which has 7 characters.",
+     "id": "u2-q029"
+    },
+    {
+     "lesson": "u2-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << 1.5e3 << \" \" << 2.5E-2;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << 1.5e3 << \" \" << 2.5E-2;\n    return 0;\n}\n",
+     "answer": "1500 0.025",
+     "explain": "1.5e3 means 1.5 times 10 to the 3, which is 1500. 2.5E-2 is 0.025. cout drops unneeded trailing zeros.",
+     "id": "u2-q030"
+    },
+    {
+     "lesson": "u2-l4",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Which statement fails to compile?",
+     "choices": [
+      "string s = string(\"a\") + \"b\";",
+      "string s = \"a\";\ns = s + \"b\";",
+      "string s(\"ab\");\ns += \"c\";",
+      "string s = \"a\" + \"b\";"
+     ],
+     "answer": 3,
+     "explain": "Two string literals are not string objects, so + cannot join them. In every other choice at least one operand is a string object.",
+     "id": "u2-q031"
+    },
+    {
+     "lesson": "u2-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "bool f = 5;\nbool g = 0;\ncout << f << g;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nbool f = 5;\nbool g = 0;\ncout << f << g;\n    return 0;\n}\n",
+     "answer": "10",
+     "explain": "Any non-zero value becomes true (printed as 1) and zero becomes false (printed as 0).",
+     "id": "u2-q032"
+    },
+    {
+     "lesson": "u2-l4",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "A float has more precision than a double.",
+     "answer": false,
+     "explain": "double is the larger type and carries more significant digits than float.",
+     "id": "u2-q033"
+    },
+    {
+     "lesson": "u2-l4",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which operator reports how many bytes a type or variable occupies?",
+     "answer": "sizeof",
+     "accept": [
+      "sizeof",
+      "sizeof()",
+      "sizeof operator"
+     ],
+     "explain": "sizeof gives a size in bytes; its exact values depend on the system.",
+     "id": "u2-q034"
+    },
+    {
+     "lesson": "u2-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which literal has type double?",
+     "choices": [
+      "3.0",
+      "3",
+      "3.0f",
+      "'3'"
+     ],
+     "answer": 0,
+     "explain": "A number with a decimal point and no suffix is a double. 3 is an int, 3.0f is a float, and '3' is a char.",
+     "id": "u2-q035"
+    },
+    {
+     "lesson": "u2-l5",
+     "type": "output",
+     "difficulty": 1,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << 17 / 5 << \" \" << 17 % 5;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << 17 / 5 << \" \" << 17 % 5;\n    return 0;\n}\n",
+     "answer": "3 2",
+     "explain": "Integer division gives the quotient 3 and % gives the remainder 2.",
+     "id": "u2-q036"
+    },
+    {
+     "lesson": "u2-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "double d = 7 / 2;\ncout << d;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ndouble d = 7 / 2;\ncout << d;\n    return 0;\n}\n",
+     "answer": "3",
+     "explain": "Both operands are integers, so 7 / 2 is already 3 before it is stored. Storing it in a double does not bring the fraction back.",
+     "id": "u2-q037"
+    },
+    {
+     "lesson": "u2-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "double d = 7 / 2.0;\ncout << d;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ndouble d = 7 / 2.0;\ncout << d;\n    return 0;\n}\n",
+     "answer": "3.5",
+     "explain": "One operand is a double, so the division is done in floating point and gives 3.5.",
+     "id": "u2-q038"
+    },
+    {
+     "lesson": "u2-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is stored by int n = 9.99; ?",
+     "choices": [
+      "10",
+      "9",
+      "9.99",
+      "The line does not compile"
+     ],
+     "answer": 1,
+     "explain": "Assigning a double to an int truncates the fraction. It does not round.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint n = 9.99;\ncout << n;\n    return 0;\n}\n",
+     "expect": "9",
+     "code": "int n = 9.99;\ncout << n;",
+     "id": "u2-q039"
+    },
+    {
+     "lesson": "u2-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What type does the compiler give x in auto x = 5.0 / 2; ?",
+     "choices": [
+      "int",
+      "float",
+      "double",
+      "long"
+     ],
+     "answer": 2,
+     "explain": "5.0 is a double literal, so the quotient is a double, and auto deduces double.",
+     "id": "u2-q040"
+    },
+    {
+     "lesson": "u2-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "int x = 1;\n{\n    int x = 2;\n    cout << x << \" \";\n}\ncout << x;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint x = 1;\n{\n    int x = 2;\n    cout << x << \" \";\n}\ncout << x;\n    return 0;\n}\n",
+     "answer": "2 1",
+     "explain": "The inner x shadows the outer one inside the braces and ceases to exist at the closing brace. The outer x is still 1.",
+     "id": "u2-q041"
+    },
+    {
+     "lesson": "u2-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which expression does NOT compile?",
+     "choices": [
+      "10 % 3",
+      "10 / 3.0",
+      "10 / 3",
+      "10.0 % 3"
+     ],
+     "answer": 3,
+     "explain": "The % operator accepts only integer operands.",
+     "id": "u2-q042"
+    },
+    {
+     "lesson": "u2-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << 2 + 3 * 4 - 8 / 2 % 3;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << 2 + 3 * 4 - 8 / 2 % 3;\n    return 0;\n}\n",
+     "answer": "13",
+     "explain": "* / % share one level and go left to right: 8 / 2 is 4, then 4 % 3 is 1. The result is 2 + 12 - 1.",
+     "id": "u2-q043"
+    },
+    {
+     "lesson": "u2-l5",
+     "type": "tf",
+     "difficulty": 3,
+     "prompt": "The statement int n{9.99}; compiles and stores 9.",
+     "answer": false,
+     "explain": "Brace initialization forbids narrowing conversions such as double to int, so the standard makes this an error. The = and () forms (int n = 9.99; or int n(9.99);) quietly truncate to 9.",
+     "id": "u2-q044"
+    },
+    {
+     "lesson": "u2-l5",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which arithmetic operator gives the remainder of an integer division?",
+     "answer": "%",
+     "accept": [
+      "%",
+      "modulus",
+      "modulus operator",
+      "modulo",
+      "mod"
+     ],
+     "explain": "The % operator, often called modulus, returns the remainder.",
+     "id": "u2-q045"
+    },
+    {
+     "lesson": "u2-l6",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which of these is a legal multi-line comment?",
+     "choices": [
+      "/* note */",
+      "// note */",
+      "<!-- note -->",
+      "** note **"
+     ],
+     "answer": 0,
+     "explain": "/* begins the comment and */ ends it, and it may span lines. // comments only last to the end of one line.",
+     "id": "u2-q046"
+    },
+    {
+     "lesson": "u2-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which constant definition is invalid?",
+     "choices": [
+      "const int LIMIT = 10;",
+      "const int LIMIT;",
+      "const double PI = 3.14159;",
+      "const char GRADE = 'A';"
+     ],
+     "answer": 1,
+     "explain": "A const must be given its value in its definition, since it cannot be assigned to afterwards.",
+     "id": "u2-q047"
+    },
+    {
+     "lesson": "u2-l6",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "const int DAYS = 7;\nint weeks = 3;\ncout << weeks * DAYS; // days total\n/* cout << 99; */",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nconst int DAYS = 7;\nint weeks = 3;\ncout << weeks * DAYS; // days total\n/* cout << 99; */\n    return 0;\n}\n",
+     "answer": "21",
+     "explain": "The comments are ignored, and the disabled statement never runs. 3 * 7 is 21.",
+     "id": "u2-q048"
+    },
+    {
+     "lesson": "u2-l6",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which key word makes a variable a named constant that cannot be changed after initialization?",
+     "answer": "const",
+     "accept": [
+      "const",
+      "constexpr"
+     ],
+     "explain": "const (or constexpr for compile-time constants) marks a variable read-only.",
+     "id": "u2-q049"
+    },
+    {
+     "lesson": "u2-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is a magic number?",
+     "choices": [
+      "A number that is always prime",
+      "A constant defined with const",
+      "An unexplained literal value in the code whose meaning is not obvious",
+      "The value returned by main"
+     ],
+     "answer": 2,
+     "explain": "Replacing magic numbers with named constants documents their meaning and lets you change them in one place.",
+     "id": "u2-q050"
+    },
+    {
+     "id": "u2-q051",
+     "lesson": "u2-l5",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "In the expression -total, the minus sign works on a single operand. What kind of operator is it?",
+     "choices": [
+      "unary",
+      "binary",
+      "ternary",
+      "relational"
+     ],
+     "answer": 0,
+     "explain": "Operators are named by how many operands they take: unary one, binary two, ternary three. Used for negation, - is unary; in a - b it is the binary subtraction operator."
+    },
+    {
+     "id": "u2-q052",
+     "lesson": "u2-l5",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "The assignment operator = is a binary operator.",
+     "answer": true,
+     "explain": "It has two operands: the variable on its left and the value on its right. Unary operators take one operand, and C++ has a single ternary operator, which takes three."
+    },
+    {
+     "id": "u2-q053",
+     "lesson": "u2-l1",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << \"Part A/nPart B\\n\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << \"Part A/nPart B\\n\";\n    return 0;\n}\n",
+     "answer": "Part A/nPart B",
+     "explain": "The newline escape sequence is a backslash followed by n. /n uses a forward slash, so it is not an escape sequence and cout prints the slash and the n as ordinary characters. Only the final \\n ends the line."
+    },
+    {
+     "id": "u2-q054",
+     "lesson": "u2-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "string s = \"ab\\tc\\n\";\ncout << s.length();",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nstring s = \"ab\\tc\\n\";\ncout << s.length();\n    return 0;\n}\n",
+     "answer": "5",
+     "explain": "Each escape sequence is stored as one character even though it is typed with two symbols. The string holds a, b, a tab, c and a newline: 5 characters."
+    },
+    {
+     "id": "u2-q055",
+     "lesson": "u2-l3",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "How many bytes of memory does the string literal \"Dayton\" occupy? (A char uses 1 byte.)",
+     "choices": [
+      "6",
+      "7",
+      "8",
+      "12"
+     ],
+     "answer": 1,
+     "explain": "The six letters are followed by the null terminator (\\0) that C++ stores at the end of every string literal, so the literal takes 7 bytes. (A string object holding Dayton still reports length() as 6; the terminator is not counted.)",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << sizeof(\"Dayton\");\n    return 0;\n}\n",
+     "expect": "7"
+    },
+    {
+     "id": "u2-q056",
+     "lesson": "u2-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which definition does NOT compile?",
+     "choices": [
+      "char grade = 'B';",
+      "char grade = 66;",
+      "char grade = \"B\";",
+      "string grade = \"B\";"
+     ],
+     "answer": 2,
+     "explain": "\"B\" in double quotes is a string literal (a B plus a null terminator), and a string cannot be stored in a char. A char takes a character literal in single quotes or a small integer code such as 66."
+    },
+    {
+     "id": "u2-q057",
+     "lesson": "u2-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? Assume the ASCII character set. (Assume the usual #include lines and using namespace std;.)",
+     "code": "char letter = 72;\ncout << letter;\nletter = letter + 1;\ncout << letter;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nchar letter = 72;\ncout << letter;\nletter = letter + 1;\ncout << letter;\n    return 0;\n}\n",
+     "answer": "HI",
+     "explain": "A char stores a numeric code, and cout prints a char variable as the character with that code. In ASCII, 72 is H and 73 is I."
+    },
+    {
+     "id": "u2-q058",
+     "lesson": "u2-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which is the E notation form of 0.000418?",
+     "choices": [
+      "4.18E4",
+      "4.18E-3",
+      "41.8E-4",
+      "4.18E-4"
+     ],
+     "answer": 3,
+     "explain": "Moving the decimal point 4 places to the right gives 4.18, so the power of ten is -4. 4.18E4 is 41800, and both 4.18E-3 and 41.8E-4 equal 0.00418."
+    },
+    {
+     "id": "u2-q059",
+     "lesson": "u2-l4",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "In the E notation value 6.25E8, the part before the E (6.25) is called the ____.",
+     "answer": "mantissa",
+     "accept": [
+      "mantissa",
+      "the mantissa",
+      "significand"
+     ],
+     "explain": "The mantissa is multiplied by the power of ten written after the E, so 6.25E8 means 6.25 times 10 to the 8th, or 625,000,000."
+    },
+    {
+     "id": "u2-q060",
+     "lesson": "u2-l4",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "C++ provides unsigned versions of float and double for values that are never negative.",
+     "answer": false,
+     "explain": "There are no unsigned floating-point types. float, double and long double always hold both positive and negative values; unsigned applies only to the integer types."
+    },
+    {
+     "id": "u2-q061",
+     "lesson": "u2-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which literal is a long integer literal?",
+     "choices": [
+      "500LL",
+      "500.0L",
+      "500.0F",
+      "500L"
+     ],
+     "answer": 3,
+     "explain": "The L suffix on a whole number makes it a long. LL makes a long long integer literal, and on a number with a decimal point L means long double and F means float."
+    },
+    {
+     "id": "u2-q062",
+     "lesson": "u2-l5",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "Why is `12 = count;` rejected by the compiler? The left side of an assignment must be what kind of operand, one that names a changeable memory location?",
+     "answer": "lvalue",
+     "accept": [
+      "lvalue",
+      "an lvalue",
+      "l-value",
+      "an l-value"
+     ],
+     "explain": "An lvalue can appear on the left of an assignment. The right side only needs an rvalue, any expression that has a value. That is why 12 = count; is an error."
+    },
+    {
+     "id": "u2-q063",
+     "lesson": "u2-l5",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Giving a variable its first value as part of its definition, as in double rate = 0.05;, is called ____.",
+     "answer": "initialization",
+     "accept": [
+      "initialization",
+      "initializing",
+      "initialisation",
+      "variable initialization"
+     ],
+     "explain": "Initialization happens in the definition itself. A later statement such as rate = 0.06; is an assignment, not an initialization."
+    },
+    {
+     "id": "u2-q064",
+     "lesson": "u2-l5",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "After this definition, which variables have been given a value?",
+     "code": "int width = 8, height, depth = 3;",
+     "choices": [
+      "all three; height also gets 3",
+      "width only",
+      "width and depth only",
+      "none; the line does not compile"
+     ],
+     "answer": 2,
+     "explain": "Each initializer belongs only to the name just before it. height is defined but left uninitialized, so its contents are unknown until something is stored in it."
+    },
+    {
+     "id": "u2-q065",
+     "lesson": "u2-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Why does this program fail to compile?",
+     "code": "#include <iostream>\nusing namespace std;\n\nint main()\n{\n    cost = 19.95;\n    double cost;\n    cout << cost << endl;\n    return 0;\n}",
+     "choices": [
+      "a double cannot hold 19.95",
+      "cost is used before it is defined",
+      "cout cannot display a double",
+      "a variable definition must also give the variable a value"
+     ],
+     "answer": 1,
+     "explain": "A variable's scope begins at its definition and the compiler reads top to bottom, so the assignment on the line above the definition refers to an unknown name. Move double cost; above it, or write double cost = 19.95;."
+    },
+    {
+     "id": "u2-q066",
+     "lesson": "u2-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "int n = 4729;\ncout << n % 10 << \" \" << n / 10 % 10 << \" \" << n / 1000;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint n = 4729;\ncout << n % 10 << \" \" << n / 10 % 10 << \" \" << n / 1000;\n    return 0;\n}\n",
+     "answer": "9 2 4",
+     "explain": "n % 10 is the rightmost digit, 9. n / 10 is 472 (integer division drops the last digit), and 472 % 10 is 2. n / 1000 keeps only the thousands digit, 4."
+    },
+    {
+     "id": "u2-q067",
+     "lesson": "u2-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "price is a double. Which expression computes 15 percent of price?",
+     "choices": [
+      "price * 0.15",
+      "price * 15%",
+      "price % 15",
+      "price / 15"
+     ],
+     "answer": 0,
+     "explain": "In C++ % is the modulus operator, never percent, and it does not accept a double operand. Write a percentage as a decimal: 15 percent is 0.15."
+    },
+    {
+     "id": "u2-q068",
+     "lesson": "u2-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "When are preprocessor directives such as #include carried out?",
+     "choices": [
+      "After compilation, while the program is being linked",
+      "While the program runs",
+      "Before the compiler translates the program",
+      "Each time main is called"
+     ],
+     "answer": 2,
+     "explain": "The preprocessor reads the source first and carries out the lines that begin with #, for example inserting the contents of iostream. The compiler then works on the result."
+    },
+    {
+     "id": "u2-q069",
+     "lesson": "u2-l1",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "Every C++ program must contain a function named main.",
+     "answer": true,
+     "explain": "main is the starting point of every C++ program. A program may have many functions, but without main it cannot be built into a runnable program."
+    },
+    {
+     "id": "u2-q070",
+     "lesson": "u2-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Why does this program fail to compile?",
+     "code": "*/ Computes a tip /*\n#include <iostream>\nusing namespace std;\n\nint main()\n{\n    cout << 0.18 * 50 << endl;\n    return 0;\n}",
+     "choices": [
+      "The comment symbols are reversed: a multi-line comment must start with /* and end with */",
+      "A comment cannot appear above #include",
+      "A multi-line comment must span at least two lines",
+      "The expression 0.18 * 50 must be in parentheses inside cout"
+     ],
+     "answer": 0,
+     "explain": "*/ only ends a comment; it cannot start one. Here */ is read as code, and the /* at the end of the first line opens a comment that is never closed, swallowing the rest of the file."
+    },
+    {
+     "id": "u2-q071",
+     "lesson": "u2-l6",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "A program typed with several statements on one line and no indentation will not compile.",
+     "answer": false,
+     "explain": "The compiler ignores spacing and line breaks between the parts of a statement, so badly laid-out code still compiles. Programming style matters because people have to read the code."
+    },
+    {
+     "id": "u2-q072",
+     "lesson": "u2-l6",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "The name of a constant defined with const must be written in all uppercase letters, or the program will not compile.",
+     "answer": false,
+     "explain": "Uppercase names such as TAX_RATE are only a convention that makes constants easy to spot. The compiler requires the const qualifier and an initial value, not capital letters."
+    },
+    {
+     "id": "u2-q073",
+     "lesson": "u2-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which line correctly includes the iostream header file?",
+     "choices": [
+      "#include (iostream)",
+      "#include iostream",
+      "include <iostream>",
+      "#include <iostream>"
+     ],
+     "answer": 3,
+     "explain": "A directive begins with #, and the name of a standard header file goes inside angle brackets. Directives are not statements, so no semicolon follows."
+    },
+    {
+     "id": "u2-q074",
+     "lesson": "u2-l2",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "Using descriptive names such as hoursWorked instead of x helps make a program ____, meaning a reader can understand it largely from the code itself.",
+     "answer": "self-documenting",
+     "accept": [
+      "self-documenting",
+      "self documenting",
+      "selfdocumenting"
+     ],
+     "explain": "A self-documenting program explains itself through well-chosen names. Named constants such as TAX_RATE do the same for fixed values."
+    },
+    {
+     "id": "u2-q075",
+     "lesson": "u2-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which code carries out this pseudocode? Store 12.5 in rate. Store 6 in hours. Multiply rate by hours and store the result in pay. Display pay.",
+     "choices": [
+      "double rate = 12.5, hours = 6, pay;\nrate * hours = pay;\ncout << pay;",
+      "double rate = 12.5, hours = 6, pay;\npay = rate * hours;\ncout << pay;",
+      "double rate = 12.5, hours = 6, pay;\ncout << pay;\npay = rate * hours;",
+      "double rate = 12.5, hours = 6, pay;\npay = rate * hours;\ncout << \"pay\";"
+     ],
+     "answer": 1,
+     "explain": "The variable receiving the result goes on the left of =, the calculation must happen before the display, and pay must not be in quotes, which would print the word pay instead of its value."
+    },
+    {
+     "id": "u2-q076",
+     "lesson": "u2-l4",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "An expression whose value is either true or false is called a ____ expression.",
+     "answer": "Boolean",
+     "accept": [
+      "Boolean",
+      "bool",
+      "Boolean expression",
+      "a Boolean expression"
+     ],
+     "explain": "Boolean expressions are named after the mathematician George Boole. Their results can be stored in a bool variable, which cout displays as 1 for true and 0 for false."
+    }
+   ],
+   "programs": [
+    {
+     "id": "u2-p1",
+     "title": "Seconds to hours, minutes and seconds",
+     "task": "Define an int named total holding 98765 seconds. Use / and % to break it into whole hours, remaining minutes and remaining seconds, then print exactly one line in the form: 27 hours, 26 minutes, 5 seconds (using your computed values). Use named constants for 3600 and 60.",
+     "sampleOutput": "27 hours, 26 minutes, 5 seconds",
+     "solution": "#include <iostream>\nusing namespace std;\n\nint main()\n{\n    const int SECS_PER_HOUR = 3600;\n    const int SECS_PER_MIN = 60;\n    int total = 98765;\n\n    int hours = total / SECS_PER_HOUR;\n    int left = total % SECS_PER_HOUR;\n    int minutes = left / SECS_PER_MIN;\n    int seconds = left % SECS_PER_MIN;\n\n    cout << hours << \" hours, \" << minutes << \" minutes, \"\n         << seconds << \" seconds\" << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u2-p2",
+     "title": "Names, escapes and a raw string",
+     "task": "Define string variables first = \"Grace\" and last = \"Hopper\". Build a string full from them with a space between. Print three lines: (1) Name: \"Grace Hopper\" with the double quotes shown; (2) Length: followed by the number of characters in full; (3) the file path C:\\data\\notes.txt printed with a raw string literal.",
+     "sampleOutput": "Name: \"Grace Hopper\"\nLength: 12\nC:\\data\\notes.txt",
+     "solution": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main()\n{\n    string first = \"Grace\";\n    string last = \"Hopper\";\n    string full = first + \" \" + last;\n\n    cout << \"Name: \\\"\" << full << \"\\\"\\n\";\n    cout << \"Length: \" << full.length() << endl;\n    cout << R\"(C:\\data\\notes.txt)\" << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u2-p3",
+     "title": "Test score average",
+     "task": "Define three int test scores 88, 92 and 79. Compute and print, one per line, labelled exactly: Sum, Integer average (sum divided by 3 using integer division), Remainder (sum % 3), and Exact average (a double computed by dividing the sum by 3.0). Use default cout formatting.",
+     "sampleOutput": "Sum: 259\nInteger average: 86\nRemainder: 1\nExact average: 86.3333",
+     "solution": "#include <iostream>\nusing namespace std;\n\nint main()\n{\n    int s1 = 88, s2 = 92, s3 = 79;\n    int sum = s1 + s2 + s3;\n    double exact = sum / 3.0;\n\n    cout << \"Sum: \" << sum << endl;\n    cout << \"Integer average: \" << sum / 3 << endl;\n    cout << \"Remainder: \" << sum % 3 << endl;\n    cout << \"Exact average: \" << exact << endl;\n    return 0;\n}\n"
+    }
+   ]
+  },
+  {
+   "id": "u3",
+   "title": "Expressions and interactivity",
+   "summary": "Keyboard input with cin, expressions and precedence, type conversion and casting, combined assignment, formatted output, strings and characters, math library and random numbers.",
+   "lessons": [
+    {
+     "id": "u3-l1",
+     "title": "cin and mathematical expressions",
+     "book": "Sections 3.1 and 3.2, pages 87 to 102",
+     "html": "<p><code>cin</code> is the standard input stream. <code>&gt;&gt;</code> is the <strong>stream extraction operator</strong>: it reads a value from the keyboard into the variable on its right. Always display a <strong>prompt</strong> (a message telling the user what to type) with <code>cout</code> first, then read: <code>cout &lt;&lt; \"Age? \"; cin &gt;&gt; age;</code>. Several values can be read in one chain, <code>cin &gt;&gt; a &gt;&gt; b;</code>, and the user separates them with spaces, tabs or newlines. Typed characters wait in the <strong>keyboard buffer</strong>, and cin reads nothing until the user presses Enter. Trap: <code>cin &gt;&gt; a, b;</code> compiles but reads only <code>a</code>. <code>cin &gt;&gt;</code> <strong>skips leading whitespace</strong> and stops at the next whitespace or at a character that cannot belong to the type. If the user types <code>3.9</code> for an <code>int</code>, the variable gets 3 and <code>.9</code> stays waiting in the buffer for the next read. Reading an int, a double and a char from the input <code>7.5 2 z</code> gives 7, .5 and the character <code>'2'</code>. Typing letters for a number puts the stream in a fail state.</p><pre><code>int a, b;\ncin &gt;&gt; a &gt;&gt; b;     // user types: 20 7\ncout &lt;&lt; a - b;     // 13</code></pre><h4>Expressions and precedence</h4><p>An expression is evaluated by <strong>precedence</strong> (which operator goes first) and <strong>associativity</strong> (the order among equal-precedence operators). From highest to lowest:</p><table><thead><tr><th>Level</th><th>Operators</th><th>Associativity</th></tr></thead><tbody><tr><td>1</td><td><code>(  )</code></td><td>inside out</td></tr><tr><td>2</td><td>unary <code>-</code></td><td>right to left</td></tr><tr><td>3</td><td><code>*  /  %</code></td><td>left to right</td></tr><tr><td>4</td><td><code>+  -</code></td><td>left to right</td></tr><tr><td>5</td><td><code>=</code> and combined assignment</td><td>right to left</td></tr></tbody></table><p>So <code>10 - 4 - 3</code> is <code>(10 - 4) - 3</code> = 3, not 9. <code>20 / 4 / 5</code> is <code>(20 / 4) / 5</code> = 1. <code>3 + 4 * 2 - 6 / 4</code> is <code>3 + 8 - 1</code> = 10, while <code>(3 + 4) * (2 - 6 / 4)</code> is <code>7 * 1</code> = 7. Division of two ints truncates.</p><h4>Converting algebra to C++</h4><p>C++ has no implied multiplication: <code>2xy</code> must be <code>2 * x * y</code>, and <code>b(c+d)</code> must be <code>b * (c + d)</code>. A fraction needs parentheses around a numerator or denominator that contains more than one term: <code>a = b / (c + d);</code> is not the same as <code>a = b / c + d;</code>. Exponents use <code>pow(base, exponent)</code> from <code>&lt;cmath&gt;</code>: <code>pow(2, 5)</code> is 32. The values in the parentheses are <strong>arguments</strong>; the <code>double</code> sent back is the <strong>return value</strong>. Averages need parentheses too: <code>a + b + c / 3</code> divides only c.</p>"
+    },
+    {
+     "id": "u3-l2",
+     "title": "Type conversion, overflow and casting",
+     "book": "Sections 3.3 to 3.5, pages 102 to 108",
+     "html": "<p>When an operator's operands have different types, C++ automatically converts them to one type; this is <strong>type coercion</strong>. Types are ranked, high to low: <code>long double</code>, <code>double</code>, <code>float</code>, <code>unsigned long long</code>, <code>long long</code>, <code>unsigned long</code>, <code>long</code>, <code>unsigned int</code>, <code>int</code>. The rules:</p><ol><li><code>char</code>, <code>short</code> and <code>unsigned short</code> values are <strong>promoted</strong> to <code>int</code> in arithmetic, so <code>'A' + 1</code> is an <code>int</code>.</li><li>When two operands differ, the lower-ranked one is promoted to the higher type: in <code>5 + 2.5</code> the 5 becomes <code>5.0</code> and the result is the <code>double</code> 7.5.</li><li>When a result is stored, it is converted to the type of the receiving variable. <code>float</code> times <code>int</code> gives a <code>float</code>, which becomes a <code>double</code> if stored in one. Converting to a lower type is <strong>demotion</strong> and can lose data.</li></ol><ul><li>Assigning a <code>double</code> to an <code>int</code> <strong>truncates</strong> the fraction: <code>int n = 7.9;</code> stores 7; it never rounds.</li><li><code>double d = 4 / 3;</code> stores 1.0, because the division is done on ints before the assignment.</li></ul><h4>Overflow and underflow</h4><p>A variable <strong>overflows</strong> when given a value too large for its type and <strong>underflows</strong> when given a value too small for it. Integers typically <strong>wrap around</strong>: with a 2-byte <code>short</code> (-32,768 to 32,767), adding 1 to 32,767 gives -32,768, and subtracting 1 from -32,768 gives 32,767. <strong>No warning or error appears</strong>; the program carries on with a wrong number. Unsigned types always wrap: a 2-byte <code>unsigned short</code> holding 65,535 plus 1 becomes 0. (Overflowing a signed <code>int</code> inside arithmetic is undefined behavior in C++, so never rely on it.) For floating-point types, underflow also means a value too close to zero to store, and what happens on floating-point overflow or underflow depends on the system: a wrong value, a stop with an error, or 0 on underflow. Prevent overflow by using a larger type (<code>long</code> instead of <code>short</code>) for results that can grow.</p><h4>Type casting</h4><p>A <strong>type cast expression</strong> forces a conversion: <code>static_cast&lt;DataType&gt;(Value)</code>. It returns a converted copy; the variable itself does not change. Where you put it matters: <code>static_cast&lt;double&gt;(sum) / count</code> converts sum first, so the division is floating point, but <code>static_cast&lt;double&gt;(sum / count)</code> is a bug, because the integer division has already dropped the fraction.</p><pre><code>int sum = 7, count = 2;\ncout &lt;&lt; sum / count &lt;&lt; \"\\n\";                        // 3\ncout &lt;&lt; static_cast&lt;double&gt;(sum) / count &lt;&lt; \"\\n\";   // 3.5\ncout &lt;&lt; static_cast&lt;char&gt;(66) &lt;&lt; \"\\n\";            // B (ASCII)</code></pre><p>The older C-style cast <code>(double)x</code> also works, but <code>static_cast</code> is the form the book uses.</p>"
+    },
+    {
+     "id": "u3-l3",
+     "title": "Combined assignment and hand tracing",
+     "book": "Sections 3.6 and 3.10, pages 108 to 112 and 133 to 135",
+     "html": "<p>Assignment is itself an expression that yields the assigned value, and it associates <strong>right to left</strong>, so <code>a = b = 4;</code> sets b to 4 and then a to 4. The <strong>combined assignment operators</strong> (also called compound or arithmetic assignment operators) <code>+=  -=  *=  /=  %=</code> apply an operation to the variable itself: <code>x += 5;</code> means <code>x = x + 5;</code>. The right side is evaluated completely first, so <code>x *= a + b;</code> means <code>x = x * (a + b);</code>, not <code>x = x * a + b;</code>.</p><pre><code>int x = 10;\nx += 4;    // 14\nx *= 2;    // 28\nx -= 3;    // 25\nx /= 5;    // 5\nx %= 3;    // 2</code></pre><p>Integer variables use integer division in <code>/=</code>: <code>int i = 9; i /= 2;</code> leaves 4. A <code>double d = 9; d /= 2;</code> leaves 4.5.</p><p>Trap: <code>x =+ 5;</code> is not <code>+=</code>. It compiles as <code>x = +5;</code> and simply stores 5, while <code>x =* 5;</code> does not compile at all.</p><h4>Hand tracing</h4><p><strong>Hand tracing</strong> is how you debug logic without running the program. Draw a column for each variable, step through the code one statement at a time, and write a new value each time a variable changes. Stop at each output statement and record what would print. It finds logic errors a compiler cannot, such as a wrong operator or an off-by-one value. For example, tracing <code>avg = a + b + c / 3;</code> with a, b, c = 3, 6, 9 gives 12 instead of 6 and points straight at the missing parentheses.</p><table><thead><tr><th>Statement</th><th>a</th><th>b</th><th>c</th></tr></thead><tbody><tr><td><code>a = 3, b = 4</code></td><td>3</td><td>4</td><td>?</td></tr><tr><td><code>c = a * b;</code></td><td>3</td><td>4</td><td>12</td></tr><tr><td><code>a = c - b;</code></td><td>8</td><td>4</td><td>12</td></tr><tr><td><code>b = a + c;</code></td><td>8</td><td>20</td><td>12</td></tr></tbody></table><p>Exam trap: update a variable in the table in the same order the program does. After <code>a = c - b</code>, later lines see the new a.</p>"
+    },
+    {
+     "id": "u3-l4",
+     "title": "Formatting output",
+     "book": "Section 3.7, pages 112 to 122",
+     "html": "<p>The <code>&lt;iomanip&gt;</code> header supplies <strong>stream manipulators</strong>. <code>setw(n)</code> sets the <strong>field width</strong> of the next value only: it is not sticky. The value is <strong>right-justified</strong> in the field by default and padded on the left with spaces; if the value needs more than n characters, nothing is cut and the field simply grows. The width counts every character, including a decimal point, a minus sign and spaces inside a string. <code>left</code> and <code>right</code> switch the justification and stay in effect: after <code>left</code>, every later field is left-justified until <code>right</code> is used.</p><pre><code>cout &lt;&lt; \"[\" &lt;&lt; setw(6) &lt;&lt; 42 &lt;&lt; \"]\";        // [    42]\ncout &lt;&lt; \"[\" &lt;&lt; setw(2) &lt;&lt; 12345 &lt;&lt; \"]\";     // [12345]\ncout &lt;&lt; left &lt;&lt; \"[\" &lt;&lt; setw(6) &lt;&lt; \"ab\" &lt;&lt; \"]\";  // [ab    ]</code></pre><p>Counting spaces is part of the skill. <code>setw(6)</code> with a two-digit number gives four spaces before it. <code>setw(5) &lt;&lt; 7 &lt;&lt; 8</code> pads only the 7: <code>    78</code>.</p><h4>Precision and decimal places</h4><ul><li><code>setprecision(n)</code> without <code>fixed</code> means <strong>n significant digits</strong>: <code>setprecision(3)</code> prints 123.456 as <code>123</code> and 0.0123456 as <code>0.0123</code>. Trailing zeros are dropped, so 5.0 prints <code>5</code>, and a value with fewer digits than the precision is not padded. If the whole-number part needs more digits than the precision allows, cout switches to scientific notation: <code>setprecision(2) &lt;&lt; 1234.5</code> prints <code>1.2e+03</code>.</li><li><code>fixed</code> means fixed-point notation, and then <code>setprecision(n)</code> means <strong>n digits after the decimal point</strong>, rounded: <code>fixed &lt;&lt; setprecision(2)</code> prints 3.14159 as <code>3.14</code> and 2.5 as <code>2.50</code>.</li><li><code>showpoint</code> forces the decimal point and trailing zeros to appear: <code>showpoint &lt;&lt; 5.0</code> prints <code>5.00000</code> (6 significant digits), and with <code>setprecision(3)</code> it prints <code>4.0</code> as <code>4.00</code>.</li><li><code>fixed</code>, <code>showpoint</code> and <code>setprecision</code> are sticky until changed. Integers are not affected by precision.</li></ul><p>Typical money output: <code>cout &lt;&lt; fixed &lt;&lt; setprecision(2);</code> once near the top, then print amounts. Trap: <code>setw</code> and <code>setprecision</code> need <code>&lt;iomanip&gt;</code>; leaving it out is a compile error, and <code>setw</code> before a <code>string</code> literal pads strings the same as numbers.</p>"
+    },
+    {
+     "id": "u3-l5",
+     "title": "Characters and strings with cin",
+     "book": "Section 3.8, pages 122 to 128",
+     "html": "<p><code>cin &gt;&gt; name</code> into a <code>string</code> reads <strong>one word</strong>: it stops at the first whitespace. Typing <code>Mary Ann</code> leaves <code>Mary</code> in the variable and <code>Ann</code> waiting in the buffer. To read a whole line including spaces use <code>getline(cin, name);</code>, which reads up to and discards the newline.</p><p><strong>The classic trap.</strong> <code>cin &gt;&gt; age;</code> leaves the Enter keystroke (a newline) in the buffer. A <code>getline</code> right afterwards reads that leftover newline as an empty line. Fix: call <code>cin.ignore();</code> between them, which discards one character (or <code>cin.ignore(n, '\\n')</code> for up to n characters or through the next newline).</p><pre><code>int age; string name;\ncin &gt;&gt; age;          // user types 30 and Enter\ncin.ignore();        // throw away the newline\ngetline(cin, name);  // now reads Bob correctly</code></pre><ul><li><code>cin &gt;&gt; ch;</code> for a <code>char</code> skips whitespace. <code>cin.get(ch);</code> or <code>ch = cin.get();</code> (get is a <strong>member function</strong> of cin) reads the <strong>very next</strong> character, even a space or newline. So a <code>cin.get</code> right after <code>cin &gt;&gt; number</code> reads the leftover newline instead of waiting; put <code>cin.ignore()</code> between them.</li><li><code>cin.get();</code> with no argument reads and discards one character.</li><li>String members: <code>s.length()</code>, <code>s[i]</code> (first index is 0), <code>s + t</code> joins (concatenates) strings and <code>s += t</code> appends t to s.</li><li><code>&lt;cctype&gt;</code> provides <code>toupper(c)</code>, <code>tolower(c)</code>, <code>isdigit(c)</code>, <code>isalpha(c)</code>, and so on. <code>toupper('q')</code> returns the code of 'Q' as an <code>int</code>, so store it in a <code>char</code> (<code>char c = toupper('q');</code>) before printing it, or <code>cout</code> shows a number.</li><li>If the type is wrong (letters for an <code>int</code>) <code>cin</code> enters a fail state and later reads do nothing until you clear it.</li></ul><p>Rule of thumb: whenever a numeric or character <code>cin &gt;&gt;</code> is followed by a <code>getline</code>, put a <code>cin.ignore()</code> between them.</p>"
+    },
+    {
+     "id": "u3-l6",
+     "title": "Math library, random numbers and problem solving",
+     "book": "Sections 3.9 and 3.11, pages 128 to 133 and 135 to 140",
+     "html": "<p>Include <code>&lt;cmath&gt;</code> for the math library: <code>sqrt(x)</code> square root; <code>pow(x, y)</code> x to the power y; <code>abs(x)</code> absolute value; <code>ceil(x)</code> rounds <strong>up</strong> (<code>ceil(2.1)</code> is 3); <code>floor(x)</code> rounds <strong>down</strong> (<code>floor(2.9)</code> is 2); <code>round(x)</code> rounds to the nearest whole number, halves away from zero (<code>round(2.5)</code> is 3, <code>round(-2.5)</code> is -3); <code>fmod(x, y)</code> is the remainder of a floating-point division (<code>fmod(7.5, 2)</code> is 1.5; <code>%</code> cannot take doubles). Also <code>sin</code>, <code>cos</code>, <code>tan</code> (angles in radians), <code>exp(x)</code> (e to the power x), <code>log(x)</code> (the <strong>natural</strong> log, base e, not base 10) and <code>log10(x)</code> (base 10). Most take and return <code>double</code>. Roots are powers: the cube root of x is <code>pow(x, 1.0 / 3)</code>; writing <code>1 / 3</code> is integer division, which gives an exponent of 0 and a result of 1.</p><pre><code>double a = 3, b = 4;\ndouble hyp = sqrt(a * a + b * b);   // 5</code></pre><h4>Random numbers</h4><p>Include <code>&lt;random&gt;</code> and define two objects: a <strong>random number engine</strong>, which produces random bits, and a <strong>distribution object</strong>, which turns them into numbers of a chosen type in a chosen range. The textbook uses the <code>random_device</code> engine:</p><pre><code>random_device engine;\nuniform_int_distribution&lt;int&gt; die(1, 6);\nint roll = die(engine);   // 1 to 6, both ends possible</code></pre><p><code>uniform_real_distribution&lt;double&gt; r(0.0, 1.0);</code> gives fractional values (by the standard, from 0.0 up to but not including 1.0). Another common engine is <code>mt19937</code>: seeded with a fixed number, as in <code>mt19937 gen(42);</code>, it repeats the <strong>same sequence every run</strong>, which helps testing. The older <code>rand()</code> and <code>srand()</code> from <code>&lt;cstdlib&gt;</code> still exist but are not the modern way. Because the value changes from run to run, questions about random numbers ask about the range or the code, never the value printed.</p><h4>Problem solving</h4><p>The case study pattern: list the inputs, the processing (formulas and operators) and the outputs. A <strong>hierarchy chart</strong> draws the overall task as a top box with its subtasks (get input, calculate, display) beneath it; pseudocode then lists the steps in order. Convert each formula to C++ (watch integer division and precedence), use named constants for fixed rates, then hand trace with sample data and compare with a hand-worked answer before trusting the program.</p>"
+    }
+   ],
+   "questions": [
+    {
+     "lesson": "u3-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which operator does cin use to read a value from the keyboard?",
+     "choices": [
+      ">> (stream extraction)",
+      "<< (stream insertion)",
+      "= (assignment)",
+      "-> (arrow)"
+     ],
+     "answer": 0,
+     "explain": "cin >> variable; extracts from the input stream. << is the insertion operator used with cout.",
+     "id": "u3-q001"
+    },
+    {
+     "lesson": "u3-l1",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "The user types: 20 7 (then Enter). What does this code print? (Assume the usual includes and using namespace std;.)",
+     "code": "int a, b;\ncin >> a >> b;\ncout << a - b;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint a, b;\ncin >> a >> b;\ncout << a - b;\n    return 0;\n}\n",
+     "answer": "13",
+     "explain": "The user types 20 7 on one line. a gets 20, b gets 7, and the program prints 20 - 7.",
+     "stdin": "20 7\n",
+     "id": "u3-q002"
+    },
+    {
+     "lesson": "u3-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What does this code print?",
+     "choices": [
+      "9 6 1",
+      "3 2 1",
+      "3 2 25",
+      "3 0 1"
+     ],
+     "answer": 1,
+     "explain": "All three use operators of equal precedence going left to right: (10-4)-3 = 3; (2*3)%4 = 6%4 = 2; (20/4)/5 = 1.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << 10 - 4 - 3 << \" \" << 2 * 3 % 4 << \" \" << 20 / 4 / 5;\n    return 0;\n}\n",
+     "expect": "3 2 1",
+     "code": "cout << 10 - 4 - 3 << \" \" << 2 * 3 % 4 << \" \" << 20 / 4 / 5;",
+     "id": "u3-q003"
+    },
+    {
+     "lesson": "u3-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which C++ statement correctly writes a = b / (c + d)?",
+     "choices": [
+      "a = b / c + d;",
+      "a = b(c + d);",
+      "a = b / (c + d);",
+      "a = b / c + b / d;"
+     ],
+     "answer": 2,
+     "explain": "The parentheses make c + d the whole denominator. Without them division happens first. C++ has no implied multiplication, so b(c + d) is not valid arithmetic.",
+     "id": "u3-q004"
+    },
+    {
+     "lesson": "u3-l1",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << 3 + 4 * 2 - 6 / 4 << \" \" << (3 + 4) * (2 - 6 / 4);",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << 3 + 4 * 2 - 6 / 4 << \" \" << (3 + 4) * (2 - 6 / 4);\n    return 0;\n}\n",
+     "answer": "10 7",
+     "explain": "First: 6 / 4 is 1 (integer division), so 3 + 8 - 1 = 10. Second: 7 * (2 - 1) = 7.",
+     "id": "u3-q005"
+    },
+    {
+     "lesson": "u3-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which <cmath> function raises a number to a power?",
+     "answer": "pow",
+     "accept": [
+      "pow",
+      "pow()"
+     ],
+     "explain": "pow(base, exponent) returns a double.",
+     "id": "u3-q006"
+    },
+    {
+     "lesson": "u3-l1",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << pow(2, 5) << \" \" << pow(9, 0.5);",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << pow(2, 5) << \" \" << pow(9, 0.5);\n    return 0;\n}\n",
+     "answer": "32 3",
+     "explain": "pow(2,5) is 32 and pow(9, 0.5) is the square root of 9. Neither has a fractional part, so cout prints no decimals.",
+     "id": "u3-q007"
+    },
+    {
+     "lesson": "u3-l1",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "In `int r = 20 / 4 * 2 % 3;` the three operators are applied one after another from left to right, so r ends up as 1.",
+     "answer": true,
+     "explain": "Multiplication, division and remainder sit at one precedence level and group left to right: 20 / 4 is 5, 5 * 2 is 10, and 10 % 3 is 1.",
+     "id": "u3-q008",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int r = 20 / 4 * 2 % 3;\n    cout << r << endl;\n    return 0;\n}\n",
+     "expect": "1"
+    },
+    {
+     "lesson": "u3-l1",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "The user types: 3.9 (then Enter). What does this code print? (Assume the usual includes and using namespace std;.)",
+     "code": "int n;\ndouble d;\ncin >> n >> d;\ncout << n << \" \" << d;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint n;\ndouble d;\ncin >> n >> d;\ncout << n << \" \" << d;\n    return 0;\n}\n",
+     "answer": "3 0.9",
+     "explain": "The int extraction reads 3 and stops at the decimal point because a . cannot be part of an int. The next extraction, into d, picks up .9.",
+     "stdin": "3.9\n",
+     "id": "u3-q009"
+    },
+    {
+     "lesson": "u3-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What does this code print?",
+     "choices": [
+      "8 1.33333",
+      "7 1.33333",
+      "8 1",
+      "7 1"
+     ],
+     "answer": 3,
+     "explain": "7.9 is truncated to 7 on assignment. 4 / 3 is integer division giving 1, which is stored as 1.0 and printed as 1.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint n = 7.9;\ndouble d = 4 / 3;\ncout << n << \" \" << d;\n    return 0;\n}\n",
+     "expect": "7 1",
+     "code": "int n = 7.9;\ndouble d = 4 / 3;\ncout << n << \" \" << d;",
+     "id": "u3-q010"
+    },
+    {
+     "lesson": "u3-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << 5 / 2 << \" \" << 5 / 2.0 << \" \" << static_cast<double>(5) / 2;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << 5 / 2 << \" \" << 5 / 2.0 << \" \" << static_cast<double>(5) / 2;\n    return 0;\n}\n",
+     "answer": "2 2.5 2.5",
+     "explain": "Only the first has two int operands. In the other two one operand is a double, so the 2 is converted and the division is floating point.",
+     "id": "u3-q011"
+    },
+    {
+     "lesson": "u3-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Given int sum = 7, count = 2; double avg = static_cast<double>(sum / count); what is wrong?",
+     "choices": [
+      "sum / count is integer division, so avg gets 3; the cast comes too late",
+      "avg gets 3.5 because the cast converts the answer",
+      "It will not compile because you cannot cast an int expression",
+      "avg gets 4 because the cast rounds up"
+     ],
+     "answer": 0,
+     "explain": "Parentheses make the division happen first, with two ints, giving 3. The cast then just turns 3 into 3.0. Cast one operand before dividing.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint sum = 7, count = 2;\ndouble avg = static_cast<double>(sum / count);\ncout << avg;\n    return 0;\n}\n",
+     "expect": "3",
+     "code": "int sum = 7, count = 2;\ndouble avg = static_cast<double>(sum / count);\ncout << avg;",
+     "id": "u3-q012"
+    },
+    {
+     "lesson": "u3-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Assigning the value 8.9 to an int variable stores 9, because the fraction is rounded.",
+     "answer": false,
+     "explain": "The fraction is discarded (truncation), so the int holds 8.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint n;\nn = 8.9;\ncout << n;\n    return 0;\n}\n",
+     "expect": "8",
+     "code": "int n;\nn = 8.9;\ncout << n;",
+     "id": "u3-q013"
+    },
+    {
+     "lesson": "u3-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Fill in the cast keyword: ____<double>(total) / count",
+     "answer": "static_cast",
+     "accept": [
+      "static_cast"
+     ],
+     "explain": "static_cast<type>(value) is the C++ type cast operator.",
+     "id": "u3-q014"
+    },
+    {
+     "lesson": "u3-l2",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "A floating-point result too close to zero to be stored in its type is called:",
+     "choices": [
+      "overflow",
+      "underflow",
+      "truncation",
+      "promotion"
+     ],
+     "answer": 1,
+     "explain": "Underflow is the too-small counterpart of overflow, which is a value too large for the type. The textbook also says an integer underflows when it is given a value below its type's minimum.",
+     "id": "u3-q015"
+    },
+    {
+     "lesson": "u3-l2",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Storing a long value in an int variable is an example of:",
+     "choices": [
+      "promotion",
+      "a static cast",
+      "demotion (narrowing)",
+      "scope"
+     ],
+     "answer": 2,
+     "explain": "Moving a value into a smaller type can lose data; the opposite direction is promotion.",
+     "id": "u3-q016"
+    },
+    {
+     "lesson": "u3-l2",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? Assume the ASCII character set. (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << 'A' + 1 << \" \" << static_cast<char>('A' + 1);",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << 'A' + 1 << \" \" << static_cast<char>('A' + 1);\n    return 0;\n}\n",
+     "answer": "66 B",
+     "explain": "The char 'A' is promoted to int in the addition, so 'A' + 1 is the int 66 (65 + 1 in ASCII) and prints as a number. Casting it to char turns it back into the character B.",
+     "id": "u3-q017"
+    },
+    {
+     "lesson": "u3-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "When an int is added to a double, the int is converted to a double before the addition.",
+     "answer": true,
+     "explain": "Operands are converted to the higher-ranked type, so the arithmetic is done in double and the result is a double.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << 5 + 2.5;\n    return 0;\n}\n",
+     "expect": "7.5",
+     "code": "cout << 5 + 2.5;",
+     "id": "u3-q018"
+    },
+    {
+     "lesson": "u3-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What value does x hold at the end?",
+     "choices": [
+      "5",
+      "1",
+      "25",
+      "2"
+     ],
+     "answer": 3,
+     "explain": "x goes 10, 14, 28, 25, 5, then 5 % 3 = 2.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint x = 10;\nx += 4;\nx *= 2;\nx -= 3;\nx /= 5;\nx %= 3;\ncout << x;\n    return 0;\n}\n",
+     "expect": "2",
+     "code": "int x = 10;\nx += 4;\nx *= 2;\nx -= 3;\nx /= 5;\nx %= 3;\ncout << x;",
+     "id": "u3-q019"
+    },
+    {
+     "lesson": "u3-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "x *= a + b; is equivalent to which statement?",
+     "choices": [
+      "x = x * (a + b);",
+      "x = x * a + b;",
+      "x = x + a * b;",
+      "x = a + b * x;"
+     ],
+     "answer": 0,
+     "explain": "A combined assignment operator has lower precedence than the arithmetic operators, so the whole right side a + b is evaluated first and then used as the multiplier. With x = 3, a = 1, b = 2 the result is 9; the other three give 5, 5 and 7.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint x = 3, a = 1, b = 2;\nx *= a + b;\ncout << x;\n    return 0;\n}\n",
+     "expect": "9",
+     "code": "int x = 3, a = 1, b = 2;\nx *= a + b;\ncout << x;",
+     "id": "u3-q020"
+    },
+    {
+     "lesson": "u3-l3",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "After a = b = 4; both a and b hold 4, because assignment is evaluated right to left.",
+     "answer": true,
+     "explain": "b = 4 is evaluated first and yields 4, which is then assigned to a.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint a = 0, b = 0;\na = b = 4;\ncout << a << b;\n    return 0;\n}\n",
+     "expect": "44",
+     "code": "int a = 0, b = 0;\na = b = 4;\ncout << a << b;",
+     "id": "u3-q021"
+    },
+    {
+     "lesson": "u3-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "int a = 3, b = 4, c;\nc = a * b;\na = c - b;\nb = a + c;\ncout << a << \" \" << b << \" \" << c;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint a = 3, b = 4, c;\nc = a * b;\na = c - b;\nb = a + c;\ncout << a << \" \" << b << \" \" << c;\n    return 0;\n}\n",
+     "answer": "8 20 12",
+     "explain": "Hand trace: c = 12; a = 12 - 4 = 8; b uses the new a: 8 + 12 = 20.",
+     "id": "u3-q022"
+    },
+    {
+     "lesson": "u3-l3",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which combined assignment operator is shorthand for x = x + 5; ? (write the operator)",
+     "answer": "+=",
+     "accept": [
+      "+=",
+      "x += 5",
+      "x += 5;"
+     ],
+     "explain": "+= adds the right-hand value to the variable.",
+     "id": "u3-q023"
+    },
+    {
+     "lesson": "u3-l3",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "What is hand tracing?",
+     "choices": [
+      "Compiling a program from the command line",
+      "Stepping through code on paper, recording each variable's value after every statement",
+      "Writing comments beside each line",
+      "Running the program with random input"
+     ],
+     "answer": 1,
+     "explain": "It is a way to find logic errors without running the program.",
+     "id": "u3-q024"
+    },
+    {
+     "lesson": "u3-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "double d = 9;\nd /= 2;\nint i = 9;\ni /= 2;\ncout << d << \" \" << i;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ndouble d = 9;\nd /= 2;\nint i = 9;\ni /= 2;\ncout << d << \" \" << i;\n    return 0;\n}\n",
+     "answer": "4.5 4",
+     "explain": "The double keeps the fraction: 4.5. The int does integer division and keeps 4.",
+     "id": "u3-q025"
+    },
+    {
+     "lesson": "u3-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? Spaces matter, so count them carefully. (Assume the usual includes and using namespace std;.)",
+     "code": "cout << \"[\" << setw(6) << 42 << \"][\" << setw(2) << 12345 << \"]\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << \"[\" << setw(6) << 42 << \"][\" << setw(2) << 12345 << \"]\";\n    return 0;\n}\n",
+     "answer": "[    42][12345]",
+     "explain": "setw(6) puts four spaces before the two-digit 42. setw(2) is too narrow for 12345, but the number is never cut off.",
+     "id": "u3-q026"
+    },
+    {
+     "lesson": "u3-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? Spaces matter. (Assume the usual includes and using namespace std;.)",
+     "code": "cout << \"[\" << setw(5) << 7 << 8 << \"]\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << \"[\" << setw(5) << 7 << 8 << \"]\";\n    return 0;\n}\n",
+     "answer": "[    78]",
+     "explain": "setw applies only to the next item, the 7, which becomes four spaces plus 7. The 8 is printed with no padding.",
+     "id": "u3-q027"
+    },
+    {
+     "lesson": "u3-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What does this code print?",
+     "choices": [
+      "3.14 2.5 10",
+      "3.14 2.50 10.00",
+      "3.14 2.50 10",
+      "3.1 2.5 10"
+     ],
+     "answer": 2,
+     "explain": "With fixed, setprecision(2) counts digits after the point and rounds. 2.5 gets a trailing zero. The int 10 is unaffected.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << fixed << setprecision(2);\ncout << 3.14159 << \" \" << 2.5 << \" \" << 10;\n    return 0;\n}\n",
+     "expect": "3.14 2.50 10",
+     "code": "cout << fixed << setprecision(2);\ncout << 3.14159 << \" \" << 2.5 << \" \" << 10;",
+     "id": "u3-q028"
+    },
+    {
+     "lesson": "u3-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << setprecision(3) << 123.456 << \" \" << 0.0123456;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << setprecision(3) << 123.456 << \" \" << 0.0123456;\n    return 0;\n}\n",
+     "answer": "123 0.0123",
+     "explain": "Without fixed, precision counts significant digits: 123 and 0.0123.",
+     "id": "u3-q029"
+    },
+    {
+     "lesson": "u3-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? Spaces matter, so count them carefully. (Assume the usual includes and using namespace std;.)",
+     "code": "cout << left << \"[\" << setw(6) << \"ab\" << \"]\";\ncout << right << \"[\" << setw(6) << \"ab\" << \"]\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << left << \"[\" << setw(6) << \"ab\" << \"]\";\ncout << right << \"[\" << setw(6) << \"ab\" << \"]\";\n    return 0;\n}\n",
+     "answer": "[ab    ][    ab]",
+     "explain": "left puts the padding after the text and right puts it before. Each field is 6 wide, so 4 spaces are added.",
+     "id": "u3-q030"
+    },
+    {
+     "lesson": "u3-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << showpoint << 5.0 << \" \" << setprecision(3) << 5.0;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << showpoint << 5.0 << \" \" << setprecision(3) << 5.0;\n    return 0;\n}\n",
+     "answer": "5.00000 5.00",
+     "explain": "showpoint keeps trailing zeros. With the default precision of 6 significant digits, 5.0 prints as 5.00000. After setprecision(3) it prints 5.00.",
+     "id": "u3-q031"
+    },
+    {
+     "lesson": "u3-l4",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which header must be included to use setw and setprecision?",
+     "choices": [
+      "<iostream>",
+      "<cmath>",
+      "<format>",
+      "<iomanip>"
+     ],
+     "answer": 3,
+     "explain": "setw, setprecision and the other parameterized manipulators are declared in <iomanip>.",
+     "id": "u3-q032"
+    },
+    {
+     "lesson": "u3-l4",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "After cout << setw(8); the width of 8 applies to every value printed afterwards.",
+     "answer": false,
+     "explain": "setw affects only the next item printed. Manipulators like fixed, left and setprecision do stay in effect.",
+     "id": "u3-q033"
+    },
+    {
+     "lesson": "u3-l4",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which manipulator makes setprecision(2) mean exactly two digits after the decimal point?",
+     "answer": "fixed",
+     "accept": [
+      "fixed",
+      "std::fixed"
+     ],
+     "explain": "fixed selects fixed-point notation, so precision counts decimal places rather than significant digits.",
+     "id": "u3-q034"
+    },
+    {
+     "lesson": "u3-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "The user types: Mary Ann (then Enter). What does this code print? (Assume the usual includes and using namespace std;.)",
+     "code": "string s;\ncin >> s;\ncout << \"[\" << s << \"]\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nstring s;\ncin >> s;\ncout << \"[\" << s << \"]\";\n    return 0;\n}\n",
+     "answer": "[Mary]",
+     "explain": "cin >> reads only up to the first whitespace.",
+     "stdin": "Mary Ann\n",
+     "id": "u3-q035"
+    },
+    {
+     "lesson": "u3-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "The user types 30, presses Enter, types Bob and presses Enter. What does this code print? (Assume the usual includes and using namespace std;.)",
+     "code": "int age;\nstring name;\ncin >> age;\ngetline(cin, name);\ncout << \"[\" << name << \"]\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint age;\nstring name;\ncin >> age;\ngetline(cin, name);\ncout << \"[\" << name << \"]\";\n    return 0;\n}\n",
+     "answer": "[]",
+     "explain": "After reading 30, the newline from Enter is still in the buffer, so getline reads an empty line.",
+     "stdin": "30\nBob\n",
+     "id": "u3-q036"
+    },
+    {
+     "lesson": "u3-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "The user types 30, presses Enter, types Bob and presses Enter. What does this code print? (Assume the usual includes and using namespace std;.)",
+     "code": "int age;\nstring name;\ncin >> age;\ncin.ignore();\ngetline(cin, name);\ncout << \"[\" << name << \"]\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint age;\nstring name;\ncin >> age;\ncin.ignore();\ngetline(cin, name);\ncout << \"[\" << name << \"]\";\n    return 0;\n}\n",
+     "answer": "[Bob]",
+     "explain": "cin.ignore() discards the leftover newline, so getline waits for and reads the next line, Bob.",
+     "stdin": "30\nBob\n",
+     "id": "u3-q037"
+    },
+    {
+     "lesson": "u3-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What does cin.ignore() with no arguments do?",
+     "choices": [
+      "Discards the next one character in the input buffer",
+      "Clears everything in the input buffer",
+      "Skips the rest of the current line",
+      "Turns off whitespace skipping"
+     ],
+     "answer": 0,
+     "explain": "By default ignore() removes a single character, which is enough to remove the newline left by cin >>.",
+     "id": "u3-q038"
+    },
+    {
+     "lesson": "u3-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "The user types: x y (then Enter). What does this code print? There is a space inside the brackets. (Assume the usual includes and using namespace std;.)",
+     "code": "char a, b;\ncin.get(a);\ncin.get(b);\ncout << \"[\" << a << b << \"]\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nchar a, b;\ncin.get(a);\ncin.get(b);\ncout << \"[\" << a << b << \"]\";\n    return 0;\n}\n",
+     "answer": "[x ]",
+     "explain": "cin.get reads raw characters including spaces, so b is the space between x and y. (Had cin >> been used, b would be y.)",
+     "stdin": "x y\n",
+     "id": "u3-q039"
+    },
+    {
+     "lesson": "u3-l5",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which function reads an entire line, spaces included, into a string variable?",
+     "answer": "getline",
+     "accept": [
+      "getline",
+      "getline()",
+      "std::getline"
+     ],
+     "explain": "getline(cin, str) reads up to and discards the newline.",
+     "id": "u3-q040"
+    },
+    {
+     "lesson": "u3-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "string fn = \"Ada\";\nstring ln = \"Lovelace\";\ncout << fn + \" \" + ln << \" \" << (fn + ln).length();",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nstring fn = \"Ada\";\nstring ln = \"Lovelace\";\ncout << fn + \" \" + ln << \" \" << (fn + ln).length();\n    return 0;\n}\n",
+     "answer": "Ada Lovelace 11",
+     "explain": "The joined name is \"Ada Lovelace\". Without the space the length is 3 + 8 = 11.",
+     "id": "u3-q041"
+    },
+    {
+     "lesson": "u3-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which header provides toupper and isdigit?",
+     "choices": [
+      "<cmath>",
+      "<cctype>",
+      "<string>",
+      "<iomanip>"
+     ],
+     "answer": 1,
+     "explain": "The character-testing and conversion functions such as toupper, tolower, isdigit and isalpha are declared in <cctype>.",
+     "id": "u3-q042"
+    },
+    {
+     "lesson": "u3-l5",
+     "type": "tf",
+     "difficulty": 3,
+     "prompt": "If the program reads an int with cin >> n and the user types abc, cin enters a fail state.",
+     "answer": true,
+     "explain": "The characters cannot be converted to an int, so the extraction fails and later reads do nothing until the stream is cleared.",
+     "id": "u3-q043"
+    },
+    {
+     "lesson": "u3-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What does this code print?",
+     "choices": [
+      "9 7 2 3",
+      "9 -7 3 2",
+      "9 7 3 2",
+      "9 7 2 2"
+     ],
+     "answer": 2,
+     "explain": "The square root of 81 is 9, abs removes the sign, ceil rounds 2.1 up to 3 and floor rounds 2.9 down to 2.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << sqrt(81) << \" \" << abs(-7) << \" \" << ceil(2.1) << \" \" << floor(2.9);\n    return 0;\n}\n",
+     "expect": "9 7 3 2",
+     "code": "cout << sqrt(81) << \" \" << abs(-7) << \" \" << ceil(2.1) << \" \" << floor(2.9);",
+     "id": "u3-q044"
+    },
+    {
+     "lesson": "u3-l6",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << round(2.5) << \" \" << round(-2.5) << \" \" << fmod(7.5, 2);",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << round(2.5) << \" \" << round(-2.5) << \" \" << fmod(7.5, 2);\n    return 0;\n}\n",
+     "answer": "3 -3 1.5",
+     "explain": "round sends halves away from zero. fmod(7.5, 2) is the floating-point remainder, 7.5 - 3*2 = 1.5.",
+     "id": "u3-q045"
+    },
+    {
+     "lesson": "u3-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "The legs of a right triangle are stored in double a = 3, b = 4;. Which expression gives the length of the hypotenuse?",
+     "choices": [
+      "sqrt(a) + sqrt(b)",
+      "pow(a * a + b * b, 1 / 2)",
+      "sqrt(a * a) + sqrt(b * b)",
+      "sqrt(a * a + b * b)"
+     ],
+     "answer": 3,
+     "explain": "Pythagoras: the hypotenuse is the square root of (a squared plus b squared), which is 5 here. pow(..., 1 / 2) is a trap: 1 / 2 is integer division, so the exponent is 0 and the result is 1. Taking square roots of the squares separately just gives a + b = 7.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ndouble a = 3, b = 4;\ncout << sqrt(a) + sqrt(b) << \" \" << pow(a * a + b * b, 1 / 2) << \" \"\n     << sqrt(a * a) + sqrt(b * b) << \" \" << sqrt(a * a + b * b);\n    return 0;\n}\n",
+     "expect": "3.73205 1 7 5",
+     "id": "u3-q046"
+    },
+    {
+     "lesson": "u3-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which header must be included to use random_device and uniform_int_distribution?",
+     "choices": [
+      "<random>",
+      "<cstdlib>",
+      "<ctime>",
+      "<cmath>"
+     ],
+     "answer": 0,
+     "explain": "The random number engines (such as random_device) and the distribution objects are declared in <random>. <cstdlib> holds the older rand and srand functions.",
+     "id": "u3-q047"
+    },
+    {
+     "lesson": "u3-l6",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "A program has the engine random_device engine;. Which code produces a die roll from 1 to 6 the way the textbook does?",
+     "choices": [
+      "int roll = engine(1, 6);",
+      "uniform_int_distribution<int> die(1, 6);\nint roll = die(engine);",
+      "uniform_int_distribution<int> die(6);\nint roll = engine.die();",
+      "int roll = 1 + engine % 6.0;"
+     ],
+     "answer": 1,
+     "explain": "You define a distribution object that holds the range and call it with the engine as its argument. The engine itself takes no range, and % cannot be applied to an engine or to a double.",
+     "id": "u3-q048"
+    },
+    {
+     "lesson": "u3-l6",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Seeding mt19937 with the same fixed number every run produces the same sequence of values each run.",
+     "answer": true,
+     "explain": "The engine is deterministic; a fixed seed repeats the sequence. A random_device seed gives a different one.",
+     "id": "u3-q049"
+    },
+    {
+     "lesson": "u3-l6",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which cmath function always rounds a floating-point value up to the next whole number?",
+     "answer": "ceil",
+     "accept": [
+      "ceil",
+      "ceil()"
+     ],
+     "explain": "ceil rounds toward positive infinity; floor rounds down.",
+     "id": "u3-q050"
+    },
+    {
+     "id": "u3-q051",
+     "lesson": "u3-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A message such as cout << \"Enter the number of guests: \"; that tells the user what to type before cin reads a value is called a ____.",
+     "answer": "prompt",
+     "accept": [
+      "prompt",
+      "a prompt",
+      "user prompt"
+     ],
+     "explain": "Always display a prompt before using cin; otherwise the program just waits and the user has no idea what it wants."
+    },
+    {
+     "id": "u3-q052",
+     "lesson": "u3-l1",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "When the user types, the characters wait in a holding area of memory until cin takes them. The textbook gives this area a two-word name. What is it?",
+     "answer": "keyboard buffer",
+     "accept": [
+      "keyboard buffer",
+      "the keyboard buffer",
+      "input buffer",
+      "buffer"
+     ],
+     "explain": "cin takes characters from the keyboard buffer. Anything a read does not use, such as a leftover newline or an extra word, stays there for the next read."
+    },
+    {
+     "id": "u3-q053",
+     "lesson": "u3-l1",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "The user types exactly 8.25 3 q and presses Enter. What does this code print? (Assume the usual includes and using namespace std;.)",
+     "code": "int whole;\ndouble frac;\nchar letter;\ncin >> whole >> frac >> letter;\ncout << whole << \"|\" << frac << \"|\" << letter;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint whole;\ndouble frac;\nchar letter;\ncin >> whole >> frac >> letter;\ncout << whole << \"|\" << frac << \"|\" << letter;\n    return 0;\n}\n",
+     "answer": "8|0.25|3",
+     "explain": "The int read stops at the decimal point, so whole is 8. The double read picks up .25. The space is skipped and the char read takes the next single character, the digit 3; the q is left in the buffer.",
+     "stdin": "8.25 3 q\n"
+    },
+    {
+     "id": "u3-q054",
+     "lesson": "u3-l1",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "The user types exactly 4 9 and presses Enter. What does this code print? (Assume the usual includes and using namespace std;.)",
+     "code": "int a = 0, b = 0;\ncin >> a, b;\ncout << a << \" \" << b;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint a = 0, b = 0;\ncin >> a, b;\ncout << a << \" \" << b;\n    return 0;\n}\n",
+     "answer": "4 0",
+     "explain": "A comma is not part of cin syntax. cin >> a, b; reads only a and then evaluates b for nothing, so b keeps 0. To read both, write cin >> a >> b;.",
+     "stdin": "4 9\n"
+    },
+    {
+     "id": "u3-q055",
+     "lesson": "u3-l1",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "cin >> hands each character to the program as soon as the key is pressed, without waiting for Enter.",
+     "answer": false,
+     "explain": "Typed characters wait in the keyboard buffer until the user presses Enter. Only then does cin read them and convert them to the variable's type."
+    },
+    {
+     "id": "u3-q056",
+     "lesson": "u3-l1",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "When two operators with the same precedence share an operand, as in 12 / 3 * 2, the order in which they work is set by the operators' ____.",
+     "answer": "associativity",
+     "accept": [
+      "associativity",
+      "associativity rules"
+     ],
+     "explain": "* / and % associate left to right, so 12 / 3 * 2 is (12 / 3) * 2 = 8, not 12 / 6 = 2. Unary negation and the assignment operators associate right to left."
+    },
+    {
+     "id": "u3-q057",
+     "lesson": "u3-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "double a = 6, b = 9, c = 12;\ncout << a + b + c / 3 << \" \" << (a + b + c) / 3;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ndouble a = 6, b = 9, c = 12;\ncout << a + b + c / 3 << \" \" << (a + b + c) / 3;\n    return 0;\n}\n",
+     "answer": "19 9",
+     "explain": "Division has higher precedence, so the first expression is 6 + 9 + 4 = 19, which is not an average. Parentheses make the addition happen first: 27 / 3 = 9."
+    },
+    {
+     "id": "u3-q058",
+     "lesson": "u3-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "In algebra, m equals the sum p + 3 divided by 2q (2 times q). Which C++ statement computes it?",
+     "choices": [
+      "m = (p + 3) / 2 * q;",
+      "m = p + 3 / (2 * q);",
+      "m = (p + 3) / (2 * q);",
+      "m = (p + 3) / 2q;"
+     ],
+     "answer": 2,
+     "explain": "Both the numerator and the denominator need parentheses, and C++ has no implied multiplication, so 2q must be written 2 * q. (p + 3) / 2 * q divides by 2 and then multiplies by q, and 2q does not compile."
+    },
+    {
+     "id": "u3-q059",
+     "lesson": "u3-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "In the statement area = pow(side, 2.0);, what are side and 2.0 called?",
+     "choices": [
+      "arguments",
+      "return values",
+      "stream manipulators",
+      "operators"
+     ],
+     "answer": 0,
+     "explain": "Arguments are the data sent into a function. pow raises its first argument to the power of its second and sends the result back as its return value, a double."
+    },
+    {
+     "id": "u3-q060",
+     "lesson": "u3-l6",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << pow(27.0, 1 / 3) << \" \" << pow(27.0, 1.0 / 3);",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << pow(27.0, 1 / 3) << \" \" << pow(27.0, 1.0 / 3);\n    return 0;\n}\n",
+     "answer": "1 3",
+     "explain": "1 / 3 is integer division and gives 0, and any number raised to the power 0 is 1. Writing 1.0 / 3 makes the exponent one third, so the second call gives the cube root, 3."
+    },
+    {
+     "id": "u3-q061",
+     "lesson": "u3-l2",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "When an operator's operands have different data types, C++ automatically converts them to a common type. The textbook calls this automatic conversion type ____.",
+     "answer": "coercion",
+     "accept": [
+      "coercion",
+      "type coercion"
+     ],
+     "explain": "Type coercion promotes the lower-ranked operand to the higher-ranked type. A conversion you write yourself with static_cast is a type cast instead."
+    },
+    {
+     "id": "u3-q062",
+     "lesson": "u3-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Given these statements, which describes what happens in weight = mass * units;?",
+     "code": "int units = 3;\nfloat mass = 2.5f;\ndouble weight;\nweight = mass * units;",
+     "choices": [
+      "mass is demoted to int, so the product is the int 7",
+      "units is promoted to double, so the multiplication is done in double",
+      "No conversion happens, because all three variables are numeric",
+      "units is promoted to float, the product is a float, and that float is converted to double when it is stored"
+     ],
+     "answer": 3,
+     "explain": "Rule 2: the lower-ranking int is promoted to the type of the other operand, float, so the product is a float (7.5). Rule 3: the value is then converted to the type of the variable receiving it, double."
+    },
+    {
+     "id": "u3-q063",
+     "lesson": "u3-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "In the expression 'A' + 1, the result has type char.",
+     "answer": false,
+     "explain": "char (and short) operands are promoted to int before arithmetic, so 'A' + 1 is an int (66 in ASCII). cout would print 66, not B, unless the result is cast back to char."
+    },
+    {
+     "id": "u3-q064",
+     "lesson": "u3-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Assume short is 2 bytes with range -32,768 to 32,767, as on most systems. What does this code typically print?",
+     "code": "short temp = -32768;\ntemp = temp - 1;\ncout << temp;",
+     "choices": [
+      "-32769",
+      "32767",
+      "-32768",
+      "Nothing; the program stops with an underflow error"
+     ],
+     "answer": 1,
+     "explain": "Going below the minimum makes the value wrap around to the type's largest value, and no error appears when the program runs. The textbook calls this underflow; going past the maximum and wrapping to the minimum is overflow.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nshort temp = -32768;\ntemp = temp - 1;\ncout << temp;\n    return 0;\n}\n",
+     "expect": "32767"
+    },
+    {
+     "id": "u3-q065",
+     "lesson": "u3-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Assume unsigned short is 2 bytes (range 0 to 65,535). What does this code print?",
+     "code": "unsigned short count = 65535;\ncount = count + 2;\ncout << count;",
+     "choices": [
+      "65537",
+      "65535",
+      "1",
+      "0"
+     ],
+     "answer": 2,
+     "explain": "65,537 does not fit, so the value wraps around past 0: 65,536 becomes 0 and 65,537 becomes 1. For unsigned types this wrap-around is guaranteed by the language.",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nunsigned short count = 65535;\ncount = count + 2;\ncout << count;\n    return 0;\n}\n",
+     "expect": "1"
+    },
+    {
+     "id": "u3-q066",
+     "lesson": "u3-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "When an integer variable overflows, the program stops and displays an error message.",
+     "answer": false,
+     "explain": "No warning or error is given. The value silently wraps around (typically to the type's lowest value) and the program goes on using the wrong number, so watch values near a type's limits."
+    },
+    {
+     "id": "u3-q067",
+     "lesson": "u3-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "According to the textbook, what happens when a floating-point variable overflows or underflows?",
+     "choices": [
+      "It depends on how the system and compiler are set up: the program may continue with a wrong value, stop with an error, or store 0 on underflow",
+      "The value always wraps around to the type's lowest value, exactly as integers do",
+      "The compiler refuses to build any program in which overflow could happen",
+      "The value is always replaced by the largest number the type can hold"
+     ],
+     "answer": 0,
+     "explain": "Floating-point overflow and underflow behavior is system dependent. (Typical PCs today store inf on overflow and 0 on underflow, but the point is that you cannot count on one behavior everywhere.)"
+    },
+    {
+     "id": "u3-q068",
+     "lesson": "u3-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Storing a number larger than the maximum of its type, such as 40000 in a `short`, is called ____.",
+     "answer": "overflow",
+     "accept": [
+      "overflow",
+      "overflows",
+      "an overflow",
+      "integer overflow"
+     ],
+     "explain": "Overflow means the value is beyond the type's maximum. Going below the type's lowest value is called underflow."
+    },
+    {
+     "id": "u3-q069",
+     "lesson": "u3-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "double price = 8.9;\nint whole = static_cast<int>(price);\ncout << whole << \" \" << price;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ndouble price = 8.9;\nint whole = static_cast<int>(price);\ncout << whole << \" \" << price;\n    return 0;\n}\n",
+     "answer": "8 8.9",
+     "explain": "The cast returns a converted copy, truncated to 8. The variable price itself is not changed and still holds 8.9."
+    },
+    {
+     "id": "u3-q070",
+     "lesson": "u3-l2",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which is a correctly written type cast expression that converts total to a double?",
+     "choices": [
+      "double<static_cast>(total)",
+      "static_cast(double)<total>",
+      "static_cast<total>(double)",
+      "static_cast<double>(total)"
+     ],
+     "answer": 3,
+     "explain": "The form is static_cast<DataType>(Value): the type you want goes inside the angle brackets and the value being converted goes in the parentheses."
+    },
+    {
+     "id": "u3-q071",
+     "lesson": "u3-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "int p, q, r;\np = q = r = 6;\np -= 2;\nq *= p;\nr /= 4;\nq += r;\ncout << p << \" \" << q << \" \" << r;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint p, q, r;\np = q = r = 6;\np -= 2;\nq *= p;\nr /= 4;\nq += r;\ncout << p << \" \" << q << \" \" << r;\n    return 0;\n}\n",
+     "answer": "4 25 1",
+     "explain": "All three start at 6. p becomes 4; q becomes 6 * 4 = 24; r becomes 6 / 4 = 1 (integer division); then q becomes 24 + 1 = 25."
+    },
+    {
+     "id": "u3-q072",
+     "lesson": "u3-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "int total = 10;\ntotal =+ 5;\ncout << total;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint total = 10;\ntotal =+ 5;\ncout << total;\n    return 0;\n}\n",
+     "answer": "5",
+     "explain": "=+ is not an operator. The compiler reads it as total = +5;, which assigns positive 5. The combined assignment operator is written +=, which would have given 15."
+    },
+    {
+     "id": "u3-q073",
+     "lesson": "u3-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "double v = 9.87654;\ncout << \"[\" << setprecision(4) << v << \"][\" << setprecision(2) << v << \"]\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ndouble v = 9.87654;\ncout << \"[\" << setprecision(4) << v << \"][\" << setprecision(2) << v << \"]\";\n    return 0;\n}\n",
+     "answer": "[9.877][9.9]",
+     "explain": "Without fixed, setprecision sets the number of significant digits and rounds: 4 digits gives 9.877 and 2 digits gives 9.9."
+    },
+    {
+     "id": "u3-q074",
+     "lesson": "u3-l4",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "What does this code print?",
+     "code": "cout << setprecision(3) << 45678.9;",
+     "choices": [
+      "45678.9",
+      "45679",
+      "4.57e+04",
+      "45700"
+     ],
+     "answer": 2,
+     "explain": "Three significant digits cannot show a five-digit whole number, so cout switches to scientific (E) notation, rounded to 4.57 times 10 to the 4th. Adding fixed would print 45678.900 instead. (Older compilers wrote the exponent as e+004.)",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << setprecision(3) << 45678.9;\n    return 0;\n}\n",
+     "expect": "4.57e+04"
+    },
+    {
+     "id": "u3-q075",
+     "lesson": "u3-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << setprecision(5) << 3.75 << \" \" << 120.0;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << setprecision(5) << 3.75 << \" \" << 120.0;\n    return 0;\n}\n",
+     "answer": "3.75 120",
+     "explain": "setprecision sets the maximum number of significant digits. A value that needs fewer is not padded: without showpoint or fixed, trailing zeros and an unneeded decimal point are not shown."
+    },
+    {
+     "id": "u3-q076",
+     "lesson": "u3-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? Spaces matter, so count them carefully. (Assume the usual includes and using namespace std;.)",
+     "code": "double amt = 7.5;\ncout << fixed << setprecision(2);\ncout << \"[\" << setw(8) << amt << \"][\" << setw(3) << amt << \"]\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ndouble amt = 7.5;\ncout << fixed << setprecision(2);\ncout << \"[\" << setw(8) << amt << \"][\" << setw(3) << amt << \"]\";\n    return 0;\n}\n",
+     "answer": "[    7.50][7.50]",
+     "explain": "7.50 takes 4 positions, counting the decimal point, so setw(8) adds 4 spaces in front. setw(3) is too narrow, so the whole value is printed with no padding and nothing cut off."
+    },
+    {
+     "id": "u3-q077",
+     "lesson": "u3-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? Spaces matter, so count them carefully. (Assume the usual includes and using namespace std;.)",
+     "code": "cout << left;\ncout << \"[\" << setw(5) << 12 << \"][\" << setw(5) << 345 << \"]\";\ncout << right;\ncout << \"[\" << setw(5) << 6 << \"]\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << left;\ncout << \"[\" << setw(5) << 12 << \"][\" << setw(5) << 345 << \"]\";\ncout << right;\ncout << \"[\" << setw(5) << 6 << \"]\";\n    return 0;\n}\n",
+     "answer": "[12   ][345  ][    6]",
+     "explain": "left stays in effect for every later field until right is used, so 12 and 345 are padded on the right. After right, 6 is padded on the left. setw has to be repeated for each value."
+    },
+    {
+     "id": "u3-q078",
+     "lesson": "u3-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << showpoint << setprecision(4);\ncout << 2.5 << \" \" << 13.0;",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << showpoint << setprecision(4);\ncout << 2.5 << \" \" << 13.0;\n    return 0;\n}\n",
+     "answer": "2.500 13.00",
+     "explain": "Without fixed, precision counts significant digits. showpoint keeps the decimal point and trailing zeros, so each value shows 4 digits in total: 2.500 and 13.00."
+    },
+    {
+     "id": "u3-q079",
+     "lesson": "u3-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which statement displays the double total in a field 10 spaces wide with exactly 2 digits after the decimal point?",
+     "choices": [
+      "cout << setw(10) << setprecision(2) << total;",
+      "cout << setw(10) << fixed << setprecision(2) << total;",
+      "cout << fixed << setw(2) << setprecision(10) << total;",
+      "cout << setw(10) << showpoint << setprecision(2) << total;"
+     ],
+     "answer": 1,
+     "explain": "fixed makes setprecision(2) mean 2 digits after the decimal point, and setw(10) sets the field for the next value printed. Without fixed, even with showpoint, precision 2 means 2 significant digits (1234.567 would print as 1.2e+03)."
+    },
+    {
+     "id": "u3-q080",
+     "lesson": "u3-l4",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "Once set, setprecision stays in effect for later floating-point values until it is changed.",
+     "answer": true,
+     "explain": "Precision, fixed, showpoint, left and right all stay in effect. setw is the exception: it applies only to the next item printed."
+    },
+    {
+     "id": "u3-q081",
+     "lesson": "u3-l4",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "With fixed in effect, setprecision(3) displays every value with 3 significant digits.",
+     "answer": false,
+     "explain": "With fixed, the precision is the number of digits after the decimal point, so 3.14159 prints as 3.142 and 25.0 prints as 25.000."
+    },
+    {
+     "id": "u3-q082",
+     "lesson": "u3-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "The user types 42, presses Enter, then types Z and presses Enter. What does this code print? (Assume the usual includes and using namespace std;.)",
+     "code": "int n;\nchar ch;\ncin >> n;\nch = cin.get();\ncout << n << \" \" << (ch == '\\n');",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint n;\nchar ch;\ncin >> n;\nch = cin.get();\ncout << n << \" \" << (ch == '\\n');\n    return 0;\n}\n",
+     "answer": "42 1",
+     "explain": "cin >> n stops at the Enter keystroke and leaves the newline in the buffer. cin.get() reads the very next character, which is that newline, so the comparison is true (printed as 1) and the Z is never read.",
+     "stdin": "42\nZ\n"
+    },
+    {
+     "id": "u3-q083",
+     "lesson": "u3-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "The user types 7 extra words and presses Enter, then types Next line and presses Enter. What does this code print? (Assume the usual includes and using namespace std;.)",
+     "code": "int code;\nstring rest;\ncin >> code;\ncin.ignore(100, '\\n');\ngetline(cin, rest);\ncout << code << \"[\" << rest << \"]\";",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nint code;\nstring rest;\ncin >> code;\ncin.ignore(100, '\\n');\ngetline(cin, rest);\ncout << code << \"[\" << rest << \"]\";\n    return 0;\n}\n",
+     "answer": "7[Next line]",
+     "explain": "cin.ignore(100, '\\n') skips up to 100 characters or until it has skipped a newline, whichever comes first, so it discards the rest of the first line including its newline. getline then reads the whole second line.",
+     "stdin": "7 extra words\nNext line\n"
+    },
+    {
+     "id": "u3-q084",
+     "lesson": "u3-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "string s = \"data\";\ns += \"base\";\ns = s + \" \" + s;\ncout << s << \" \" << s.length();",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\nstring s = \"data\";\ns += \"base\";\ns = s + \" \" + s;\ncout << s << \" \" << s.length();\n    return 0;\n}\n",
+     "answer": "database database 17",
+     "explain": "+= appends base, giving database (8 characters). Then s + \" \" + s joins two copies with a space between: 8 + 1 + 8 = 17 characters."
+    },
+    {
+     "id": "u3-q085",
+     "lesson": "u3-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A program must read a full name such as Ana Ruiz, typed on one line, into one variable. Which code does it correctly?",
+     "choices": [
+      "string name;\ncin >> name;",
+      "char name;\ngetline(cin, name);",
+      "string name;\ngetline >> name;",
+      "string name;\ngetline(cin, name);"
+     ],
+     "answer": 3,
+     "explain": "getline(cin, name) reads the whole line, spaces included, into a string. cin >> stops at the space and keeps only Ana, a char holds one character, and getline is called with parentheses, not with >>."
+    },
+    {
+     "id": "u3-q086",
+     "lesson": "u3-l6",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which header file must be included to use the math library functions sqrt, pow, log10 and fmod?",
+     "answer": "cmath",
+     "accept": [
+      "cmath",
+      "<cmath>",
+      "#include <cmath>"
+     ],
+     "explain": "<cmath> declares the math library functions. <iomanip> is for output manipulators and <cstdlib> holds other utilities such as rand."
+    },
+    {
+     "id": "u3-q087",
+     "lesson": "u3-l6",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume the usual #include lines and using namespace std;.)",
+     "code": "cout << exp(0.0) << \" \" << log10(100.0) << \" \" << log(100.0);",
+     "program": "#include <iostream>\n#include <iomanip>\n#include <string>\n#include <cmath>\n#include <cstdlib>\n#include <cctype>\n#include <random>\nusing namespace std;\n\nint main()\n{\ncout << exp(0.0) << \" \" << log10(100.0) << \" \" << log(100.0);\n    return 0;\n}\n",
+     "answer": "1 2 4.60517",
+     "explain": "exp(0.0) is e to the power 0, which is 1. log10 is the base-10 logarithm, so log10(100.0) is 2. log is the NATURAL logarithm (base e), so log(100.0) is about 4.60517, not 2."
+    },
+    {
+     "id": "u3-q088",
+     "lesson": "u3-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Using the <random> library as the textbook does, which two objects do you define to produce random integers in a range?",
+     "choices": [
+      "A random number engine, such as random_device, and a distribution object, such as uniform_int_distribution",
+      "A stream object and a stream manipulator",
+      "Two random_device engines, one for the minimum and one for the maximum",
+      "An int variable for the seed and a char variable for the range"
+     ],
+     "answer": 0,
+     "explain": "The engine produces random bits; the distribution object turns them into numbers of a chosen type within the range you give it, as in uniform_int_distribution<int> dist(1, 6); followed by dist(engine)."
+    },
+    {
+     "id": "u3-q089",
+     "lesson": "u3-l6",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "The distribution uniform_int_distribution<int> pick(1, 10); can produce both 1 and 10.",
+     "answer": true,
+     "explain": "For uniform_int_distribution the range is inclusive: both the minimum and the maximum given in the parentheses are possible results."
+    },
+    {
+     "id": "u3-q090",
+     "lesson": "u3-l6",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "In the problem-solving case study, the overall task is drawn as a top box with boxes for its smaller subtasks (get input, calculate, display) below it. What is this diagram called?",
+     "answer": "hierarchy chart",
+     "accept": [
+      "hierarchy chart",
+      "a hierarchy chart",
+      "hierarchy diagram"
+     ],
+     "explain": "A hierarchy chart breaks a task into the steps that make it up. It shows what the parts are, not the exact order of statements, which the pseudocode then lists."
+    },
+    {
+     "id": "u3-q091",
+     "lesson": "u3-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Pseudocode: Get the sale amount. Get the tax rate as a decimal (0.06 for 6 percent). Tax is the sale amount times the rate. Total is the sale amount plus the tax. Display the tax and the total. Which C++ calculation matches it? (sale and rate were read with cin; all variables are doubles.)",
+     "choices": [
+      "tax = sale * rate;\ntotal = sale * tax;",
+      "total = sale + tax;\ntax = sale * rate;",
+      "tax = sale * rate;\ntotal = sale + tax;",
+      "tax = sale * rate / 100;\ntotal = sale + tax;"
+     ],
+     "answer": 2,
+     "explain": "The steps must run in the pseudocode's order because total uses tax. The rate is already a decimal, so dividing by 100 again would make the tax a hundred times too small."
+    }
+   ],
+   "programs": [
+    {
+     "id": "u3-p1",
+     "title": "Restaurant bill",
+     "task": "Read the meal price (a double) from the keyboard. Compute tax at 7% and a tip of 18% of the meal price (not including tax). Print four lines with fixed-point output of two decimals: each label left-justified in a field of 8, each amount right-justified in a field of 8, in this order: Meal, Tax, Tip, Total. Use named constants for the rates.",
+     "stdin": "40\n",
+     "sampleOutput": "Meal       40.00\nTax         2.80\nTip         7.20\nTotal      50.00",
+     "solution": "#include <iostream>\n#include <iomanip>\nusing namespace std;\n\nint main()\n{\n    const double TAX_RATE = 0.07;\n    const double TIP_RATE = 0.18;\n    double meal;\n\n    cin >> meal;\n    double tax = meal * TAX_RATE;\n    double tip = meal * TIP_RATE;\n    double total = meal + tax + tip;\n\n    cout << fixed << setprecision(2);\n    cout << left << setw(8) << \"Meal\" << right << setw(8) << meal << endl;\n    cout << left << setw(8) << \"Tax\" << right << setw(8) << tax << endl;\n    cout << left << setw(8) << \"Tip\" << right << setw(8) << tip << endl;\n    cout << left << setw(8) << \"Total\" << right << setw(8) << total << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u3-p2",
+     "title": "Greeting with an age and a full name",
+     "task": "Read an int age, then a full name (first and last, with a space) on the next line. Print: Hello, <name>! then on the next line: In 5 years you will be <age + 5>. Make sure the full name is read correctly.",
+     "stdin": "36\nGrace Hopper\n",
+     "sampleOutput": "Hello, Grace Hopper!\nIn 5 years you will be 41.",
+     "solution": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main()\n{\n    int age;\n    string name;\n\n    cin >> age;\n    cin.ignore();\n    getline(cin, name);\n\n    cout << \"Hello, \" << name << \"!\" << endl;\n    cout << \"In 5 years you will be \" << age + 5 << \".\" << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u3-p3",
+     "title": "Circle measurements",
+     "task": "Read a radius (a double). With const double PI = 3.14159265 compute area = PI * r * r and circumference = 2 * PI * r. Print five lines in this order: Area, Circumference and Remainder (area divided by 4 using fmod), each shown with exactly two decimals; then Floor and Ceil, the area rounded down with floor and up with ceil, shown as whole numbers with no decimals. Use these labels exactly: Area: Circumference: Remainder: Floor: Ceil:",
+     "stdin": "2.5\n",
+     "sampleOutput": "Area: 19.63\nCircumference: 15.71\nRemainder: 3.63\nFloor: 19\nCeil: 20",
+     "solution": "#include <iostream>\n#include <iomanip>\n#include <cmath>\nusing namespace std;\n\nint main()\n{\n    const double PI = 3.14159265;\n    double r;\n    cin >> r;\n\n    double area = PI * r * r;\n    double circ = 2 * PI * r;\n\n    cout << fixed << setprecision(2);\n    cout << \"Area: \" << area << endl;\n    cout << \"Circumference: \" << circ << endl;\n    cout << \"Remainder: \" << fmod(area, 4) << endl;\n    cout << setprecision(0);\n    cout << \"Floor: \" << floor(area) << endl;\n    cout << \"Ceil: \" << ceil(area) << endl;\n    return 0;\n}\n"
+    }
+   ]
+  }
+ ]
+}

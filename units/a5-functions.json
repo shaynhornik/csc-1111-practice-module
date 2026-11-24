@@ -1,0 +1,1342 @@
+{
+ "units": [
+  {
+   "id": "u6",
+   "title": "Functions",
+   "summary": "Defining, prototyping and calling functions, passing by value and by reference, return values, scope and lifetime, default arguments, overloading, exit(), and stubs and drivers.",
+   "lessons": [
+    {
+     "id": "u6-l1",
+     "title": "Why functions, defining, calling and prototypes",
+     "book": "Sections 6.1 to 6.3, pages 309 to 320",
+     "html": "<p><strong>Modular programming</strong> means breaking a large program into small, separate subprograms (functions), each doing one job. The textbook calls this <strong>divide and conquer</strong>. Benefits: simpler code, <strong>code reuse</strong> (write a task once, call it wherever it is needed), easier testing, and team work. A function that is called does its work and control returns to the statement after the call.</p>\n<h4>Parts of a function</h4>\n<p>A <strong>function definition</strong> has a <strong>header</strong> (return type, name, parameter list, no semicolon) and a <strong>body</strong> in braces. A <strong>function call</strong> is a statement or expression such as <code>showMenu();</code> or <code>total = add(2, 3);</code> and has no return type and no types in the parentheses. The parts of a definition are the <strong>return type</strong>, the <strong>name</strong>, the <strong>parameter list</strong> and the <strong>body</strong>.</p><pre><code>void showMenu()            // header\n{                          // body starts\n    cout &lt;&lt; \"1. Start\" &lt;&lt; endl;\n}\nint main()\n{\n    showMenu();            // call\n    return 0;\n}</code></pre><p>A <strong>void function</strong> returns nothing and is called as a statement on its own. Every program has <code>main</code>; execution always begins with its first statement. When main calls <code>a</code>, and <code>a</code> calls <code>b</code>, <code>b</code> finishes first, then the rest of <code>a</code>, then the rest of main (the calls nest like a stack). A finished function always returns to the statement after its call, in whichever function made the call, not automatically to main. A function definition can never be placed inside another function.</p>\n<h4>Prototypes</h4>\n<p>The compiler reads top to bottom and must know a function's name, return type and parameter types before it sees a call. Either define the function above <code>main</code>, or put a <strong>function prototype</strong> (declaration) above <code>main</code> and the definition below it.</p><pre><code>void greet(int times);     // prototype: ends with a semicolon\n\nint main()\n{\n    greet(2);\n    return 0;\n}\n\nvoid greet(int times)      // definition: no semicolon\n{\n    for (int i = 0; i &lt; times; i++)\n        cout &lt;&lt; \"Hi\" &lt;&lt; endl;\n}</code></pre><ul><li>The prototype is the header plus a semicolon. Parameter names in a prototype are optional: <code>void greet(int);</code> is legal.</li>\n<li>The prototype and the later header must agree on the return type, the number of parameters and their types.</li>\n<li>Trap: calling a function with no prior prototype or definition is a compile error (\"not declared in this scope\").</li>\n<li>Trap: a semicolon after the header of the definition, <code>void greet(int t);</code> followed by a brace body, is an error.</li></ul>"
+    },
+    {
+     "id": "u6-l2",
+     "title": "Arguments, parameters and passing by value",
+     "book": "Sections 6.4 to 6.5, pages 321 to 327",
+     "html": "<p>A <strong>parameter</strong> is a variable declared in the function header; it receives a value when the function is called. An <strong>argument</strong> is the value (a literal, a variable, or any expression) written in the parentheses of the call.</p><pre><code>void showArea(double len, int wid)   // parameters\n{\n    cout &lt;&lt; len * wid &lt;&lt; endl;\n}\n...\nshowArea(2.5, 4);          // arguments\nshowArea(x + 1.0, n * 2);  // expressions are fine</code></pre><ul><li>Arguments are matched to parameters by <strong>position</strong>, left to right, not by name. The call needs the same number of arguments as parameters (unless default arguments exist).</li>\n<li>Every parameter needs its own type: <code>void f(int a, b)</code> is an error; write <code>void f(int a, int b)</code>.</li>\n<li>A parameter's scope is the body of its own function. It is created at the call and destroyed at the return.</li>\n<li>The call contains no types: <code>showArea(double 2.5, 4)</code> is an error.</li>\n<li>If an argument's type differs from the parameter's type, it is converted to the parameter type. A double passed to an int parameter loses its fraction (truncation: 3.9 becomes 3). An int passed to a double parameter becomes 3.0. A char argument passed to an int parameter becomes its numeric code, and an int passed to a char parameter becomes the character with that code.</li></ul>\n<h4>Pass by value</h4>\n<p>By default C++ passes arguments <strong>by value</strong>: the parameter is a separate copy initialized from the argument. Changing the parameter inside the function never changes the caller's variable, even if the two variables have the same name. They live in different functions and are different memory locations.</p><pre><code>void tryChange(int n)\n{\n    n = 99;                // changes only the copy\n}\nint main()\n{\n    int n = 5;\n    tryChange(n);\n    cout &lt;&lt; n;             // prints 5\n}</code></pre><p>A famous consequence: a <code>swap(int a, int b)</code> written with by-value parameters swaps the copies only; the caller's variables are unchanged. Passing by value is safe because the function cannot damage the caller's data, but it also means the function cannot send results back through its parameters.</p>"
+    },
+    {
+     "id": "u6-l3",
+     "title": "The return statement and returning values",
+     "book": "Sections 6.6 to 6.9, pages 328 to 343",
+     "html": "<p><strong>Menu-driven programs</strong> (6.6) are a natural fit: main shows a menu, reads the choice in a loop, and a <code>switch</code> calls one function per choice. A <strong>hierarchy chart</strong> plans such a program: main at the top, and below each function the functions it calls. A good function does one task and its name says which (<code>getScore</code>, <code>isLeapYear</code>). A <strong>value-returning function</strong> has a return type other than <code>void</code> and sends one value back to the caller with <code>return expression;</code>.</p><pre><code>int square(int n)\n{\n    return n * n;\n}\n...\nint a = square(4);                 // 16\ncout &lt;&lt; square(3) + square(4);     // 25: call used in an expression</code></pre><ul><li>A <code>return</code> ends the function immediately. Statements after it in the same path never run.</li>\n<li>A function returns at most <strong>one</strong> value with <code>return</code>.</li>\n<li>The returned value is converted to the declared return type. A function declared <code>double avg(int a, int b)</code> that executes <code>return (a + b) / 2;</code> does integer division first (7/2 is 3) and returns 3.0. Use <code>/ 2.0</code> to keep the fraction. Assigning a returned double to an int variable truncates.</li>\n<li>A <code>void</code> function may contain <code>return;</code> (no value) to leave early. It may not return a value. A non-void function must return a value on every path.</li>\n<li>A call to a value-returning function can appear anywhere a value of that type can: on the right of <code>=</code>, in <code>cout</code>, as another call's argument, or in a condition. The result may also be ignored.</li></ul>\n<h4>Returning a bool</h4>\n<p>A function that answers a yes/no question can return <code>bool</code>. Name it like a question, and call it directly in an <code>if</code> or loop condition. Never write the type in the call or leave off the parentheses.</p><pre><code>bool isEven(int n)\n{\n    return n % 2 == 0;\n}\n...\nif (isEven(10))        // correct\n    cout &lt;&lt; \"even\";\ncout &lt;&lt; isEven(7);     // prints 0 (false prints as 0, true as 1)</code></pre><p>Traps an examiner likes: <code>if (isEven)</code> (names the function, wrong), <code>if (bool isEven(n))</code> (type in a call), and a <code>void</code> function containing <code>return x;</code>.</p>"
+    },
+    {
+     "id": "u6-l4",
+     "title": "Local, global and static local variables",
+     "book": "Sections 6.10 to 6.11, pages 344 to 354",
+     "html": "<p>A variable's <strong>scope</strong> is the part of the program where its name can be used. A <strong>local variable</strong> (including a parameter) is defined inside a function; it is visible only in that function (more exactly, in its block after the definition). Two functions may each have a local variable called <code>count</code>; they are unrelated. Its <strong>lifetime</strong> is from the call to the return: the variable comes into being on entry to the function and is destroyed when the function ends, so the value is gone by the next call. A local variable that is not initialized holds garbage, so always initialize it.</p>\n<h4>Global variables</h4>\n<p>A <strong>global variable</strong> is defined outside every function. Its scope runs from its definition to the end of the file, so only functions defined after it can see and change it. It lives for the whole run and, if not initialized, starts at 0. Globals are discouraged: any function can change them, so a wrong value is hard to trace, functions become tied to the global and hard to reuse, and programs become hard to test. A <strong>global constant</strong> (<code>const double TAX = 0.07;</code>) is the accepted exception, since nothing can change it.</p>\n<h4>Shadowing</h4>\n<p>If a local variable (or parameter) has the same name as a global, the local <strong>shadows</strong> (hides) the global inside that function. Changes affect only the local one. Within one function, though, a parameter and a local variable may not share a name: <code>void f(int n) { int n = 2; }</code> does not compile.</p><pre><code>int level = 10;               // global\nvoid test()\n{\n    int level = 1;            // hides the global\n    level++;\n    cout &lt;&lt; level &lt;&lt; endl;    // 2\n}\nint main()\n{\n    test();\n    cout &lt;&lt; level &lt;&lt; endl;    // 10, global untouched\n}</code></pre><h4>Static local variables</h4>\n<p>Adding <code>static</code> to a local definition gives it a <strong>static lifetime</strong>: it is created and initialized <em>once</em>, the first time execution reaches it, and it keeps its value between calls. Its scope is still only that function. If you give no initial value it starts at 0. The initializer does not run again on later calls.</p><pre><code>void count()\n{\n    static int calls = 0;     // runs once\n    int fresh = 0;            // runs every call\n    calls++; fresh++;\n    cout &lt;&lt; calls &lt;&lt; fresh &lt;&lt; endl;\n}\n// three calls print 11, 21, 31</code></pre><p>Remember: a static local is not global. Other functions still cannot use its name.</p>"
+    },
+    {
+     "id": "u6-l5",
+     "title": "Default arguments and reference parameters",
+     "book": "Sections 6.12 to 6.13, pages 355 to 364",
+     "html": "<h4>Default arguments</h4>\n<p>A <strong>default argument</strong> is a value used when the caller leaves that argument out. Put it in the prototype; if there is no prototype, in the header. Never in both.</p><pre><code>void pay(double hours, double rate = 15.0, int bonus = 0);\n\npay(40);            // rate 15.0, bonus 0\npay(40, 20.0);      // bonus 0\npay(40, 20.0, 50);  // nothing defaulted</code></pre><ul><li>Defaults fill in from the right. Once a parameter has a default, every parameter to its right must have one too. <code>void f(int a = 1, int b);</code> is an error.</li>\n<li>When calling, you can leave out only trailing arguments. You cannot skip one in the middle (<code>pay(40, , 50)</code> is a syntax error).</li>\n<li>The textbook's rule: a default argument is a literal value or a named constant (standard C++ also allows some other expressions, but never another parameter of the same function: <code>void f(int a, int b = a);</code> is an error). It is used only when the argument is missing.</li></ul>\n<h4>Reference parameters</h4>\n<p>A <strong>reference variable</strong> is another name for an existing variable. Write <code>&amp;</code> after the type in the parameter list to make a <strong>reference parameter</strong>: the parameter is then an alias for the caller's argument, not a copy. Assignments to it change the caller's variable. <code>int&amp; x</code>, <code>int &amp;x</code> and <code>int &amp; x</code> mean the same thing.</p><pre><code>void swapInts(int&amp; a, int&amp; b)\n{\n    int t = a;\n    a = b;\n    b = t;\n}\nint main()\n{\n    int x = 1, y = 2;\n    swapInts(x, y);       // x is 2, y is 1\n}</code></pre><ul><li>The <code>&amp;</code> goes after the type and before the name (<code>int &amp;value</code>, never <code>int value&amp;</code>), and it is not written when the parameter is used. When a reference parameter is used, the argument is <strong>passed by reference</strong>.</li>\n<li>The call looks the same as a by-value call; only the header and prototype show <code>&amp;</code>. The prototype must also have it: <code>void swapInts(int&amp;, int&amp;);</code>.</li>\n<li>The argument must be a variable (an lvalue). A literal or an expression such as <code>x + 1</code> cannot be bound to a non-const reference, so <code>swapInts(3, y)</code> is an error.</li>\n<li>Use references when a function must give back more than one result (for example quotient and remainder) or change the caller's variable. Use value parameters when the function only needs to read the data, so it cannot damage it by accident.</li>\n<li>A function can mix kinds: <code>void f(int a, int&amp; b)</code> changes only the caller's second argument.</li></ul>"
+    },
+    {
+     "id": "u6-l6",
+     "title": "Overloading, exit(), stubs and drivers",
+     "book": "Sections 6.14 to 6.16, pages 365 to 374",
+     "html": "<h4>Overloading</h4>\n<p><strong>Overloaded functions</strong> share one name but have different parameter lists, so each does a similar job for different data. The compiler picks the version by the number, types and order of the arguments in the call. The name plus the parameter types in order is the function's <strong>signature</strong>; the return type is not part of it. The <strong>return type alone is not enough</strong>: <code>int get(int);</code> and <code>double get(int);</code> in one scope is an error.</p><pre><code>void show(int n)    { cout &lt;&lt; \"int \"    &lt;&lt; n &lt;&lt; endl; }\nvoid show(double d) { cout &lt;&lt; \"double \" &lt;&lt; d &lt;&lt; endl; }\nvoid show(int a, int b) { cout &lt;&lt; a + b &lt;&lt; endl; }\n\nshow(3);      // int 3\nshow(3.5);    // double 3.5\nshow(3, 4);   // 7</code></pre><p>A call whose argument exactly matches one parameter list uses it. A call such as <code>show('A')</code> with no exact match converts the argument (here char to int) following the language's ranking; ambiguous cases do not compile. Trap: do not combine overloads with default arguments in ways that make a call match two versions.</p>\n<h4>The exit() function</h4>\n<p><code>exit(n)</code>, from <code>&lt;cstdlib&gt;</code>, ends the whole program immediately from any function, no matter how deep the calls are; nothing after it runs, not even the rest of main. The value is passed to the operating system: <code>0</code> (or <code>EXIT_SUCCESS</code>) means normal, nonzero (or <code>EXIT_FAILURE</code>) means error. A <code>return</code> only leaves the current function.</p>\n<h4>Stubs and drivers</h4>\n<p>These are testing tools used while a program is under construction.</p>\n<ul><li>A <strong>stub</strong> is a dummy function with the right header that stands in for a function not yet written. It usually just prints a message, or returns a fixed value, so the rest of the program can be tested.</li>\n<li>A <strong>driver</strong> is a small throwaway program (or main) whose only job is to call one function with chosen test values and display the results, so the function can be tested alone.</li></ul><pre><code>double computeTax(double income)   // stub\n{\n    cout &lt;&lt; \"computeTax called\" &lt;&lt; endl;\n    return 100.0;                  // fixed dummy value\n}\n\nint main()                         // driver for isPass\n{\n    cout &lt;&lt; isPass(59) &lt;&lt; isPass(60) &lt;&lt; endl;\n}</code></pre><p>Quick memory aid: a stub is called by the program; a driver calls the function.</p>"
+    }
+   ],
+   "questions": [
+    {
+     "lesson": "u6-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which statement best describes modular programming?",
+     "choices": [
+      "Dividing a program into small functions, each performing one task",
+      "Writing the entire program inside main and separating the parts with comments",
+      "Keeping every variable in one global array so all code can reach it",
+      "Compiling each statement of the program separately"
+     ],
+     "answer": 0,
+     "explain": "Modular programming breaks a big problem into small functions that each do one job (the textbook calls this divide and conquer). Functions also allow code reuse and are easier to test and maintain.",
+     "id": "u6-q001"
+    },
+    {
+     "lesson": "u6-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Identify lines A, B and C.",
+     "choices": [
+      "A is a header, B is a prototype, C is a call",
+      "A is a prototype, B is a definition, C is a call",
+      "A is a call, B is a definition, C is a prototype",
+      "A is a prototype, B is a call, C is a definition"
+     ],
+     "answer": 1,
+     "explain": "A has a semicolon and no body, so it is a prototype. B has a body, so it is the definition (header plus body). C supplies an argument and a result variable, so it is a call.",
+     "code": "int cube(int n);                        // A\nint cube(int n) { return n * n * n; }   // B\nx = cube(4);                            // C",
+     "id": "u6-q002"
+    },
+    {
+     "lesson": "u6-l1",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "The header of a function definition ends with a semicolon, just like a prototype does.",
+     "answer": false,
+     "explain": "Only the prototype ends with a semicolon. In a definition the header is followed directly by the body in braces; a semicolon after the header is a syntax error.",
+     "id": "u6-q003"
+    },
+    {
+     "lesson": "u6-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A line such as `double avg(int, int);` that tells the compiler a function's name, return type and parameter types before the function is defined is called a function ____.",
+     "answer": "prototype",
+     "accept": [
+      "declaration",
+      "function prototype",
+      "prototype",
+      "function declaration"
+     ],
+     "explain": "A prototype (the textbook notes it is also called a function declaration) lets main call a function that is defined later in the file.",
+     "id": "u6-q004"
+    },
+    {
+     "lesson": "u6-l1",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid b() { cout << \"B1\" << endl; }\nvoid a() { cout << \"A1\" << endl; b(); cout << \"A2\" << endl; }\nint main()\n{\n    cout << \"M1\" << endl;\n    a();\n    cout << \"M2\" << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid b() { cout << \"B1\" << endl; }\nvoid a() { cout << \"A1\" << endl; b(); cout << \"A2\" << endl; }\nint main()\n{\n    cout << \"M1\" << endl;\n    a();\n    cout << \"M2\" << endl;\n    return 0;\n}\n",
+     "answer": "M1\nA1\nB1\nA2\nM2",
+     "explain": "main prints M1 and calls a. a prints A1 and calls b, which prints B1 and returns. Then a finishes with A2, and control returns to main for M2.",
+     "id": "u6-q005"
+    },
+    {
+     "lesson": "u6-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is wrong with this program?",
+     "choices": [
+      "A void function cannot be called from main",
+      "greet must be defined inside main",
+      "greet is called before the compiler has seen a prototype or definition for it",
+      "greet needs a return statement at the end"
+     ],
+     "answer": 2,
+     "explain": "The compiler reads top to bottom. Add the prototype void greet(); above main or move the definition above main.",
+     "code": "#include <iostream>\nusing namespace std;\nint main()\n{\n    greet();\n    return 0;\n}\nvoid greet()\n{\n    cout << \"Hi\";\n}",
+     "id": "u6-q006"
+    },
+    {
+     "lesson": "u6-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A function named grade receives a double and an int and returns a char. Which is its correct prototype?",
+     "choices": [
+      "grade(double, int) : char;",
+      "void grade(double, int);",
+      "char grade(double x, int y)",
+      "char grade(double, int);"
+     ],
+     "answer": 3,
+     "explain": "The form is return type, name, parameter types, then a semicolon. `char grade(double x, int y)` has no semicolon, so it is a header, not a prototype, and the other two have the wrong form or the wrong return type.",
+     "id": "u6-q007"
+    },
+    {
+     "lesson": "u6-l1",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "Write the prototype for a function named isEven that receives one int and returns a bool. Leave out the parameter name and include the semicolon.",
+     "answer": "bool isEven(int);",
+     "accept": [
+      "bool isEven(int);",
+      "bool isEven(int x);",
+      "bool isEven(int n);",
+      "bool isEven(int num);",
+      "bool isEven(int number);",
+      "bool isEven(int value);"
+     ],
+     "explain": "Return type bool, name isEven, one int parameter. The parameter name is optional in a prototype.",
+     "id": "u6-q008"
+    },
+    {
+     "lesson": "u6-l1",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "Parameter names are optional in a function prototype.",
+     "answer": true,
+     "explain": "Only the types matter in a prototype, so void show(int, double); is legal. Names are required in the definition.",
+     "id": "u6-q009"
+    },
+    {
+     "lesson": "u6-l1",
+     "type": "output",
+     "difficulty": 1,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid line()\n{\n    cout << \"----\" << endl;\n}\nint main()\n{\n    line();\n    cout << \"Menu\" << endl;\n    line();\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid line()\n{\n    cout << \"----\" << endl;\n}\nint main()\n{\n    line();\n    cout << \"Menu\" << endl;\n    line();\n    return 0;\n}\n",
+     "answer": "----\nMenu\n----",
+     "explain": "Each call to line runs its body once, so the dashes print before and after Menu.",
+     "id": "u6-q010"
+    },
+    {
+     "lesson": "u6-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which statement about function definitions is true?",
+     "choices": [
+      "A function definition cannot appear inside the body of another function",
+      "Every function must be defined inside main to be callable",
+      "A void function must end with a return statement",
+      "Functions must be defined in the same order that they are called"
+     ],
+     "answer": 0,
+     "explain": "All definitions are written at file level, one after another (main need not be first or last). A void function may omit return, and order does not matter when prototypes are used.",
+     "id": "u6-q011"
+    },
+    {
+     "lesson": "u6-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "In a program that has several functions, where does execution begin?",
+     "choices": [
+      "At the first function defined in the file",
+      "At the first statement of main",
+      "At the first prototype",
+      "At the function with the longest body"
+     ],
+     "answer": 1,
+     "explain": "Execution always starts in main, regardless of where main is placed.",
+     "id": "u6-q012"
+    },
+    {
+     "lesson": "u6-l2",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "In the code shown, which statement is correct?",
+     "choices": [
+      "n is an argument and 7 is a parameter",
+      "Both n and 7 are parameters",
+      "n is a parameter and 7 is an argument",
+      "Both n and 7 are arguments"
+     ],
+     "answer": 2,
+     "explain": "The parameter is the variable in the function header. The argument is the value in the call.",
+     "code": "void show(int n) { cout << n; }\n...\nshow(7);",
+     "id": "u6-q013"
+    },
+    {
+     "lesson": "u6-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A variable listed in the parentheses of a function header that receives data from the caller is called a ____.",
+     "answer": "parameter",
+     "accept": [
+      "parameter",
+      "parameter variable",
+      "formal parameter",
+      "formal argument"
+     ],
+     "explain": "Parameters receive the values of the arguments when the function is called. Some books say formal parameter (or formal argument) for parameter and actual parameter for argument.",
+     "id": "u6-q014"
+    },
+    {
+     "lesson": "u6-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid bump(int n)\n{\n    n = n + 10;\n    cout << n << endl;\n}\nint main()\n{\n    int n = 5;\n    bump(n);\n    cout << n << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid bump(int n)\n{\n    n = n + 10;\n    cout << n << endl;\n}\nint main()\n{\n    int n = 5;\n    bump(n);\n    cout << n << endl;\n    return 0;\n}\n",
+     "answer": "15\n5",
+     "explain": "The parameter n is a copy of main's n. Changing the copy to 15 does not affect main's n, which stays 5.",
+     "id": "u6-q015"
+    },
+    {
+     "lesson": "u6-l2",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid show(int a, double b)\n{\n    cout << a << \" \" << b << endl;\n}\nint main()\n{\n    show(3.9, 4);\n    show(4, 3.5);\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid show(int a, double b)\n{\n    cout << a << \" \" << b << endl;\n}\nint main()\n{\n    show(3.9, 4);\n    show(4, 3.5);\n    return 0;\n}\n",
+     "answer": "3 4\n4 3.5",
+     "explain": "In the first call 3.9 converts to int 3 (truncation) and 4 becomes the double 4.0, which prints as 4. Arguments match by position.",
+     "id": "u6-q016"
+    },
+    {
+     "lesson": "u6-l2",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Given the prototype void box(int w, int h, char c); which call is legal?",
+     "choices": [
+      "box(2, 3);",
+      "box(int 2, int 3, '*');",
+      "box(2, 3, '*', 1);",
+      "box(2, 3, '*');"
+     ],
+     "answer": 3,
+     "explain": "A call needs one argument per parameter and no types. The other calls have too few arguments, types in the call, or too many arguments.",
+     "id": "u6-q017"
+    },
+    {
+     "lesson": "u6-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "The call show(x * 2 + 1); is legal for a function with one int parameter, where x is an int.",
+     "answer": true,
+     "explain": "Any expression of a suitable type can be an argument; it is evaluated and its value is copied into the parameter.",
+     "id": "u6-q018"
+    },
+    {
+     "lesson": "u6-l2",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid swapIt(int a, int b)\n{\n    int t = a;\n    a = b;\n    b = t;\n}\nint main()\n{\n    int x = 1, y = 2;\n    swapIt(x, y);\n    cout << x << \" \" << y << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid swapIt(int a, int b)\n{\n    int t = a;\n    a = b;\n    b = t;\n}\nint main()\n{\n    int x = 1, y = 2;\n    swapIt(x, y);\n    cout << x << \" \" << y << endl;\n    return 0;\n}\n",
+     "answer": "1 2",
+     "explain": "Both parameters are copies, so the swap happens only inside swapIt. x and y are unchanged.",
+     "id": "u6-q019"
+    },
+    {
+     "lesson": "u6-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "An argument of type double is passed to an int parameter. What happens?",
+     "choices": [
+      "It is converted to int and the fractional part is discarded",
+      "The program does not compile",
+      "The parameter becomes a double for that call",
+      "The value is rounded to the nearest integer"
+     ],
+     "answer": 0,
+     "explain": "C++ converts the argument to the parameter's type. double to int truncates toward zero (3.9 becomes 3); it does not round.",
+     "id": "u6-q020"
+    },
+    {
+     "lesson": "u6-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "If a function has two parameters and no default arguments, a call with one argument is legal.",
+     "answer": false,
+     "explain": "The number of arguments must match the number of parameters unless the missing ones have default arguments.",
+     "id": "u6-q021"
+    },
+    {
+     "lesson": "u6-l2",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid show(char c, int n)\n{\n    for (int i = 0; i < n; i++)\n        cout << c;\n    cout << endl;\n}\nint main()\n{\n    show('*', 3);\n    show('a' + 1, 2);\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid show(char c, int n)\n{\n    for (int i = 0; i < n; i++)\n        cout << c;\n    cout << endl;\n}\nint main()\n{\n    show('*', 3);\n    show('a' + 1, 2);\n    return 0;\n}\n",
+     "answer": "***\nbb",
+     "explain": "'a' + 1 is the int 98. It is converted to char for the parameter c, which is 'b'.",
+     "id": "u6-q022"
+    },
+    {
+     "lesson": "u6-l3",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "How many values can a function send back to its caller using a return statement?",
+     "choices": [
+      "Any number, separated by commas",
+      "One",
+      "Two",
+      "As many as it has parameters"
+     ],
+     "answer": 1,
+     "explain": "A return statement returns a single value. To send back more, use reference parameters.",
+     "id": "u6-q023"
+    },
+    {
+     "lesson": "u6-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is wrong with this function?",
+     "choices": [
+      "Nothing, it is correct",
+      "The parameter n must be a reference",
+      "A void function cannot return a value; the return type should be int",
+      "The expression n * n * n needs parentheses"
+     ],
+     "answer": 2,
+     "explain": "A function declared void returns nothing. Change the header to int cube(int n) to return the result.",
+     "code": "void cube(int n)\n{\n    return n * n * n;\n}",
+     "id": "u6-q024"
+    },
+    {
+     "lesson": "u6-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nint sq(int n)\n{\n    return n * n;\n}\nint main()\n{\n    cout << sq(3) + sq(4) << endl;\n    cout << sq(sq(2)) << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nint sq(int n)\n{\n    return n * n;\n}\nint main()\n{\n    cout << sq(3) + sq(4) << endl;\n    cout << sq(sq(2)) << endl;\n    return 0;\n}\n",
+     "answer": "25\n16",
+     "explain": "sq(3) + sq(4) = 9 + 16 = 25. The inner call sq(2) is 4 and becomes the argument of the outer call, giving 16.",
+     "id": "u6-q025"
+    },
+    {
+     "lesson": "u6-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid check(int n)\n{\n    if (n < 0)\n    {\n        cout << \"neg\" << endl;\n        return;\n    }\n    cout << \"ok\" << endl;\n}\nint main()\n{\n    check(-1);\n    check(2);\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid check(int n)\n{\n    if (n < 0)\n    {\n        cout << \"neg\" << endl;\n        return;\n    }\n    cout << \"ok\" << endl;\n}\nint main()\n{\n    check(-1);\n    check(2);\n    return 0;\n}\n",
+     "answer": "neg\nok",
+     "explain": "For -1 the return ends the function before \"ok\" is printed. For 2 the if is skipped, so ok prints.",
+     "id": "u6-q026"
+    },
+    {
+     "lesson": "u6-l3",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "A void function may contain the statement return; with no value.",
+     "answer": true,
+     "explain": "It leaves the function early. Only return with a value is illegal in a void function.",
+     "id": "u6-q027"
+    },
+    {
+     "lesson": "u6-l3",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "Write the header (no semicolon) of a function named larger that receives two ints named a and b and returns an int.",
+     "answer": "int larger(int a, int b)",
+     "accept": [
+      "int larger(int a, int b)",
+      "int larger(int a, int b){"
+     ],
+     "explain": "Return type, name, then each parameter with its type.",
+     "id": "u6-q028"
+    },
+    {
+     "lesson": "u6-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nbool isOdd(int n)\n{\n    return n % 2 != 0;\n}\nint main()\n{\n    cout << isOdd(7) << isOdd(8) << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nbool isOdd(int n)\n{\n    return n % 2 != 0;\n}\nint main()\n{\n    cout << isOdd(7) << isOdd(8) << endl;\n    return 0;\n}\n",
+     "answer": "10",
+     "explain": "true prints as 1 and false as 0 when sent to cout.",
+     "id": "u6-q029"
+    },
+    {
+     "lesson": "u6-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "isPrime is a function with one int parameter that returns bool. Which if statement is correct?",
+     "choices": [
+      "if (isPrime)",
+      "if (bool isPrime(n))",
+      "if (isPrime(int n))",
+      "if (isPrime(n))"
+     ],
+     "answer": 3,
+     "explain": "Call it with an argument and no types, and use the returned bool as the condition. `if (isPrime)` names the function without calling it; it compiles (with a warning) but is always true. The other two put types inside a call, which does not compile.",
+     "id": "u6-q030"
+    },
+    {
+     "lesson": "u6-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\ndouble half(double x)\n{\n    return x / 2;\n}\nint main()\n{\n    int a = half(7);\n    double b = half(7);\n    cout << a << \" \" << b << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\ndouble half(double x)\n{\n    return x / 2;\n}\nint main()\n{\n    int a = half(7);\n    double b = half(7);\n    cout << a << \" \" << b << endl;\n    return 0;\n}\n",
+     "answer": "3 3.5",
+     "explain": "half(7) returns 3.5. Stored in an int it is truncated to 3. Stored in a double it stays 3.5.",
+     "id": "u6-q031"
+    },
+    {
+     "lesson": "u6-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\ndouble avg(int a, int b)\n{\n    return (a + b) / 2;\n}\nint main()\n{\n    cout << avg(3, 4) << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\ndouble avg(int a, int b)\n{\n    return (a + b) / 2;\n}\nint main()\n{\n    cout << avg(3, 4) << endl;\n    return 0;\n}\n",
+     "answer": "3",
+     "explain": "(3 + 4) / 2 is integer division, which gives 3. The 3 is then converted to 3.0 and prints as 3. Writing / 2.0 would give 3.5.",
+     "id": "u6-q032"
+    },
+    {
+     "lesson": "u6-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What happens when a return statement executes inside a value-returning function?",
+     "choices": [
+      "The function ends at once and the value goes back to the caller",
+      "The value is stored and the function keeps running to its closing brace",
+      "The whole program ends",
+      "The value is printed on the screen"
+     ],
+     "answer": 0,
+     "explain": "return exits the function immediately and hands the value to the point of the call. It does not print anything.",
+     "id": "u6-q033"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Where can a local variable defined inside a function be used?",
+     "choices": [
+      "In any function in the file",
+      "Only inside that function",
+      "In main and in the function that defined it",
+      "Anywhere after the function is first called"
+     ],
+     "answer": 1,
+     "explain": "Local variables have local scope. Other functions cannot see them.",
+     "id": "u6-q034"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nint total = 100;\nvoid f()\n{\n    int total = 5;\n    total++;\n    cout << total << endl;\n}\nint main()\n{\n    f();\n    cout << total << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nint total = 100;\nvoid f()\n{\n    int total = 5;\n    total++;\n    cout << total << endl;\n}\nint main()\n{\n    f();\n    cout << total << endl;\n    return 0;\n}\n",
+     "answer": "6\n100",
+     "explain": "Inside f, the local total hides the global. The ++ changes the local (5 to 6). main prints the untouched global.",
+     "id": "u6-q035"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid tick()\n{\n    static int calls = 0;\n    calls++;\n    cout << calls << endl;\n}\nint main()\n{\n    tick();\n    tick();\n    tick();\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid tick()\n{\n    static int calls = 0;\n    calls++;\n    cout << calls << endl;\n}\nint main()\n{\n    tick();\n    tick();\n    tick();\n    return 0;\n}\n",
+     "answer": "1\n2\n3",
+     "explain": "The static variable is initialized once and keeps its value between calls, so it counts up.",
+     "id": "u6-q036"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid f()\n{\n    int a = 0;\n    static int b = 0;\n    a++;\n    b++;\n    cout << a << b << endl;\n}\nint main()\n{\n    f();\n    f();\n    f();\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid f()\n{\n    int a = 0;\n    static int b = 0;\n    a++;\n    b++;\n    cout << a << b << endl;\n}\nint main()\n{\n    f();\n    f();\n    f();\n    return 0;\n}\n",
+     "answer": "11\n12\n13",
+     "explain": "a is recreated and set to 0 on every call, so it is always 1. b is static and keeps counting: 1, 2, 3.",
+     "id": "u6-q037"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which C++ keyword makes a local variable keep its value between calls to its function?",
+     "answer": "static",
+     "accept": [
+      "static"
+     ],
+     "explain": "A static local variable is created once and lives for the whole run, but its scope is still the function.",
+     "id": "u6-q038"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "A local int variable that is defined without an initial value is automatically set to 0.",
+     "answer": false,
+     "explain": "Local variables hold garbage until assigned. Only globals and statics get automatic zero.",
+     "id": "u6-q039"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "A global int variable that is not explicitly initialized starts out as 0.",
+     "answer": true,
+     "explain": "Global (and static) variables are zero-initialized before the program starts.",
+     "id": "u6-q040"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Why are global variables generally discouraged?",
+     "choices": [
+      "They are slower than local variables by a factor of ten",
+      "They cannot be used inside functions",
+      "Any function can change them, so bugs are hard to trace and functions become hard to reuse",
+      "They must always be declared const"
+     ],
+     "answer": 2,
+     "explain": "Shared writable data creates hidden dependencies between functions. Passing data through parameters keeps functions self-contained.",
+     "id": "u6-q041"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Why is a global constant such as const double TAX_RATE = 0.07; usually acceptable?",
+     "choices": [
+      "Constants take no memory",
+      "Constants are local to main",
+      "Global constants may be modified by any function",
+      "No function can accidentally change its value"
+     ],
+     "answer": 3,
+     "explain": "The usual risk of globals is unwanted modification, and a constant cannot be modified.",
+     "id": "u6-q042"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is the error?",
+     "choices": [
+      "x is local to first, so second cannot use it",
+      "first must return x",
+      "x must be a static variable",
+      "second needs a prototype before it can use x"
+     ],
+     "answer": 0,
+     "explain": "Each local variable is visible only in its own function. second would need its own x, or a parameter.",
+     "code": "void first()\n{\n    int x = 5;\n}\nvoid second()\n{\n    cout << x;\n}",
+     "id": "u6-q043"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nint level = 1;\nvoid up()\n{\n    level = level * 2;\n}\nint main()\n{\n    up();\n    up();\n    up();\n    cout << level << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nint level = 1;\nvoid up()\n{\n    level = level * 2;\n}\nint main()\n{\n    up();\n    up();\n    up();\n    cout << level << endl;\n    return 0;\n}\n",
+     "answer": "8",
+     "explain": "up changes the global each time: 1, 2, 4, 8.",
+     "id": "u6-q044"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "tf",
+     "difficulty": 3,
+     "prompt": "The initializer in static int n = 10; runs every time the function is called.",
+     "answer": false,
+     "explain": "It runs only once. On later calls the variable keeps whatever value it had.",
+     "id": "u6-q045"
+    },
+    {
+     "lesson": "u6-l4",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which statement describes the lifetime of an ordinary local variable?",
+     "choices": [
+      "It exists for the whole run of the program",
+      "It comes into being on entry to the function and is destroyed on return",
+      "It is created when the program starts and destroyed when main ends",
+      "It is created at the first call and keeps its value for later calls"
+     ],
+     "answer": 1,
+     "explain": "That is why an ordinary local variable cannot remember anything between calls; a static local can.",
+     "id": "u6-q046"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Where should a default argument be specified when a prototype is used?",
+     "choices": [
+      "In both the prototype and the header",
+      "In the header only",
+      "In the call only",
+      "In the prototype only"
+     ],
+     "answer": 3,
+     "explain": "Defaults go in the prototype (or the header if there is no prototype), never both. Repeating it is a compile error.",
+     "id": "u6-q047"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is wrong with this prototype?",
+     "choices": [
+      "Once a parameter has a default, all parameters to its right must have defaults",
+      "A prototype cannot have default arguments",
+      "Default arguments must be 0",
+      "There can be only one default argument per function"
+     ],
+     "answer": 0,
+     "explain": "Defaults fill from the right. b has no default but follows a, which does.",
+     "code": "void pack(int a = 1, int b, int c = 3);",
+     "id": "u6-q048"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid show(int a, int b = 10, int c = 100)\n{\n    cout << a + b + c << endl;\n}\nint main()\n{\n    show(1);\n    show(1, 2);\n    show(1, 2, 3);\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid show(int a, int b = 10, int c = 100)\n{\n    cout << a + b + c << endl;\n}\nint main()\n{\n    show(1);\n    show(1, 2);\n    show(1, 2, 3);\n    return 0;\n}\n",
+     "answer": "111\n103\n6",
+     "explain": "show(1) = 1+10+100. show(1,2) = 1+2+100. show(1,2,3) uses no defaults.",
+     "id": "u6-q049"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Given void f(int a, int b = 2, int c = 3); which call is illegal?",
+     "choices": [
+      "f(5);",
+      "f();",
+      "f(5, 6);",
+      "f(5, 6, 7);"
+     ],
+     "answer": 1,
+     "explain": "Parameter a has no default, so at least one argument is required.",
+     "id": "u6-q050"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which symbol, placed after the type in a parameter, makes it a reference parameter?",
+     "answer": "&",
+     "accept": [
+      "&",
+      "ampersand",
+      "an ampersand"
+     ],
+     "explain": "`int& n` (or `int &n`) is a reference parameter: an alias for the caller's variable.",
+     "id": "u6-q051"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid swapIt(int& a, int& b)\n{\n    int t = a;\n    a = b;\n    b = t;\n}\nint main()\n{\n    int x = 1, y = 2;\n    swapIt(x, y);\n    cout << x << \" \" << y << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid swapIt(int& a, int& b)\n{\n    int t = a;\n    a = b;\n    b = t;\n}\nint main()\n{\n    int x = 1, y = 2;\n    swapIt(x, y);\n    cout << x << \" \" << y << endl;\n    return 0;\n}\n",
+     "answer": "2 1",
+     "explain": "The parameters are aliases of x and y, so the swap changes the caller's variables.",
+     "id": "u6-q052"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid f(int a, int& b)\n{\n    a += 5;\n    b += 5;\n}\nint main()\n{\n    int x = 1, y = 1;\n    f(x, y);\n    cout << x << \" \" << y << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid f(int a, int& b)\n{\n    a += 5;\n    b += 5;\n}\nint main()\n{\n    int x = 1, y = 1;\n    f(x, y);\n    cout << x << \" \" << y << endl;\n    return 0;\n}\n",
+     "answer": "1 6",
+     "explain": "a is a copy, so x stays 1. b is a reference to y, so y becomes 6.",
+     "id": "u6-q053"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is wrong with this program?",
+     "choices": [
+      "inc must return a value",
+      "The function name inc is reserved",
+      "A literal such as 5 cannot be passed to a reference parameter; it needs a variable",
+      "The parameter must be const"
+     ],
+     "answer": 2,
+     "explain": "A non-const reference must be bound to a variable (an lvalue), because the function may change it.",
+     "code": "void inc(int& n) { n++; }\nint main()\n{\n    inc(5);\n    return 0;\n}",
+     "id": "u6-q054"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "Write the prototype for a function named order that receives two int reference parameters and returns nothing. Leave out the parameter names.",
+     "answer": "void order(int&, int&);",
+     "accept": [
+      "void order(int&, int&);",
+      "void order(int &, int &);",
+      "void order(int& a, int& b);",
+      "void order(int &a, int &b);",
+      "void order(int& x, int& y);",
+      "void order(int &x, int &y);"
+     ],
+     "explain": "Return type void, and each int is followed by an ampersand. The ampersand has to be written in the prototype and again in the function header.",
+     "id": "u6-q055"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "A reference parameter is another name for the argument variable in the caller.",
+     "answer": true,
+     "explain": "No copy is made; the function works directly on the caller's variable.",
+     "id": "u6-q056"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which header suits a function that must give both the quotient and the remainder of two ints back to the caller?",
+     "choices": [
+      "int divide(int a, int b, int q, int r)",
+      "void divide(int& a, int& b, int q, int r)",
+      "int divide(int a, int b)",
+      "void divide(int a, int b, int& q, int& r)"
+     ],
+     "answer": 3,
+     "explain": "A function can return only one value. Reference parameters let it fill in two caller variables.",
+     "id": "u6-q057"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid addTo(int& total, int amount = 1)\n{\n    total += amount;\n}\nint main()\n{\n    int t = 0;\n    addTo(t);\n    addTo(t, 5);\n    addTo(t);\n    cout << t << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid addTo(int& total, int amount = 1)\n{\n    total += amount;\n}\nint main()\n{\n    int t = 0;\n    addTo(t);\n    addTo(t, 5);\n    addTo(t);\n    cout << t << endl;\n    return 0;\n}\n",
+     "answer": "7",
+     "explain": "0+1 = 1, then +5 = 6, then +1 = 7. The reference parameter updates t each time.",
+     "id": "u6-q058"
+    },
+    {
+     "lesson": "u6-l5",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "The declarations int &x and int& x mean the same thing.",
+     "answer": true,
+     "explain": "Whitespace around the ampersand does not matter.",
+     "id": "u6-q059"
+    },
+    {
+     "lesson": "u6-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What lets the compiler distinguish overloaded functions?",
+     "choices": [
+      "Different numbers or types of parameters",
+      "Different return types",
+      "Different parameter names",
+      "Different function body lengths"
+     ],
+     "answer": 0,
+     "explain": "The parameter list (number, types, order) is the signature used to pick an overload. Return type and parameter names do not count.",
+     "id": "u6-q060"
+    },
+    {
+     "lesson": "u6-l6",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid show(int n)\n{\n    cout << \"int \" << n << endl;\n}\nvoid show(double d)\n{\n    cout << \"double \" << d << endl;\n}\nvoid show(char c)\n{\n    cout << \"char \" << c << endl;\n}\nint main()\n{\n    show(5);\n    show(2.5);\n    show('z');\n    return 0;\n}\n",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid show(int n)\n{\n    cout << \"int \" << n << endl;\n}\nvoid show(double d)\n{\n    cout << \"double \" << d << endl;\n}\nvoid show(char c)\n{\n    cout << \"char \" << c << endl;\n}\nint main()\n{\n    show(5);\n    show(2.5);\n    show('z');\n    return 0;\n}\n",
+     "answer": "int 5\ndouble 2.5\nchar z",
+     "explain": "Each call exactly matches one overload by argument type.",
+     "id": "u6-q061"
+    },
+    {
+     "lesson": "u6-l6",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Calling the exit function, for example `exit(0);`, ends the whole program immediately, even when it is called from a function other than main.",
+     "answer": true,
+     "explain": "exit needs <cstdlib> and terminates the program at once from any function. A return statement, by contrast, only ends the current function.",
+     "id": "u6-q062"
+    },
+    {
+     "lesson": "u6-l6",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\n#include <cstdlib>\nusing namespace std;\n\nvoid stop()\n{\n    cout << \"A\" << endl;\n    exit(0);\n    cout << \"B\" << endl;\n}\nint main()\n{\n    cout << \"1\" << endl;\n    stop();\n    cout << \"2\" << endl;\n    return 0;\n}\n",
+     "program": "#include <iostream>\n#include <cstdlib>\nusing namespace std;\n\nvoid stop()\n{\n    cout << \"A\" << endl;\n    exit(0);\n    cout << \"B\" << endl;\n}\nint main()\n{\n    cout << \"1\" << endl;\n    stop();\n    cout << \"2\" << endl;\n    return 0;\n}\n",
+     "answer": "1\nA",
+     "explain": "exit(0) ends the program inside stop, so neither B nor 2 prints.",
+     "id": "u6-q063"
+    },
+    {
+     "lesson": "u6-l6",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A dummy function with the correct header that stands in for a function not yet written, used for testing, is called a ____.",
+     "answer": "stub",
+     "accept": [
+      "stub",
+      "function stub"
+     ],
+     "explain": "A stub usually prints a message or returns a fixed value.",
+     "id": "u6-q064"
+    },
+    {
+     "lesson": "u6-l6",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "What is a driver?",
+     "choices": [
+      "A function that replaces one that has not been written",
+      "A function that calls exit",
+      "A small program or main that calls a function with test values to check it",
+      "A prototype with default arguments"
+     ],
+     "answer": 2,
+     "explain": "Drivers call the function under test; stubs are called by the rest of the program.",
+     "id": "u6-q065"
+    },
+    {
+     "id": "u6-q066",
+     "lesson": "u6-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "The first line of a function definition, which gives the return type, the name and the parameter list, is called the function ____.",
+     "answer": "header",
+     "accept": [
+      "header",
+      "function header"
+     ],
+     "explain": "The header is followed by the body in braces. Unlike a prototype, the header of a definition has no semicolon after it."
+    },
+    {
+     "id": "u6-q067",
+     "lesson": "u6-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which line is a function call, rather than a function header or a prototype?",
+     "choices": [
+      "void printTotal(int amount)",
+      "void printTotal(int);",
+      "printTotal(sales);",
+      "void printTotal(int amount);"
+     ],
+     "answer": 2,
+     "explain": "A call names the function and supplies arguments, with no return type and no parameter types. A line that starts with a return type is a header (no semicolon) or a prototype (semicolon)."
+    },
+    {
+     "id": "u6-q068",
+     "lesson": "u6-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Writing the statements for a task once, as a function, and then calling that function wherever the task is needed is a benefit the textbook calls code ____.",
+     "answer": "reuse",
+     "accept": [
+      "reuse",
+      "code reuse",
+      "reusability"
+     ],
+     "explain": "Code reuse avoids repeating the same statements in several places. The other big reason for functions is dividing a large problem into small, manageable pieces (divide and conquer)."
+    },
+    {
+     "id": "u6-q069",
+     "lesson": "u6-l1",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "When a function finishes, control always goes back to main, no matter which function called it.",
+     "answer": false,
+     "explain": "Control returns to the statement right after the call, in whatever function made the call. If a calls b, then b returns into a, not into main."
+    },
+    {
+     "id": "u6-q070",
+     "lesson": "u6-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A program has the function `void showValue(int quantity)`. Write a statement that calls it and passes the int variable count.",
+     "answer": "showValue(count);",
+     "accept": [
+      "showValue(count);"
+     ],
+     "explain": "A call gives only the function name and the argument. Writing a type in the call, as in `showValue(int count);`, is a compile error, and the parameter's name (quantity) is not used in the call."
+    },
+    {
+     "id": "u6-q071",
+     "lesson": "u6-l2",
+     "type": "output",
+     "difficulty": 1,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid showDiff(int big, int small)\n{\n    cout << big - small << endl;\n}\nint main()\n{\n    int a = 3, b = 10;\n    showDiff(b, a);\n    showDiff(a, b);\n    return 0;\n}\n",
+     "answer": "7\n-7",
+     "explain": "Arguments are copied into the parameters by position, not by name. In the second call big receives 3 and small receives 10, so it prints 3 - 10.",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid showDiff(int big, int small)\n{\n    cout << big - small << endl;\n}\nint main()\n{\n    int a = 3, b = 10;\n    showDiff(b, a);\n    showDiff(a, b);\n    return 0;\n}\n"
+    },
+    {
+     "id": "u6-q072",
+     "lesson": "u6-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is wrong with this function?",
+     "code": "int addAll(int x, y, z)\n{\n    return x + y + z;\n}",
+     "choices": [
+      "Each parameter needs its own data type: int x, int y, int z",
+      "Parameters must be separated by semicolons, not commas",
+      "A function cannot have more than two parameters",
+      "The return expression must be in parentheses"
+     ],
+     "answer": 0,
+     "explain": "A parameter list is not like a variable definition such as `int x, y, z;`. Every parameter needs a type in front of its name, so y and z are errors."
+    },
+    {
+     "id": "u6-q073",
+     "lesson": "u6-l2",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "After a function returns, main can still use that function's parameter variables.",
+     "answer": false,
+     "explain": "A parameter's scope is limited to the body of its own function, and it is destroyed when the function returns. main never sees it."
+    },
+    {
+     "id": "u6-q074",
+     "lesson": "u6-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "You are writing a function that receives a variable from the caller, and you must be sure the function cannot change the caller's variable. What should you do?",
+     "choices": [
+      "Make the parameter a reference parameter with &",
+      "Pass the argument by value, using an ordinary parameter with no &",
+      "Make the variable global",
+      "Give the parameter the same name as the caller's variable"
+     ],
+     "answer": 1,
+     "explain": "A value parameter holds only a copy, so the function cannot reach the original. A reference parameter is exactly how a function is allowed to change it, and matching names has no effect."
+    },
+    {
+     "id": "u6-q075",
+     "lesson": "u6-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "In the code below, x is still 5 after the call, because the parameter is an independent copy of the argument. The call is made by ___ (one word).",
+     "answer": "value",
+     "accept": [
+      "value",
+      "by value",
+      "pass by value",
+      "passing by value",
+      "pass-by-value"
+     ],
+     "explain": "Passing by value is the default in C++. The parameter has its own memory location, so changing it leaves the argument alone.",
+     "code": "void bump(int n)\n{\n    n++;\n}\n// in main:\nint x = 5;\nbump(x);\ncout << x;",
+     "program": "#include <iostream>\nusing namespace std;\nvoid bump(int n)\n{\n    n++;\n}\nint main()\n{\n    int x = 5;\n    bump(x);\n    cout << x;\n    return 0;\n}\n",
+     "expect": "5"
+    },
+    {
+     "id": "u6-q076",
+     "lesson": "u6-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "The user types 2, then 5, then 1, then 3. What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid showDouble(int n)\n{\n    cout << n * 2 << endl;\n}\nvoid showSquare(int n)\n{\n    cout << n * n << endl;\n}\nint main()\n{\n    int choice;\n    int n = 6;\n    do\n    {\n        cin >> choice;\n        switch (choice)\n        {\n            case 1: showDouble(n); break;\n            case 2: showSquare(n); break;\n            case 3: break;\n            default: cout << \"?\" << endl;\n        }\n    } while (choice != 3);\n    return 0;\n}\n",
+     "stdin": "2 5 1 3\n",
+     "answer": "36\n?\n12",
+     "explain": "This is the menu-driven pattern: a loop reads a choice and a switch calls one function per choice. 2 calls showSquare (36), 5 matches no case (?), 1 calls showDouble (12), and 3 ends the loop.",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid showDouble(int n)\n{\n    cout << n * 2 << endl;\n}\nvoid showSquare(int n)\n{\n    cout << n * n << endl;\n}\nint main()\n{\n    int choice;\n    int n = 6;\n    do\n    {\n        cin >> choice;\n        switch (choice)\n        {\n            case 1: showDouble(n); break;\n            case 2: showSquare(n); break;\n            case 3: break;\n            default: cout << \"?\" << endl;\n        }\n    } while (choice != 3);\n    return 0;\n}\n"
+    },
+    {
+     "id": "u6-q077",
+     "lesson": "u6-l3",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "When a program is designed with functions, what does a hierarchy chart show?",
+     "choices": [
+      "The order in which every statement runs, with decision diamonds",
+      "The value of every variable at each step",
+      "How the variables are laid out in memory",
+      "Which functions call which other functions"
+     ],
+     "answer": 3,
+     "explain": "A hierarchy chart is a box diagram with main at the top and, under each function, the functions it calls. It shows the program's structure, not the step-by-step logic that a flowchart shows."
+    },
+    {
+     "id": "u6-q078",
+     "lesson": "u6-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nint half(double x)\n{\n    return x / 2;\n}\nint main()\n{\n    double d = half(7.0);\n    cout << d << endl;\n    cout << half(9.8) << endl;\n    return 0;\n}\n",
+     "answer": "3\n4",
+     "explain": "The value of a return expression is converted to the function's return type. 3.5 becomes the int 3 before it leaves half, so storing it in a double cannot bring the .5 back. 4.9 likewise becomes 4.",
+     "program": "#include <iostream>\nusing namespace std;\n\nint half(double x)\n{\n    return x / 2;\n}\nint main()\n{\n    double d = half(7.0);\n    cout << d << endl;\n    cout << half(9.8) << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u6-q079",
+     "lesson": "u6-l3",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Which choice describes every problem in this function?",
+     "code": "double average(int a, int b, int c)\n{\n    double result;\n    result = a + b + c / 3;\n}",
+     "choices": [
+      "It has no return statement; the arithmetic is correct",
+      "result must be an int because the parameters are ints",
+      "It has no return statement, and only c is divided by 3 (with integer division)",
+      "Only the arithmetic is wrong; a double function may end without return"
+     ],
+     "answer": 2,
+     "explain": "A value-returning function must send its value back with `return result;` (g++ only warns, but the caller gets garbage). Also / binds tighter than +, so this computes a + b + (c / 3); write (a + b + c) / 3.0."
+    },
+    {
+     "id": "u6-q080",
+     "lesson": "u6-l3",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Functions that send a value back to the statement that called them, such as pow, are called ____ functions.",
+     "answer": "value-returning",
+     "accept": [
+      "value-returning",
+      "value returning",
+      "non-void",
+      "nonvoid"
+     ],
+     "explain": "A value-returning function names a type other than void in its header and ends with return expression;. A void function returns nothing."
+    },
+    {
+     "id": "u6-q081",
+     "lesson": "u6-l3",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A program contains `int cube(int num)`, which returns num cubed. Write one statement that passes 4 to cube and stores the returned value in the existing int variable result.",
+     "answer": "result = cube(4);",
+     "accept": [
+      "result = cube(4);"
+     ],
+     "explain": "The call goes on the right side of the assignment; the returned value (64) replaces the call and is stored in result."
+    },
+    {
+     "id": "u6-q082",
+     "lesson": "u6-l4",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "A function defines a local `int total;` while a global `int total;` also exists. Inside that function, the local one ____ the global one (one word).",
+     "answer": "shadows",
+     "accept": [
+      "shadows",
+      "shadow",
+      "hides",
+      "hide",
+      "shadows it",
+      "hides it"
+     ],
+     "explain": "Inside that function the name refers to the local variable, and the global is hidden. Outside the function the global is used as normal."
+    },
+    {
+     "id": "u6-q083",
+     "lesson": "u6-l4",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "This function compiles.",
+     "code": "void f(int n)\n{\n    int n = 2;\n    cout << n;\n}",
+     "answer": false,
+     "explain": "A parameter is a local variable of its function, and one function cannot define two variables with the same name in its body. Different functions may each use the name n."
+    },
+    {
+     "id": "u6-q084",
+     "lesson": "u6-l4",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "What happens with this program?",
+     "code": "#include <iostream>\nusing namespace std;\n\nint getBonus()\n{\n    return bonus * 2;\n}\nint bonus = 50;\nint main()\n{\n    cout << getBonus();\n    return 0;\n}",
+     "choices": [
+      "It prints 100",
+      "Compile error: getBonus uses bonus before bonus is defined",
+      "It prints 0, because globals start at 0",
+      "It prints an unpredictable value"
+     ],
+     "answer": 1,
+     "explain": "A global variable's scope runs from its definition to the end of the file. getBonus comes before the definition, so bonus is undeclared there. Moving `int bonus = 50;` above getBonus would make it print 100."
+    },
+    {
+     "id": "u6-q085",
+     "lesson": "u6-l4",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "A static local int that is defined without an initial value starts out holding garbage, just like an ordinary local int.",
+     "answer": false,
+     "explain": "Like global variables, static local variables are automatically initialized to 0. Only ordinary (non-static) locals start with garbage.",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid f()\n{\n    static int s;\n    cout << s << endl;\n    s++;\n}\nint main()\n{\n    f();\n    f();\n    return 0;\n}\n",
+     "expect": "0\n1"
+    },
+    {
+     "id": "u6-q086",
+     "lesson": "u6-l4",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "The period during which a variable exists in memory, from when it is created until it is destroyed, is called its ____.",
+     "answer": "lifetime",
+     "accept": [
+      "lifetime",
+      "life time",
+      "life-time"
+     ],
+     "explain": "An ordinary local variable's lifetime is one call of its function; a static local or a global lives for the whole run. Scope, where the name can be used, is a different idea."
+    },
+    {
+     "id": "u6-q087",
+     "lesson": "u6-l5",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Given `void f(int a = 1, int b = 2, int c = 3);`, a call may leave out the argument for b and still supply one for c, as in `f(5, , 7);`.",
+     "answer": false,
+     "explain": "Arguments are matched left to right, so you cannot skip one in the middle: `f(5, , 7);` is a syntax error. Once b is left out, c must be left out too."
+    },
+    {
+     "id": "u6-q088",
+     "lesson": "u6-l5",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "LIMIT is a global `const int`. Which prototype is illegal?",
+     "choices": [
+      "void f(int a, int b = 10);",
+      "void f(int a, int b = LIMIT);",
+      "void f(int a, int b = LIMIT * 2);",
+      "void f(int a, int b = a);"
+     ],
+     "answer": 3,
+     "explain": "A default argument may not use another parameter of the same function. Literals and named constants, the kinds of default the textbook lists, are fine, and so is a constant expression built from them."
+    },
+    {
+     "id": "u6-q089",
+     "lesson": "u6-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "This function is meant to store the user's input in the caller's variable. What is wrong with it?",
+     "code": "void readCount(int count&)\n{\n    cout << \"How many? \";\n    cin >> count&;\n}",
+     "choices": [
+      "The & belongs after the type (int &count), and it is not written when the variable is used (cin >> count)",
+      "Nothing; the & may go on either side of the name",
+      "A void function cannot read input with cin",
+      "The & must also be written in every call, as in readCount(&n)"
+     ],
+     "answer": 0,
+     "explain": "A reference parameter is declared as type, ampersand, name. Once declared, the parameter is used like any variable. In a call, &x would pass an address, which is a different thing."
+    },
+    {
+     "id": "u6-q090",
+     "lesson": "u6-l5",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "For a reference parameter, the & appears in both the prototype and the function header, but not in the function call.",
+     "answer": true,
+     "explain": "The prototype `void doubleIt(int&);` and the header `void doubleIt(int &n)` both need the ampersand. The call is written normally: `doubleIt(x);`."
+    },
+    {
+     "id": "u6-q091",
+     "lesson": "u6-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid mix(int& a, int b)\n{\n    a = a + b;\n    b = 0;\n}\nint main()\n{\n    int p = 2, q = 5;\n    mix(p, q);\n    cout << p << \" \" << q << endl;\n    mix(q, p);\n    cout << p << \" \" << q << endl;\n    return 0;\n}\n",
+     "answer": "7 5\n7 12",
+     "explain": "a is a reference and b is a copy. The first call changes p to 2 + 5 = 7 and zeroes only the copy of q. The second call makes a an alias for q, so q becomes 5 + 7 = 12, while p is unchanged.",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid mix(int& a, int b)\n{\n    a = a + b;\n    b = 0;\n}\nint main()\n{\n    int p = 2, q = 5;\n    mix(p, q);\n    cout << p << \" \" << q << endl;\n    mix(q, p);\n    cout << p << \" \" << q << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u6-q092",
+     "lesson": "u6-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "The user types 150, then 42. What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nvoid getNumber(int& num)\n{\n    cin >> num;\n    while (num < 1 || num > 100)\n    {\n        cout << \"Out of range\" << endl;\n        cin >> num;\n    }\n}\nint main()\n{\n    int value = 0;\n    getNumber(value);\n    cout << value * 2 << endl;\n    return 0;\n}\n",
+     "stdin": "150\n42\n",
+     "answer": "Out of range\n84",
+     "explain": "num is a reference to main's value, so the number read inside getNumber is stored in value. 150 fails the range check, 42 passes, and main prints 42 * 2.",
+     "program": "#include <iostream>\nusing namespace std;\n\nvoid getNumber(int& num)\n{\n    cin >> num;\n    while (num < 1 || num > 100)\n    {\n        cout << \"Out of range\" << endl;\n        cin >> num;\n    }\n}\nint main()\n{\n    int value = 0;\n    getNumber(value);\n    cout << value * 2 << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u6-q093",
+     "lesson": "u6-l6",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "A function's name together with the data types of its parameters, in order, is called the function's ____. C++ uses it to tell overloaded functions apart.",
+     "answer": "signature",
+     "accept": [
+      "signature",
+      "function signature"
+     ],
+     "explain": "For `int square(int n)` the signature is square(int). The return type is not part of the signature, which is why two functions cannot differ only by return type."
+    },
+    {
+     "id": "u6-q094",
+     "lesson": "u6-l6",
+     "type": "output",
+     "difficulty": 1,
+     "prompt": "What does this print?",
+     "code": "#include <iostream>\nusing namespace std;\n\nint area(int side)\n{\n    return side * side;\n}\nint area(int length, int width)\n{\n    return length * width;\n}\nint main()\n{\n    cout << area(4) << \" \" << area(4, 6) << endl;\n    return 0;\n}\n",
+     "answer": "16 24",
+     "explain": "The overloads differ in the number of parameters. The one-argument call uses area(int) and the two-argument call uses area(int, int).",
+     "program": "#include <iostream>\nusing namespace std;\n\nint area(int side)\n{\n    return side * side;\n}\nint area(int length, int width)\n{\n    return length * width;\n}\nint main()\n{\n    cout << area(4) << \" \" << area(4, 6) << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u6-q095",
+     "lesson": "u6-l6",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which header file must be included to use the exit function and the constants EXIT_SUCCESS and EXIT_FAILURE?",
+     "choices": [
+      "<iostream>",
+      "<cmath>",
+      "<cstdlib>",
+      "<exit>"
+     ],
+     "answer": 2,
+     "explain": "exit and both constants come from <cstdlib>. exit(EXIT_FAILURE) reports an unsuccessful end to the operating system; exit(0) or exit(EXIT_SUCCESS) reports a normal one."
+    },
+    {
+     "id": "u6-q096",
+     "lesson": "u6-l6",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Two functions that are both named getValue and both take no parameters can be in the same program as long as one returns int and the other returns double.",
+     "answer": false,
+     "explain": "Overloaded functions must have different parameter lists. The return type is not part of the signature, so these two definitions conflict and the program does not compile."
+    },
+    {
+     "id": "u6-q097",
+     "lesson": "u6-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "If a function does not return a value, the key word ____ is written as its return type.",
+     "answer": "void",
+     "accept": [
+      "void"
+     ],
+     "explain": "A void function just does its job and ends; it is called as a statement on its own, such as `showMenu();`, and may use `return;` with no value to leave early."
+    },
+    {
+     "id": "u6-q098",
+     "lesson": "u6-l4",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "Two different functions in the same program may each define a local variable named total.",
+     "answer": true,
+     "explain": "A local variable is visible only inside its own function, so the two totals are separate variables that never clash."
+    }
+   ],
+   "programs": [
+    {
+     "id": "u6-p1",
+     "title": "Quiz grader with three functions",
+     "task": "Write three functions and use them from main. double average(int a, int b, int c) returns the average of three scores. char letter(double avg) returns A for 90 or above, B for 80 or above, C for 70 or above, D for 60 or above, otherwise F. bool passed(char grade) returns true unless the grade is F. main reads three integer scores, then prints the average with 1 decimal place on the first line (label Average: ), the letter grade on the second (label Grade: ), and Passed or Failed on the third.",
+     "stdin": "88 92 79",
+     "sampleOutput": "Average: 86.3\nGrade: B\nPassed",
+     "solution": "#include <iostream>\n#include <iomanip>\nusing namespace std;\n\ndouble average(int a, int b, int c) { return (a + b + c) / 3.0; }\nchar letter(double avg)\n{\n    if (avg >= 90) return 'A';\n    if (avg >= 80) return 'B';\n    if (avg >= 70) return 'C';\n    if (avg >= 60) return 'D';\n    return 'F';\n}\nbool passed(char grade) { return grade != 'F'; }\nint main()\n{\n    int a, b, c;\n    cin >> a >> b >> c;\n    double avg = average(a, b, c);\n    char g = letter(avg);\n    cout << fixed << setprecision(1);\n    cout << \"Average: \" << avg << endl;\n    cout << \"Grade: \" << g << endl;\n    cout << (passed(g) ? \"Passed\" : \"Failed\") << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u6-p2",
+     "title": "Order three numbers with references",
+     "task": "Write void orderPair(int& x, int& y) that swaps x and y only when x is greater than y. In main read three integers a, b, c, call orderPair three times (on a and b, then b and c, then a and b) so that they end up in ascending order, and print them separated by spaces on one line.",
+     "stdin": "9 3 6",
+     "sampleOutput": "3 6 9",
+     "solution": "#include <iostream>\nusing namespace std;\n\nvoid orderPair(int& x, int& y)\n{\n    if (x > y)\n    {\n        int t = x;\n        x = y;\n        y = t;\n    }\n}\nint main()\n{\n    int a, b, c;\n    cin >> a >> b >> c;\n    orderPair(a, b);\n    orderPair(b, c);\n    orderPair(a, b);\n    cout << a << \" \" << b << \" \" << c << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u6-p3",
+     "title": "Running total with a static local",
+     "task": "Write int addToTotal(int amount) that keeps a static local variable total (starting at 0), adds amount to it, and returns the new total. In main read integers until 0 is entered (do not add the 0). After each number print Running total: followed by the value returned by addToTotal. After the loop print Entries: and the count of numbers entered.",
+     "stdin": "5 10 3 0",
+     "sampleOutput": "Running total: 5\nRunning total: 15\nRunning total: 18\nEntries: 3",
+     "solution": "#include <iostream>\nusing namespace std;\n\nint addToTotal(int amount)\n{\n    static int total = 0;\n    total += amount;\n    return total;\n}\nint main()\n{\n    int n, entries = 0;\n    cin >> n;\n    while (n != 0)\n    {\n        cout << \"Running total: \" << addToTotal(n) << endl;\n        entries++;\n        cin >> n;\n    }\n    cout << \"Entries: \" << entries << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u6-p4",
+     "title": "Overloaded area functions",
+     "task": "Write three overloaded functions named area, all returning double: area(double radius) returns the area of a circle (use 3.14159), area(double length, double width) returns the area of a rectangle, and area(double length, double width, double height) returns the surface area of a box (2 times the sum of the three face products). In main read length, width and height as doubles, then print the circle area using length as the radius, the rectangle area, and the box surface area, one per line, each to 2 decimal places with a label (Circle:, Rectangle:, Box:).",
+     "stdin": "2 3 4",
+     "sampleOutput": "Circle: 12.57\nRectangle: 6.00\nBox: 52.00",
+     "solution": "#include <iostream>\n#include <iomanip>\nusing namespace std;\n\ndouble area(double radius) { return 3.14159 * radius * radius; }\ndouble area(double length, double width) { return length * width; }\ndouble area(double length, double width, double height)\n{\n    return 2 * (length * width + length * height + width * height);\n}\nint main()\n{\n    double l, w, h;\n    cin >> l >> w >> h;\n    cout << fixed << setprecision(2);\n    cout << \"Circle: \" << area(l) << endl;\n    cout << \"Rectangle: \" << area(l, w) << endl;\n    cout << \"Box: \" << area(l, w, h) << endl;\n    return 0;\n}\n"
+    },
+    {
+     "id": "u6-p5",
+     "title": "Make change",
+     "task": "Write void makeChange(int cents, int& quarters, int& dimes, int& nickels, int& pennies) that computes the fewest coins for the amount (use as many quarters as possible, then dimes, then nickels, then pennies). In main read an amount in cents, call the function, and print the four counts on four lines labelled Quarters:, Dimes:, Nickels:, Pennies:.",
+     "stdin": "87",
+     "sampleOutput": "Quarters: 3\nDimes: 1\nNickels: 0\nPennies: 2",
+     "solution": "#include <iostream>\nusing namespace std;\n\nvoid makeChange(int cents, int& quarters, int& dimes, int& nickels, int& pennies)\n{\n    quarters = cents / 25;\n    cents = cents % 25;\n    dimes = cents / 10;\n    cents = cents % 10;\n    nickels = cents / 5;\n    pennies = cents % 5;\n}\nint main()\n{\n    int cents, q, d, n, p;\n    cin >> cents;\n    makeChange(cents, q, d, n, p);\n    cout << \"Quarters: \" << q << endl;\n    cout << \"Dimes: \" << d << endl;\n    cout << \"Nickels: \" << n << endl;\n    cout << \"Pennies: \" << p << endl;\n    return 0;\n}\n"
+    }
+   ]
+  }
+ ]
+}

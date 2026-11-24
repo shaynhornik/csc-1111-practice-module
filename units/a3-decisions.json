@@ -1,0 +1,1334 @@
+{
+ "units": [
+  {
+   "id": "u4",
+   "title": "Making decisions",
+   "summary": "Relational and logical operators, if, if/else, nested and chained decisions, flags, string and char comparison, the conditional operator, switch, and variable scope.",
+   "lessons": [
+    {
+     "id": "u4-l1",
+     "title": "Relational operators and the if statement",
+     "book": "Sections 4.1 and 4.2, pages 153 to 165",
+     "html": "\n<p>A <strong>relational operator</strong> compares two values and produces a <strong>relational expression</strong>. The six operators are <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>==</code> (equal to) and <code>!=</code> (not equal to). Each of the two-character operators is written with no space inside it, and the order matters: <code>&gt;=</code> and <code>&lt;=</code> are legal, <code>=&gt;</code> and <code>=&lt;</code> are not.</p>\n<p>A relational expression produces a value: <strong>1 for true and 0 for false</strong>. When printed with <code>cout</code> you see 1 or 0, not the words. Any nonzero value counts as true when used as a condition; only 0 is false.</p>\n<pre><code>cout &lt;&lt; (7 &gt; 2);        // 1\ncout &lt;&lt; (7 == 2);       // 0\nbool ok = (3 != 4);      // ok holds true (1)</code></pre>\n<p><strong>Precedence.</strong> Arithmetic binds tighter than relational operators, which bind tighter than <code>==</code> and <code>!=</code>, which bind tighter than assignment. So <code>a + 1 &gt; b</code> means <code>(a + 1) &gt; b</code>. Relational operators group left to right, so <code>x &gt; 5 &gt; 2</code> is <code>(x &gt; 5) &gt; 2</code>: compare 1 or 0 with 2, which is always false. Likewise <code>0 &lt;= x &lt;= 100</code> is always true. Mathematical chaining does not work in C++.</p>\n<h4>The if statement</h4>\n<p>The <code>if</code> statement is the basic <em>selection</em> (decision) structure. If the parenthesized expression is true (nonzero), the statement after it runs; otherwise it is skipped.</p>\n<pre><code>if (balance &lt; 0)\n    cout &lt;&lt; \"Overdrawn\\n\";</code></pre>\n<p>Rules an examiner tests:</p>\n<ul>\n<li>The parentheses around the condition are required; there is no <code>then</code> keyword.</li>\n<li><strong>No semicolon</strong> after the closing parenthesis. <code>if (x &gt; 5);</code> is legal: the lone semicolon is an empty (null) statement, so the if controls nothing and the next statement runs every time.</li>\n<li>Without braces, the if controls <strong>only the one statement</strong> that follows it. Indentation means nothing to the compiler. Use braces <code>{ }</code> to make a <em>conditionally executed block</em>.</li>\n<li><strong><code>=</code> is assignment, <code>==</code> is comparison.</strong> <code>if (k = 5)</code> assigns 5 to k and then tests the value 5, which is nonzero, so it is always true. It compiles, so the error is silent.</li>\n</ul>\n<p>Common flowchart reading: a diamond is the decision; the \"yes\" branch goes to the conditionally executed statement(s) and the \"no\" branch skips past them, rejoining the main path. In pseudocode this is <code>If condition Then ... End If</code>.</p>\n"
+    },
+    {
+     "id": "u4-l2",
+     "title": "Expanding the if: if/else, nesting and floating-point",
+     "book": "Sections 4.3, 4.4 and 4.5, pages 166 to 179",
+     "html": "\n<p><strong>Several statements.</strong> To make more than one statement conditional, enclose them in braces. A missing brace is a classic trap: only the first statement is conditional and the rest run always, whatever the indentation suggests.</p>\n<pre><code>if (hours &gt; 40)\n{\n    overtime = hours - 40;\n    pay += overtime * rate * 0.5;\n}</code></pre>\n<p><strong>Comparing floating-point values.</strong> <code>float</code> and <code>double</code> values are stored in binary and often carry tiny rounding errors, so two values that are equal in arithmetic may not be equal in the machine. On a typical PC (IEEE 754 doubles) <code>0.1 + 0.2 == 0.3</code> is false. Do not test computed floating-point numbers with <code>==</code>. The book advises using <code>&lt;</code> and <code>&gt;</code> instead; another common fix is to test whether the difference is smaller than a small tolerance, for example <code>fabs(a - b) &lt; 0.00001</code> (needs <code>&lt;cmath&gt;</code>).</p>\n<h4>if/else</h4>\n<p>The <code>if/else</code> statement runs exactly one of two paths. The <code>else</code> has no condition and no semicolon before it (<code>if (x &gt; 0); else ...</code> is a compile error because the semicolon ended the if). Use braces on both branches whenever either has more than one statement.</p>\n<pre><code>if (age &gt;= 65)\n    price = 6;\nelse\n    price = 9;</code></pre>\n<h4>Nested if statements</h4>\n<p>An if placed inside another if is a <strong>nested if</strong>. An if nested in the if part is tested only when the outer condition is true; one nested in the else part is tested only when it is false. The <strong>dangling else rule</strong>: an <code>else</code> always belongs to the nearest preceding <code>if</code> that does not already have an else, <em>regardless of indentation</em>.</p>\n<pre><code>if (a &gt; 3)\n    if (b &gt; 3)\n        cout &lt;&lt; \"X\";\n    else            // pairs with if (b &gt; 3)\n        cout &lt;&lt; \"Y\";</code></pre>\n<p>With a = 1 nothing prints, because the whole inner if/else is skipped. To attach an else to the outer if, wrap the inner if in braces. Good style: indent each nested level and use braces so the structure is obvious. Indentation is for human readers only; the compiler ignores it.</p>\n<p><strong>Flowchart to code.</strong> A flowchart decision diamond with two exits (yes/no) becomes if/else; a second diamond on the \"yes\" path becomes a nested if. Pseudocode <code>If A Then / If B Then ... Else ... End If / End If</code> maps to braces that make each Else belong where the pseudocode shows.</p>\n<p>Remember: <code>if (x = 0)</code> assigns and is false; <code>if (x == 0)</code> tests. Also keep in mind that an assignment expression itself yields the value it stores.</p>\n"
+    },
+    {
+     "id": "u4-l3",
+     "title": "if/else if chains, initialization and flags",
+     "book": "Sections 4.6, 4.7 and 4.8, pages 180 to 188",
+     "html": "\n<p>When there are several mutually exclusive outcomes, use an <strong>if/else if chain</strong>. Conditions are tested from the top; the first true one runs its statement and the <strong>rest of the chain is skipped</strong>. An optional <strong>trailing else</strong> is a catch-all that runs only if every condition above was false.</p>\n<pre><code>if (score &gt;= 90)      grade = 'A';\nelse if (score &gt;= 80) grade = 'B';\nelse if (score &gt;= 70) grade = 'C';\nelse                  grade = 'F';</code></pre>\n<p><strong>Order matters.</strong> Because only the first true test counts, tests must run from most restrictive to least. If you test <code>score &gt;= 70</code> first, a 95 gets a C. A chain of separate <code>if</code>s is different: every if is tested independently, so more than one block can run. Use a chain when the cases are exclusive; use separate ifs when they are not. A trailing else is the usual way to handle \"none of the above\" or an error message; it plays the same role as <code>default</code> in a switch. An if/else if chain is really a nested if/else written compactly: each <code>else if</code> is an if statement in the else part of the one before.</p>\n<h4>if with initialization (C++17)</h4>\n<p>C++17 lets you put an initialization before the condition, separated by a semicolon:</p>\n<pre><code>if (int len = name.length(); len &lt; 3)\n    cout &lt;&lt; \"too short\";\nelse\n    cout &lt;&lt; len &lt;&lt; \" characters\";</code></pre>\n<p>The initialization runs first, then the condition is tested. The variable's scope is the if statement <strong>and its else parts only</strong>; using it after the statement is a compile error. In an if/else if chain, a variable defined in one clause is visible from there to the end of the whole chain.</p>\n<h4>Flags</h4>\n<p>A <strong>flag</strong> is a variable that signals whether some condition has happened. It is usually a <code>bool</code> (older code used an <code>int</code> with 0 and 1). Set it false up front (a local variable that is never initialized holds garbage, not 0), set it true when the event occurs, and test it later: <code>if (found)</code> is clearer than <code>if (found == true)</code>.</p>\n<ul>\n<li>A <code>bool</code> holds only <code>true</code> (1) or <code>false</code> (0). Assigning any nonzero number, such as <code>bool b = 25;</code>, stores true.</li>\n<li><code>cout</code> prints a bool as 1 or 0 unless you use <code>boolalpha</code>.</li>\n<li>A bool can be assigned the result of a relational expression: <code>bool adult = (age &gt;= 18);</code></li>\n</ul>\n<p>Pseudocode to code: \"If temp &lt; 32 then Freezing, else if temp &lt; 60 then Cold, otherwise Warm\" is a two-test chain ending in else, with the lower threshold tested first.</p>\n"
+    },
+    {
+     "id": "u4-l4",
+     "title": "Logical operators, ranges, menus and input validation",
+     "book": "Sections 4.9 to 4.12, pages 188 to 200",
+     "html": "\n<p>The three <strong>logical operators</strong> combine or invert conditions. The result is always 1 (true) or 0 (false).</p>\n<table><thead><tr><th>p</th><th>q</th><th>p &amp;&amp; q</th><th>p || q</th><th>!p</th></tr></thead><tbody>\n<tr><td>false</td><td>false</td><td>false</td><td>false</td><td>true</td></tr>\n<tr><td>false</td><td>true</td><td>false</td><td>true</td><td>true</td></tr>\n<tr><td>true</td><td>false</td><td>false</td><td>true</td><td>false</td></tr>\n<tr><td>true</td><td>true</td><td>true</td><td>true</td><td>false</td></tr></tbody></table>\n<p><code>&amp;&amp;</code> (AND) is true only if both sides are true. <code>||</code> (OR) is true if at least one side is true. <code>!</code> (NOT) reverses its single operand.</p>\n<p><strong>Precedence, high to low:</strong> <code>!</code>, then arithmetic, then <code>&lt; &gt; &lt;= &gt;=</code>, then <code>== !=</code>, then <code>&amp;&amp;</code>, then <code>||</code>, then <code>=</code>. So <code>a || b &amp;&amp; c</code> is <code>a || (b &amp;&amp; c)</code>, and <code>!x &gt; 5</code> is <code>(!x) &gt; 5</code>. Parentheses make intent clear.</p>\n<p><strong>Short-circuit evaluation.</strong> Evaluation is left to right and stops as soon as the result is known. In <code>A &amp;&amp; B</code>, if A is false, B is never evaluated. In <code>A || B</code>, if A is true, B is never evaluated. Side effects in B (such as <code>++n</code> or an assignment) simply do not happen. <code>&amp;&amp;</code> and <code>||</code> group left to right. This is also why <code>d != 0 &amp;&amp; total / d &gt; 2</code> is safe.</p>\n<h4>Checking ranges</h4>\n<p>To test \"inside\" a range, use <strong>&amp;&amp;</strong>: <code>x &gt;= 1 &amp;&amp; x &lt;= 10</code>. To test \"outside,\" use <strong>||</strong>: <code>x &lt; 1 || x &gt; 10</code>. Using the wrong one makes a condition that is always or never true. Do not write <code>1 &lt;= x &lt;= 10</code>. De Morgan: <code>!(a &amp;&amp; b)</code> equals <code>!a || !b</code>, and <code>!(a || b)</code> equals <code>!a &amp;&amp; !b</code>.</p>\n<h4>Menus</h4>\n<p>A <strong>menu-driven program</strong> prints a list of choices, reads the user's selection, then uses an if/else if chain or a switch to act on it, with a default or else branch for an invalid choice.</p>\n<h4>Validating input</h4>\n<p><strong>Input validation</strong> means testing data before using it. Garbage in, garbage out (GIGO): a program that accepts a negative age or a menu choice of 9 produces nonsense. Typical pattern: read the value; if it is outside the legal range, print a message; else carry on with the calculation. Validate against the range the problem allows, and check the boundaries (is 0 allowed? is 100?) with <code>&gt;=</code> versus <code>&gt;</code> carefully.</p>\n"
+    },
+    {
+     "id": "u4-l5",
+     "title": "Comparing characters and strings; the conditional operator",
+     "book": "Sections 4.13 and 4.14, pages 201 to 207",
+     "html": "\n<p><strong>Characters.</strong> A <code>char</code> is stored as its ASCII code, so relational operators compare codes. Useful anchors: digits <code>'0'</code> to <code>'9'</code> are 48 to 57; uppercase <code>'A'</code> to <code>'Z'</code> are 65 to 90; lowercase <code>'a'</code> to <code>'z'</code> are 97 to 122. So <code>'A' &lt; 'B'</code> is true, <code>'9' &lt; 'A'</code> is true, and <code>'Z' &lt; 'a'</code> is true: <strong>every uppercase letter is less than every lowercase letter</strong>. Arithmetic on chars gives an int: <code>'c' + 1</code> is 100, and <code>char('c' + 1)</code> is <code>'d'</code>.</p>\n<p><strong>Strings.</strong> Relational operators work on <code>string</code> objects (include <code>&lt;string&gt;</code>). Comparison goes character by character from the left using ASCII codes, stopping at the first difference. If one string is a prefix of the other, the shorter is less. Comparison is case sensitive.</p>\n<pre><code>string a = \"apple\", b = \"Apple\";\ncout &lt;&lt; (a == b);   // 0\ncout &lt;&lt; (a &gt; b);    // 1, because 'a' (97) &gt; 'A' (65)\ncout &lt;&lt; (\"cat\" &lt; string(\"category\"));  // 1 (prefix)</code></pre>\n<p>Beware that comparing C-string literals or char arrays with <code>==</code> compares addresses, not text; at least one operand should be a <code>string</code> object.</p>\n<h4>The conditional operator ?:</h4>\n<p>The <strong>conditional operator</strong> is the only C++ <strong>ternary operator</strong> (three operands). Format: <code>expression1 ? expression2 : expression3</code>. If expression1 is true the whole thing has the value of expression2; otherwise expression3. It is an <em>expression</em>, so it produces a value you can assign or print.</p>\n<pre><code>int larger = (a &gt; b) ? a : b;\ncout &lt;&lt; (n % 2 == 0 ? \"even\" : \"odd\");</code></pre>\n<p>It is shorthand for if/else: <code>if (a &gt; b) larger = a; else larger = b;</code>. Notes:</p>\n<ul>\n<li>Its precedence is low (just above assignment), so wrap it in parentheses when it is part of a larger expression or a <code>&lt;&lt;</code> chain.</li>\n<li>Only the chosen branch is evaluated.</li>\n<li>The second and third operands should have compatible types.</li>\n<li>Use it for short value choices; use if/else when the branches are statements or are long.</li>\n</ul>\n"
+    },
+    {
+     "id": "u4-l6",
+     "title": "The switch statement, initialization and variable scope",
+     "book": "Sections 4.15 to 4.17, pages 208 to 221",
+     "html": "\n<p>A <strong>switch</strong> statement selects among many alternatives by matching the value of one expression against <strong>case labels</strong>.</p>\n<pre><code>switch (choice)\n{\n    case 1:  cout &lt;&lt; \"Add\";    break;\n    case 2:  cout &lt;&lt; \"Remove\"; break;\n    case 'x': cout &lt;&lt; \"Exit\"; break;   // char labels are fine\n    default: cout &lt;&lt; \"Invalid\";\n}</code></pre>\n<ul>\n<li>The switch expression must evaluate to an <strong>integer type or a char</strong>. A <code>double</code> or a <code>string</code> is not allowed.</li>\n<li>Each case label must be an integer or char <strong>constant</strong> (a literal or a <code>const</code> value), never an ordinary variable, and the labels must be <strong>unique</strong>. Labels end with a colon.</li>\n<li>Execution jumps to the matching label and then <strong>keeps running through every following statement</strong> until it hits <code>break</code> or the closing brace. This is <strong>fall-through</strong>. Forgetting <code>break</code> is the standard bug; deliberate fall-through lets several labels share code (<code>case 'y': case 'Y': ...</code>).</li>\n<li><code>default</code> runs if no label matches. It may appear anywhere, but is usually last, where it needs no break. If there is no match and no default, nothing happens.</li>\n<li>A switch cannot test ranges or compound conditions; use if/else if for those.</li>\n</ul>\n<h4>switch with initialization (C++17)</h4>\n<p><code>switch (int r = n % 4; r) { ... }</code> runs the initialization first, then switches on the expression after the semicolon. The variable exists only inside that switch statement.</p>\n<h4>Blocks and variable scope</h4>\n<p>A <strong>block</strong> is a group of statements in braces. A variable's <strong>scope</strong> is the part of the program where it can be used: from its definition to the end of the block that contains it. Consequences:</p>\n<ul>\n<li>A variable defined inside an if-block or case block is unavailable after the closing brace; using it later is a compile error.</li>\n<li>You may define variables almost anywhere, but a name can only be defined once per block.</li>\n<li>An inner block may define a variable with the <strong>same name as an outer one</strong>. Inside the inner block the new variable <strong>hides</strong> the outer one; the outer variable is unchanged and visible again after the block ends.</li>\n</ul>\n<pre><code>int x = 10;\n{\n    int x = 99;     // hides outer x\n    cout &lt;&lt; x;      // 99\n}\ncout &lt;&lt; x;          // 10</code></pre>\n<p>Defining a variable directly in one case of a switch without braces can cause \"jump bypasses initialization\" errors; put braces around such a case.</p>\n"
+    }
+   ],
+   "questions": [
+    {
+     "id": "u4-q001",
+     "lesson": "u4-l1",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which operator tests whether two values are NOT equal?",
+     "choices": [
+      "!=",
+      "<>",
+      "=!",
+      "!=="
+     ],
+     "answer": 0,
+     "explain": "C++ spells not-equal as !=. The form <> is from other languages and =! would parse as assignment of a logical NOT."
+    },
+    {
+     "id": "u4-q002",
+     "lesson": "u4-l1",
+     "type": "output",
+     "difficulty": 1,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "cout << (7 > 2) << (7 < 2) << (3 == 3) << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    cout << (7 > 2) << (7 < 2) << (3 == 3) << endl;\n    return 0;\n}\n",
+     "answer": "101",
+     "explain": "A true relational expression has the value 1 and a false one 0, so the three results are 1, 0, 1 with nothing between them."
+    },
+    {
+     "id": "u4-q003",
+     "lesson": "u4-l1",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "The value of the relational expression 9 < 4 is 0.",
+     "answer": true,
+     "explain": "False relational expressions evaluate to 0 (true is 1)."
+    },
+    {
+     "id": "u4-q004",
+     "lesson": "u4-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which relational operator means 'greater than or equal to'? Type the operator.",
+     "answer": ">=",
+     "accept": [
+      ">="
+     ],
+     "explain": "The two characters are written > then =, with no space. The reversed form => is not an operator."
+    },
+    {
+     "id": "u4-q005",
+     "lesson": "u4-l1",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int x = 10;\ncout << (x > 5 > 2) << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int x = 10;\n    cout << (x > 5 > 2) << endl;\n    return 0;\n}\n",
+     "answer": "0",
+     "explain": "The comparison groups left to right: (10 > 5) is 1, then 1 > 2 is false. C++ has no chained comparisons."
+    },
+    {
+     "id": "u4-q006",
+     "lesson": "u4-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is printed?",
+     "choices": [
+      "Nothing",
+      "big",
+      "Compile error",
+      "big, but only when n is greater than 10"
+     ],
+     "answer": 1,
+     "code": "int n = 3;\nif (n > 10);\n    cout << \"big\";",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int n = 3;\n    if (n > 10);\n        cout << \"big\";\n    return 0;\n}\n",
+     "expect": "big",
+     "explain": "The semicolon right after the condition is an empty statement, so the if controls nothing and the cout always runs."
+    },
+    {
+     "id": "u4-q007",
+     "lesson": "u4-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What does this code print?",
+     "choices": [
+      "no",
+      "yes, and k is still 2",
+      "yes",
+      "It does not compile"
+     ],
+     "answer": 2,
+     "code": "int k = 2;\nif (k = 5)\n    cout << \"yes\";\nelse\n    cout << \"no\";",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int k = 2;\n    if (k = 5)\n        cout << \"yes\";\n    else\n        cout << \"no\";\n    return 0;\n}\n",
+     "expect": "yes",
+     "explain": "k = 5 is an assignment whose value is 5. A nonzero value is true, so the if branch runs. (k is now 5.)"
+    },
+    {
+     "id": "u4-q008",
+     "lesson": "u4-l1",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "In C++, the condition of an if statement is false only when its value is 0.",
+     "answer": true,
+     "explain": "Any nonzero value (positive or negative) counts as true. Only zero is false."
+    },
+    {
+     "id": "u4-q009",
+     "lesson": "u4-l1",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A student writes: if (x =< 5). What is wrong?",
+     "choices": [
+      "Nothing; it compiles and means less than or equal",
+      "x must be written after the 5",
+      "It needs a semicolon before the parenthesis",
+      "=< is not an operator; the correct spelling is <="
+     ],
+     "answer": 3,
+     "explain": "Relational operators with an equal sign put the < or > first: <= and >=."
+    },
+    {
+     "id": "u4-q010",
+     "lesson": "u4-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int score = 40;\nif (score > 50)\n    cout << \"Pass\\n\";\n    cout << \"Congrats\\n\";\ncout << \"End\\n\";",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int score = 40;\n    if (score > 50)\n        cout << \"Pass\\n\";\n        cout << \"Congrats\\n\";\n    cout << \"End\\n\";\n    return 0;\n}\n",
+     "answer": "Congrats\nEnd",
+     "explain": "No braces, so only the first cout belongs to the if. The Congrats line and End line always run, despite the indentation."
+    },
+    {
+     "id": "u4-q011",
+     "lesson": "u4-l2",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print on a typical PC, where double uses the standard IEEE 754 binary format (as it does with g++)? (Assume it is inside main and <cmath> is included.)",
+     "code": "double a = 0.1 + 0.2;\nif (a == 0.3)\n    cout << \"equal\";\nelse\n    cout << \"different\";\ncout << \" \";\nif (fabs(a - 0.3) < 0.000001)\n    cout << \"close\";\nelse\n    cout << \"far\";",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    double a = 0.1 + 0.2;\n    if (a == 0.3)\n        cout << \"equal\";\n    else\n        cout << \"different\";\n    cout << \" \";\n    if (fabs(a - 0.3) < 0.000001)\n        cout << \"close\";\n    else\n        cout << \"far\";\n    return 0;\n}\n",
+     "answer": "different close",
+     "explain": "0.1, 0.2 and 0.3 cannot be stored exactly in binary, so the computed sum is not exactly the stored 0.3 and == reports different, while the tiny difference is well inside the tolerance. The general lesson is not about one machine: never rely on == for computed floating-point values; use < and > comparisons, or test whether the absolute difference is below a small tolerance."
+    },
+    {
+     "id": "u4-q012",
+     "lesson": "u4-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Comparing two computed double values with == is a reliable way to test whether they are equal.",
+     "answer": false,
+     "explain": "Some fractions cannot be stored exactly in binary, so values that are equal in arithmetic can differ in the last bits. The book advises sticking with < and > comparisons for floating-point values; another common approach is testing whether fabs(a - b) is below a small tolerance."
+    },
+    {
+     "id": "u4-q013",
+     "lesson": "u4-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which statement sets `bonus` to 50 when `sales` equals 2000, and sets it to 0 otherwise?",
+     "choices": [
+      "if (sales == 2000) bonus = 50; else bonus = 0;",
+      "if (sales = 2000) bonus = 50; else bonus = 0;",
+      "if (sales == 2000); bonus = 50; else bonus = 0;",
+      "if (sales == 2000) bonus == 50; else bonus == 0;"
+     ],
+     "answer": 0,
+     "explain": "Only the version with == in the condition and = in the branches is right. `sales = 2000` assigns 2000, which is nonzero, so bonus is always 50. A semicolon right after the condition ends the if, so the else has no if and the code does not compile. `bonus == 50` only compares and assigns nothing."
+    },
+    {
+     "id": "u4-q014",
+     "lesson": "u4-l2",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int a = 1, b = 7;\nif (a > 3)\n    if (b > 3)\n        cout << \"X\";\nelse\n    cout << \"Y\";\ncout << \"Z\" << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int a = 1, b = 7;\n    if (a > 3)\n        if (b > 3)\n            cout << \"X\";\n    else\n        cout << \"Y\";\n    cout << \"Z\" << endl;\n    return 0;\n}\n",
+     "answer": "Z",
+     "explain": "The else pairs with the nearest if (the b test), not the one it is lined up with. Since a > 3 is false, the whole inner if/else is skipped and only Z prints."
+    },
+    {
+     "id": "u4-q015",
+     "lesson": "u4-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "An if statement placed inside another if statement is called a ___ if statement.",
+     "answer": "nested",
+     "accept": [
+      "nested",
+      "nested if"
+     ],
+     "explain": "A nested if is an if inside the body of another if or else."
+    },
+    {
+     "id": "u4-q016",
+     "lesson": "u4-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "A semicolon directly after the closing parenthesis of an if condition is a compile error.",
+     "answer": false,
+     "explain": "It is legal: the lone semicolon is an empty (null) statement that becomes the if's body, so the next statement runs every time. That is why the bug is hard to see. (It does become a compile error when an else follows, because the else then has no if.)"
+    },
+    {
+     "id": "u4-q017",
+     "lesson": "u4-l2",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "What does this print?",
+     "choices": [
+      "T",
+      "F",
+      "TF",
+      "Nothing"
+     ],
+     "answer": 1,
+     "code": "int n = 0;\nif (n)\n    cout << \"T\";\nelse\n    cout << \"F\";",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int n = 0;\n    if (n)\n        cout << \"T\";\n    else\n        cout << \"F\";\n    return 0;\n}\n",
+     "expect": "F",
+     "explain": "n is 0, which is false, so the else branch runs."
+    },
+    {
+     "id": "u4-q018",
+     "lesson": "u4-l2",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "A flowchart shows a decision diamond 'Is age >= 18?'. The Yes path leads to a second diamond 'Is member?', whose Yes path prints Discount and whose No path prints Regular. The first diamond's No path prints Minor. Which code matches?",
+     "choices": [
+      "if (age >= 18) { if (member) cout << \"Discount\"; } else cout << \"Regular\"; else cout << \"Minor\";",
+      "if (age >= 18 && member) cout << \"Discount\"; else cout << \"Regular\"; cout << \"Minor\";",
+      "if (age >= 18) { if (member) cout << \"Discount\"; else cout << \"Regular\"; } else cout << \"Minor\";",
+      "if (age >= 18) cout << \"Discount\"; if (member) cout << \"Regular\"; else cout << \"Minor\";"
+     ],
+     "answer": 2,
+     "explain": "The second question lives only on the Yes path, so it is nested inside the first if. Its else belongs to it; the outer else gets Minor."
+    },
+    {
+     "id": "u4-q019",
+     "lesson": "u4-l3",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int s = 95;\nif (s >= 60)\n    cout << \"D\";\nelse if (s >= 90)\n    cout << \"A\";\nelse\n    cout << \"F\";",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int s = 95;\n    if (s >= 60)\n        cout << \"D\";\n    else if (s >= 90)\n        cout << \"A\";\n    else\n        cout << \"F\";\n    return 0;\n}\n",
+     "answer": "D",
+     "explain": "Tests run top to bottom and the first true one wins. 95 >= 60 is true, so D prints and the A test is never reached."
+    },
+    {
+     "id": "u4-q020",
+     "lesson": "u4-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int n = 15;\nif (n > 10)\n    cout << \"A\";\nif (n > 5)\n    cout << \"B\";\nelse if (n > 1)\n    cout << \"C\";\nelse\n    cout << \"D\";",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int n = 15;\n    if (n > 10)\n        cout << \"A\";\n    if (n > 5)\n        cout << \"B\";\n    else if (n > 1)\n        cout << \"C\";\n    else\n        cout << \"D\";\n    return 0;\n}\n",
+     "answer": "AB",
+     "explain": "The first if is separate from the chain below it, so A prints. The chain starts at n > 5, which is true, so B prints and C and D are skipped."
+    },
+    {
+     "id": "u4-q021",
+     "lesson": "u4-l3",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "In an if/else if chain, when does the trailing else run?",
+     "choices": [
+      "Whenever the first if is false",
+      "Every time, after the other branches",
+      "Only when the last else if is true",
+      "Only when every condition above it was false"
+     ],
+     "answer": 3,
+     "explain": "The final else is the catch-all for no match. Once any earlier condition is true, the rest of the chain is skipped."
+    },
+    {
+     "id": "u4-q022",
+     "lesson": "u4-l3",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "In an if/else if chain, once one condition is true, the conditions after it are not evaluated.",
+     "answer": true,
+     "explain": "The chain is a single statement; after one branch runs control jumps past the whole chain."
+    },
+    {
+     "id": "u4-q023",
+     "lesson": "u4-l3",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "if (int r = 17 % 5; r == 2)\n    cout << \"r is \" << r;\nelse\n    cout << \"no\";",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    if (int r = 17 % 5; r == 2)\n        cout << \"r is \" << r;\n    else\n        cout << \"no\";\n    return 0;\n}\n",
+     "answer": "r is 2",
+     "explain": "17 % 5 is 2, so the condition r == 2 is true. The initialization variable is usable inside the if branch."
+    },
+    {
+     "id": "u4-q024",
+     "lesson": "u4-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "In C++17, where can a variable defined in an if statement's initialization clause be used?",
+     "choices": [
+      "Inside the if statement and its else parts only",
+      "Anywhere later in the same function",
+      "Only inside the condition itself",
+      "Only inside the else branch"
+     ],
+     "answer": 0,
+     "explain": "Its scope ends at the end of the whole if/else statement. Use after that point is a compile error."
+    },
+    {
+     "id": "u4-q025",
+     "lesson": "u4-l3",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A variable, often a bool, that signals whether some condition has occurred is called a ___.",
+     "answer": "flag",
+     "accept": [
+      "flag",
+      "a flag"
+     ],
+     "explain": "A flag is set when the event happens and tested later."
+    },
+    {
+     "id": "u4-q026",
+     "lesson": "u4-l3",
+     "type": "output",
+     "difficulty": 1,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "bool ok = (5 < 2);\ncout << ok << \" \" << !ok << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    bool ok = (5 < 2);\n    cout << ok << \" \" << !ok << endl;\n    return 0;\n}\n",
+     "answer": "0 1",
+     "explain": "5 < 2 is false (0), and !ok flips it to true (1). cout prints bools as 1 and 0."
+    },
+    {
+     "id": "u4-q027",
+     "lesson": "u4-l3",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "What does this print?",
+     "choices": [
+      "25",
+      "1",
+      "true",
+      "0"
+     ],
+     "answer": 1,
+     "code": "bool b = 25;\ncout << b;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    bool b = 25;\n    cout << b;\n    return 0;\n}\n",
+     "expect": "1",
+     "explain": "Assigning any nonzero number to a bool stores true, which cout prints as 1."
+    },
+    {
+     "id": "u4-q028",
+     "lesson": "u4-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Pseudocode: if temp is below 32 show Freezing; otherwise, if temp is below 60 show Cold; otherwise show Warm. Which code is correct?",
+     "choices": [
+      "if (temp < 60) cout << \"Cold\"; else if (temp < 32) cout << \"Freezing\"; else cout << \"Warm\";",
+      "if (temp < 32) cout << \"Freezing\"; if (temp < 60) cout << \"Cold\"; else cout << \"Warm\";",
+      "if (temp < 32) cout << \"Freezing\"; else if (temp < 60) cout << \"Cold\"; else cout << \"Warm\";",
+      "if (temp < 32) cout << \"Freezing\"; else if (temp > 60) cout << \"Cold\"; else cout << \"Warm\";"
+     ],
+     "answer": 2,
+     "explain": "The lower threshold must be tested first in the chain. Testing temp < 60 first shows Cold for 20 degrees. Two separate ifs print both Freezing and Cold for 20. Testing temp > 60 for Cold shows Warm for 45."
+    },
+    {
+     "id": "u4-q029",
+     "lesson": "u4-l3",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "Which C++ data type (give its keyword) is most often used for a flag that holds either true or false?",
+     "answer": "bool",
+     "accept": [
+      "bool"
+     ],
+     "explain": "bool holds true or false (stored as 1 or 0). The keyword is bool; boolean is not a C++ type (that spelling is Java's)."
+    },
+    {
+     "id": "u4-q030",
+     "lesson": "u4-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "bool a = true, b = false, c = false;\ncout << (a || b && c) << ((a || b) && c) << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    bool a = true, b = false, c = false;\n    cout << (a || b && c) << ((a || b) && c) << endl;\n    return 0;\n}\n",
+     "answer": "10",
+     "explain": "&& has higher precedence than ||. First: a || (b && c) = true. Second: (true) && false = false."
+    },
+    {
+     "id": "u4-q031",
+     "lesson": "u4-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int x = 0, y = 5;\nif (x != 0 && (y = 10) > 0)\n    cout << \"in \";\ncout << y << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int x = 0, y = 5;\n    if (x != 0 && (y = 10) > 0)\n        cout << \"in \";\n    cout << y << endl;\n    return 0;\n}\n",
+     "answer": "5",
+     "explain": "x != 0 is false, so && short-circuits and the assignment y = 10 never runs. y stays 5."
+    },
+    {
+     "id": "u4-q032",
+     "lesson": "u4-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int n = 3;\nbool r = n > 1 || ++n > 100;\ncout << r << n << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int n = 3;\n    bool r = n > 1 || ++n > 100;\n    cout << r << n << endl;\n    return 0;\n}\n",
+     "answer": "13",
+     "explain": "n > 1 is true, so || skips the right side and n is never incremented. r is 1 and n is 3."
+    },
+    {
+     "id": "u4-q033",
+     "lesson": "u4-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which condition is true when score is OUTSIDE the range 0 to 100?",
+     "choices": [
+      "score < 0 && score > 100",
+      "score >= 0 && score <= 100",
+      "!(score < 0 || score > 100)",
+      "score < 0 || score > 100"
+     ],
+     "answer": 3,
+     "explain": "Outside means below the low end OR above the high end. Joining the two tests with && can never be true, since no score is both below 0 and above 100. `score >= 0 && score <= 100` and `!(score < 0 || score > 100)` are both true for scores inside the range."
+    },
+    {
+     "id": "u4-q034",
+     "lesson": "u4-l4",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which logical operator, written !, reverses the truth value of its operand? Give its name.",
+     "answer": "NOT",
+     "accept": [
+      "not",
+      "logical not",
+      "the not operator",
+      "not operator",
+      "logical not operator",
+      "negation",
+      "logical negation"
+     ],
+     "explain": "The ! operator is logical NOT."
+    },
+    {
+     "id": "u4-q035",
+     "lesson": "u4-l4",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Let p be 1, q be 0 and r be 0. Then the expression `p || q && r` is true.",
+     "answer": true,
+     "explain": "AND binds tighter than OR, so the expression is p || (q && r), which is 1 || 0 and therefore true. Grouped the other way, (p || q) && r, it would be false.",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int p = 1, q = 0, r = 0;\n    cout << (p || q && r) << endl;\n    return 0;\n}\n",
+     "expect": "1"
+    },
+    {
+     "id": "u4-q036",
+     "lesson": "u4-l4",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int x = 3;\ncout << (!x > 5) << (!(x > 5)) << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int x = 3;\n    cout << (!x > 5) << (!(x > 5)) << endl;\n    return 0;\n}\n",
+     "answer": "01",
+     "explain": "! binds tighter than >, so !x is 0 and 0 > 5 is false (0). The second form is !(false) = 1."
+    },
+    {
+     "id": "u4-q037",
+     "lesson": "u4-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which operator has the LOWEST precedence?",
+     "choices": [
+      "||",
+      "&&",
+      "==",
+      "!"
+     ],
+     "answer": 0,
+     "explain": "From highest to lowest: !, relational, equality, &&, ||. (The assignment operator is lower still but is not listed here.)"
+    },
+    {
+     "id": "u4-q038",
+     "lesson": "u4-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "With p true and q false, what is the value of `!(p && q) && (p || q)`? (cout displays a bool value as 1 or 0.)",
+     "choices": [
+      "false (cout shows 0)",
+      "true (cout shows 1)",
+      "It depends on short-circuit order",
+      "It is a syntax error"
+     ],
+     "answer": 1,
+     "code": "bool p = true, q = false;\ncout << (!(p && q) && (p || q));",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    bool p = true, q = false;\n    cout << (!(p && q) && (p || q));\n    return 0;\n}\n",
+     "expect": "1",
+     "explain": "p && q is false, so its NOT is true; p || q is true; true && true is true, which cout displays as 1."
+    },
+    {
+     "id": "u4-q039",
+     "lesson": "u4-l4",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "bool p = true, q = false;\ncout << (p && q) << (p || q) << (!p) << (!q) << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    bool p = true, q = false;\n    cout << (p && q) << (p || q) << (!p) << (!q) << endl;\n    return 0;\n}\n",
+     "answer": "0101",
+     "explain": "Row p true, q false of the truth table: AND is false, OR is true, NOT p is false, NOT q is true."
+    },
+    {
+     "id": "u4-q040",
+     "lesson": "u4-l4",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Which condition is equivalent to !(a > 5 || b < 3)?",
+     "choices": [
+      "a <= 5 || b >= 3",
+      "a < 5 && b > 3",
+      "a <= 5 && b >= 3",
+      "a > 5 && b < 3"
+     ],
+     "answer": 2,
+     "explain": "De Morgan: negate each comparison (> becomes <=, < becomes >=) and switch || to &&."
+    },
+    {
+     "id": "u4-q041",
+     "lesson": "u4-l4",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A program that tests user input before using it is performing input ___.",
+     "answer": "validation",
+     "accept": [
+      "validation",
+      "input validation"
+     ],
+     "explain": "Input validation guards against bad data (garbage in, garbage out)."
+    },
+    {
+     "id": "u4-q042",
+     "lesson": "u4-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "A menu program shows choices 1 to 4. After reading choice, which design best handles a value like 9?",
+     "choices": [
+      "Assume the user always types 1 to 4, since the menu lists only those values",
+      "Use four separate if statements, one per valid choice, with no else",
+      "Put a nested if inside each menu item's branch to check the choice again",
+      "End the switch or if/else if chain with a default or final else that reports an invalid choice"
+     ],
+     "answer": 3,
+     "explain": "Menu code should have a catch-all branch for values outside the list."
+    },
+    {
+     "id": "u4-q043",
+     "lesson": "u4-l4",
+     "type": "tf",
+     "difficulty": 3,
+     "prompt": "In the expression (d != 0 && total / d > 2), division by zero cannot occur when d is 0.",
+     "answer": true,
+     "explain": "When d is 0, d != 0 is false and short-circuit evaluation skips the division."
+    },
+    {
+     "id": "u4-q044",
+     "lesson": "u4-l5",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume it is inside main and the ASCII character set.)",
+     "code": "cout << ('a' > 'A') << ('9' < 'A') << ('Z' < 'a') << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    cout << ('a' > 'A') << ('9' < 'A') << ('Z' < 'a') << endl;\n    return 0;\n}\n",
+     "answer": "111",
+     "explain": "ASCII: a is 97 and A is 65; the digit 9 is 57, below A; Z is 90, below a. All three are true."
+    },
+    {
+     "id": "u4-q045",
+     "lesson": "u4-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main and the ASCII character set.)",
+     "code": "string s1 = \"Zebra\", s2 = \"apple\";\nif (s1 < s2)\n    cout << \"Zebra first\";\nelse\n    cout << \"apple first\";",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    string s1 = \"Zebra\", s2 = \"apple\";\n    if (s1 < s2)\n        cout << \"Zebra first\";\n    else\n        cout << \"apple first\";\n    return 0;\n}\n",
+     "answer": "Zebra first",
+     "explain": "'Z' is 90 and 'a' is 97, so Zebra is less. ASCII order puts all uppercase before all lowercase."
+    },
+    {
+     "id": "u4-q046",
+     "lesson": "u4-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which is true of the strings \"cat\" and \"category\" (as string objects)?",
+     "choices": [
+      "\"cat\" < \"category\"",
+      "\"cat\" > \"category\"",
+      "\"cat\" == \"category\"",
+      "They cannot be compared"
+     ],
+     "answer": 0,
+     "code": "string a = \"cat\", b = \"category\";\ncout << (a < b);",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    string a = \"cat\", b = \"category\";\n    cout << (a < b);\n    return 0;\n}\n",
+     "expect": "1",
+     "explain": "The first three characters match and then \"cat\" runs out, so the shorter string is less. a < b is true, which the program displays as 1."
+    },
+    {
+     "id": "u4-q047",
+     "lesson": "u4-l5",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Two string objects with the same letters compare equal with == only if their letter cases also match.",
+     "answer": true,
+     "explain": "The comparison is case sensitive: \"Cat\" != \"cat\"."
+    },
+    {
+     "id": "u4-q048",
+     "lesson": "u4-l5",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "The ?: operator, which has three operands, is called the ___ operator.",
+     "answer": "conditional",
+     "accept": [
+      "conditional",
+      "ternary",
+      "conditional operator",
+      "ternary operator"
+     ],
+     "explain": "Its formal name is the conditional operator; it is also the only ternary operator."
+    },
+    {
+     "id": "u4-q049",
+     "lesson": "u4-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int n = 5;\ncout << (n % 2 == 0 ? \"even\" : \"odd\") << (n > 3 ? 1 : 0) << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int n = 5;\n    cout << (n % 2 == 0 ? \"even\" : \"odd\") << (n > 3 ? 1 : 0) << endl;\n    return 0;\n}\n",
+     "answer": "odd1",
+     "explain": "5 % 2 is 1, so odd. n > 3 is true so the second ?: yields 1. The parentheses are needed because ?: has lower precedence than <<."
+    },
+    {
+     "id": "u4-q050",
+     "lesson": "u4-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which statement is equivalent to result = (x > 0) ? 10 : 20; ?",
+     "choices": [
+      "if (x > 0) result = 20; else result = 10;",
+      "if (x > 0) result = 10; else result = 20;",
+      "result = 10; if (x > 0) result = 20;",
+      "if (x > 0) result = 10; result = 20;"
+     ],
+     "answer": 1,
+     "explain": "The first operand is the condition, the second the true value, the third the false value."
+    },
+    {
+     "id": "u4-q051",
+     "lesson": "u4-l5",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "What is the value of v after: int x = 4; int v = x > 2 ? x * 2 : x / 2;",
+     "choices": [
+      "2",
+      "4",
+      "8",
+      "1"
+     ],
+     "answer": 2,
+     "code": "int x = 4;\nint v = x > 2 ? x * 2 : x / 2;\ncout << v;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int x = 4;\n    int v = x > 2 ? x * 2 : x / 2;\n    cout << v;\n    return 0;\n}\n",
+     "expect": "8",
+     "explain": "x > 2 is true, so the expression is x * 2 = 8."
+    },
+    {
+     "id": "u4-q052",
+     "lesson": "u4-l6",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int n = 2;\nswitch (n)\n{\n    case 1: cout << \"A\";\n    case 2: cout << \"B\";\n    case 3: cout << \"C\"; break;\n    case 4: cout << \"D\";\n}",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int n = 2;\n    switch (n)\n    {\n        case 1: cout << \"A\";\n        case 2: cout << \"B\";\n        case 3: cout << \"C\"; break;\n        case 4: cout << \"D\";\n    }\n    return 0;\n}\n",
+     "answer": "BC",
+     "explain": "Execution enters at case 2 and falls through into case 3, which has the break."
+    },
+    {
+     "id": "u4-q053",
+     "lesson": "u4-l6",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int v = 9;\nswitch (v)\n{\n    default: cout << \"D\";\n    case 1:  cout << \"1\"; break;\n    case 2:  cout << \"2\";\n}",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int v = 9;\n    switch (v)\n    {\n        default: cout << \"D\";\n        case 1:  cout << \"1\"; break;\n        case 2:  cout << \"2\";\n    }\n    return 0;\n}\n",
+     "answer": "D1",
+     "explain": "default can appear anywhere. With no match it runs, then falls through into case 1 and stops at its break."
+    },
+    {
+     "id": "u4-q054",
+     "lesson": "u4-l6",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "switch (int r = 17 % 4; r)\n{\n    case 0:  cout << \"zero\"; break;\n    case 1:  cout << \"one\";  break;\n    default: cout << \"many\";\n}",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    switch (int r = 17 % 4; r)\n    {\n        case 0:  cout << \"zero\"; break;\n        case 1:  cout << \"one\";  break;\n        default: cout << \"many\";\n    }\n    return 0;\n}\n",
+     "answer": "one",
+     "explain": "The initialization runs first: 17 % 4 is 1. The switch then selects case 1."
+    },
+    {
+     "id": "u4-q055",
+     "lesson": "u4-l6",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int x = 10;\n{\n    int x = 99;\n    cout << x << \" \";\n}\ncout << x << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int x = 10;\n    {\n        int x = 99;\n        cout << x << \" \";\n    }\n    cout << x << endl;\n    return 0;\n}\n",
+     "answer": "99 10",
+     "explain": "The inner x hides the outer one inside the braces. After the block the outer x (unchanged) is visible again."
+    },
+    {
+     "id": "u4-q056",
+     "lesson": "u4-l6",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int v = 1;\nif (v == 1)\n{\n    int v = 2;\n    v += 10;\n    cout << v << \" \";\n}\ncout << v << endl;",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int v = 1;\n    if (v == 1)\n    {\n        int v = 2;\n        v += 10;\n        cout << v << \" \";\n    }\n    cout << v << endl;\n    return 0;\n}\n",
+     "answer": "12 1",
+     "explain": "The inner v is a separate variable (2, then 12). The outer v was never touched and prints 1 afterward."
+    },
+    {
+     "id": "u4-q057",
+     "lesson": "u4-l6",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "A switch expression may be a double.",
+     "answer": false,
+     "explain": "The switch expression must be an integer type or char. Use if/else if for doubles and strings."
+    },
+    {
+     "id": "u4-q058",
+     "lesson": "u4-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What may a case label be?",
+     "choices": [
+      "Any variable holding an int",
+      "A range such as 1 to 10",
+      "A relational expression such as x > 5",
+      "An integer or char constant such as 5, 'y' or a const int"
+     ],
+     "answer": 3,
+     "explain": "Case labels must be integer (or char) constant expressions, and each matches exactly one value; ranges and conditions need if/else if. (g++ accepts `case 1 ... 10:` as a nonstandard extension, but standard C++ has no case ranges.)"
+    },
+    {
+     "id": "u4-q059",
+     "lesson": "u4-l6",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "Which keyword makes control leave a switch statement?",
+     "answer": "break",
+     "accept": [
+      "break",
+      "break;"
+     ],
+     "explain": "Without break, execution falls through into the next case."
+    },
+    {
+     "id": "u4-q060",
+     "lesson": "u4-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What is the term for execution continuing from one case into the next because there is no break?",
+     "choices": [
+      "fall-through",
+      "short-circuiting",
+      "scope hiding",
+      "defaulting"
+     ],
+     "answer": 0,
+     "explain": "Fall-through is sometimes intended (several labels sharing code) but usually a missing-break bug."
+    },
+    {
+     "id": "u4-q061",
+     "lesson": "u4-l6",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "The part of a program in which a variable can be used is its ___.",
+     "answer": "scope",
+     "accept": [
+      "scope"
+     ],
+     "explain": "Scope runs from the definition to the closing brace of the block that contains it."
+    },
+    {
+     "id": "u4-q062",
+     "lesson": "u4-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What happens with this code?",
+     "choices": [
+      "It prints 5",
+      "Compile error: y is not defined at the cout",
+      "It prints 0",
+      "It prints garbage"
+     ],
+     "answer": 1,
+     "code": "int x = 3;\nif (x > 0)\n{\n    int y = 5;\n}\ncout << y;",
+     "explain": "y was defined inside the braces and goes out of scope at the closing brace, so the cout cannot see it."
+    },
+    {
+     "id": "u4-q063",
+     "lesson": "u4-l6",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "A switch statement with two case labels having the same value is legal; the first one is used.",
+     "answer": false,
+     "explain": "Duplicate case values are a compile error."
+    },
+    {
+     "id": "u4-q064",
+     "lesson": "u4-l6",
+     "type": "mc",
+     "difficulty": 3,
+     "prompt": "Which is true of the variable r in switch (int r = n % 4; r) { ... } ?",
+     "choices": [
+      "r can be used after the closing brace of the switch",
+      "The initialization runs after the cases are matched",
+      "r can be used only inside the switch statement",
+      "A switch cannot have an initialization clause in any version of C++"
+     ],
+     "answer": 2,
+     "explain": "C++17 allows the initialization clause; its variable's scope is the switch statement."
+    },
+    {
+     "id": "u4-q065",
+     "lesson": "u4-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "When cout prints a relational expression that is true, what number appears?",
+     "answer": "1",
+     "accept": [
+      "1",
+      "one"
+     ],
+     "code": "cout << (6 >= 6);",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    cout << (6 >= 6);\n    return 0;\n}\n",
+     "expect": "1",
+     "explain": "True prints as 1 and false as 0 (unless boolalpha is set)."
+    },
+    {
+     "id": "u4-q066",
+     "lesson": "u4-l1",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "An expression such as `total >= limit`, which compares two values with one of the six comparison operators, is called a ___ expression. (Give the book's term.)",
+     "answer": "relational",
+     "accept": [
+      "relational",
+      "relational expression",
+      "boolean",
+      "boolean expression"
+     ],
+     "explain": "Expressions built with >, <, >=, <=, == or != are relational expressions, so called because each tests a relationship between two values. The book notes they are also known as Boolean expressions, since their value is true or false."
+    },
+    {
+     "id": "u4-q067",
+     "lesson": "u4-l2",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "The compiler uses indentation to decide which statements an if statement controls.",
+     "answer": false,
+     "explain": "The compiler ignores indentation. Without braces an if controls exactly one statement. Programmers indent conditionally executed statements one level so that people reading the code can see the structure."
+    },
+    {
+     "id": "u4-q068",
+     "lesson": "u4-l2",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "With n equal to -3, this code still prints B, although the programmer wanted both lines to happen only when n is positive. What pair of symbols must be placed around the two `cout` lines to fix it?",
+     "answer": "braces",
+     "accept": [
+      "braces",
+      "curly braces",
+      "curly brackets",
+      "{}",
+      "{ }"
+     ],
+     "explain": "Braces turn the two statements into one block, which the if then controls as a unit. Without them only the first statement is conditional and the second always runs.",
+     "code": "if (n > 0)\n    cout << \"A\";\n    cout << \"B\";",
+     "program": "#include <iostream>\nusing namespace std;\nint main()\n{\n    int n = -3;\n    if (n > 0)\n        cout << \"A\";\n        cout << \"B\";\n    return 0;\n}\n",
+     "expect": "B"
+    },
+    {
+     "id": "u4-q069",
+     "lesson": "u4-l3",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "In a switch, the `default:` section runs when no case label matches. Which clause of an if/else if chain plays that same catch-all role?",
+     "answer": "else",
+     "accept": [
+      "else",
+      "the else",
+      "final else",
+      "trailing else",
+      "the trailing else"
+     ],
+     "explain": "Both are catch-alls: the trailing else runs when no condition above it was true, and default runs when no case label matches."
+    },
+    {
+     "id": "u4-q070",
+     "lesson": "u4-l3",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "Any if/else if chain could be rewritten as nested if/else statements, because each else if is simply an if statement placed in the else part of the one before it.",
+     "answer": true,
+     "explain": "The if/else if statement is a compact form of nested if/else. It is preferred because it is easier to read and its lines do not keep moving right with deeper indentation."
+    },
+    {
+     "id": "u4-q071",
+     "lesson": "u4-l2",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "In the code below, the statement `cout << \"X\";` is reached only when a is false and b is true.",
+     "answer": true,
+     "explain": "The inner if sits in the else part, which runs only when a is false. The inner test of b then decides whether X prints.",
+     "code": "if (a)\n    cout << \"P\";\nelse\n{\n    if (b)\n        cout << \"X\";\n}"
+    },
+    {
+     "id": "u4-q072",
+     "lesson": "u4-l3",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "A local int variable that is defined without an initial value, such as `int count;` inside main, automatically starts at 0.",
+     "answer": false,
+     "explain": "An uninitialized local variable holds whatever was already in that memory (garbage), and using that value is undefined behavior. That is why a flag or counter should get its starting value when it is defined."
+    },
+    {
+     "id": "u4-q073",
+     "lesson": "u4-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "This test is meant to be true only when `age` is in the range 13 through 19. What is wrong with it?",
+     "code": "if (age >= 13 || age <= 19)\n    cout << \"Teen\";",
+     "choices": [
+      "It is true only when age is exactly 13 or exactly 19",
+      "Nothing; || is the right operator for testing whether a value is inside a range",
+      "It is true for every value of age; the two tests must be joined with && instead",
+      "It is never true, because no age can pass both tests"
+     ],
+     "answer": 2,
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int count = 0;\n    for (int age = -1000; age <= 1000; age++)\n        if (age >= 13 || age <= 19)\n            count++;\n    cout << count << endl;\n    return 0;\n}\n",
+     "expect": "2001",
+     "explain": "Every number is either at least 13 or at most 19, so joining the tests with || makes the condition always true. A value inside a range must pass both tests: `age >= 13 && age <= 19`. Use || to test whether a value is outside a range."
+    },
+    {
+     "id": "u4-q074",
+     "lesson": "u4-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "`paid` is a bool flag. Which statement sets `fee` to 0 only when the flag is set (true)?",
+     "choices": [
+      "if (paid) fee = 0;",
+      "if (paid = true) fee = 0;",
+      "if (!paid) fee = 0;",
+      "if (paid == 0) fee = 0;"
+     ],
+     "answer": 0,
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    for (int t = 0; t <= 1; t++)\n    {\n        bool paid = t;\n        int f1 = 10, f2 = 10, f3 = 10, f4 = 10;\n        if (paid) f1 = 0;\n        bool p2 = paid;\n        if (p2 = true) f2 = 0;\n        if (!paid) f3 = 0;\n        if (paid == 0) f4 = 0;\n        cout << f1 << \" \" << f2 << \" \" << f3 << \" \" << f4 << endl;\n    }\n    return 0;\n}\n",
+     "expect": "10 0 0 0\n0 0 10 10",
+     "explain": "A bool can be the whole condition: `if (paid)` means the same as `if (paid == true)`. `paid = true` assigns true, so fee is set to 0 every time. `!paid` and `paid == 0` test for the flag NOT being set."
+    },
+    {
+     "id": "u4-q075",
+     "lesson": "u4-l1",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main.)",
+     "code": "int a = 4, b = 9;\ncout << (a * 2 > b) << (b - a == 5) << (3 == 2 < 1) << endl;",
+     "answer": "010",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int a = 4, b = 9;\n    cout << (a * 2 > b) << (b - a == 5) << (3 == 2 < 1) << endl;\n    return 0;\n}\n",
+     "explain": "Arithmetic is done before comparing: 8 > 9 is 0 and 5 == 5 is 1. In the last one, < has higher precedence than ==, so 2 < 1 (0) is computed first and then 3 == 0 is 0."
+    },
+    {
+     "id": "u4-q076",
+     "lesson": "u4-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main and the ASCII character set.)",
+     "code": "cout << ('7' == 7) << ('7' == 55) << ('7' - '0' == 7) << endl;",
+     "answer": "011",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    cout << ('7' == 7) << ('7' == 55) << ('7' - '0' == 7) << endl;\n    return 0;\n}\n",
+     "explain": "The character '7' is stored as its ASCII code 55, not the number 7, so the first comparison is false and the second true. Subtracting '0' (48) from a digit character gives the digit's numeric value: 55 - 48 is 7."
+    },
+    {
+     "id": "u4-q077",
+     "lesson": "u4-l5",
+     "type": "output",
+     "difficulty": 3,
+     "prompt": "What does this code print? (Assume it is inside main, <string> is included, and the ASCII character set.)",
+     "code": "string a = \"100\", b = \"25\";\nif (a < b)\n    cout << a << \" comes first\";\nelse\n    cout << b << \" comes first\";",
+     "answer": "100 comes first",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    string a = \"100\", b = \"25\";\n    if (a < b)\n        cout << a << \" comes first\";\n    else\n        cout << b << \" comes first\";\n    return 0;\n}\n",
+     "explain": "string objects compare character by character, not by numeric value. The first characters already differ: '1' (49) is less than '2' (50), so \"100\" is less than \"25\" even though 100 is greater than 25 as a number."
+    },
+    {
+     "id": "u4-q078",
+     "lesson": "u4-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which of these if/else if chains could be rewritten directly as a switch statement?",
+     "choices": [
+      "if (score >= 90) ... else if (score >= 80) ... else ...",
+      "if (x == 1) ... else if (y == 2) ... else ...",
+      "if (price == 9.5) ... else if (price == 12.5) ... else ...",
+      "if (code == 1) ... else if (code == 2) ... else if (code == 5) ... else ..."
+     ],
+     "answer": 3,
+     "explain": "A switch compares ONE integer (or char) expression for equality against constant values, so the chain on code fits, with its final else becoming default. Ranges such as score >= 90, tests on two different variables, and double values cannot be expressed as case labels."
+    },
+    {
+     "id": "u4-q079",
+     "lesson": "u4-l6",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Pseudocode: Select on size. When 1, display S. When 2 or 3, display M. Otherwise display L. Which C++ matches it for every value of size?",
+     "choices": [
+      "switch (size) { case 1: cout << \"S\"; case 2: case 3: cout << \"M\"; break; default: cout << \"L\"; }",
+      "switch (size) { case 1: cout << \"S\"; break; case 2: case 3: cout << \"M\"; break; default: cout << \"L\"; }",
+      "switch (size) { case 1: cout << \"S\"; break; case 2 || 3: cout << \"M\"; break; default: cout << \"L\"; }",
+      "switch (size) { case 1: cout << \"S\"; break; case 2: case 3: cout << \"M\"; break; }"
+     ],
+     "answer": 1,
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int sizes[] = {1, 2, 3, 7};\n    for (int size : sizes)\n    {\n        switch (size) { case 1: cout << \"S\"; break; case 2: case 3: cout << \"M\"; break; default: cout << \"L\"; }\n        cout << \" \";\n    }\n    cout << endl;\n    return 0;\n}\n",
+     "expect": "S M M L",
+     "explain": "Stacking `case 2: case 3:` lets two labels share one block. Without the break after case 1, size 1 prints SM. `case 2 || 3` is the constant 1 (true), which duplicates case 1 and does not compile. Without default, a value such as 7 prints nothing instead of L."
+    },
+    {
+     "id": "u4-q080",
+     "lesson": "u4-l2",
+     "type": "output",
+     "difficulty": 2,
+     "prompt": "What does this code print if the user types 14? (Assume it is inside main.)",
+     "code": "int n;\ncin >> n;\nif (n > 0)\n{\n    cout << \"P\";\n    if (n > 10)\n    {\n        cout << \"Q\";\n        if (n > 20)\n            cout << \"R\";\n    }\n    else\n        cout << \"S\";\n}\ncout << endl;",
+     "stdin": "14\n",
+     "answer": "PQ",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int n;\n    cin >> n;\n    if (n > 0)\n    {\n        cout << \"P\";\n        if (n > 10)\n        {\n            cout << \"Q\";\n            if (n > 20)\n                cout << \"R\";\n        }\n        else\n            cout << \"S\";\n    }\n    cout << endl;\n    return 0;\n}\n",
+     "explain": "14 > 0 prints P. 14 > 10 is true, so Q prints and the else that belongs to that if (S) is skipped; the braces keep that else from pairing with if (n > 20). 14 > 20 is false, so R does not print."
+    },
+    {
+     "id": "u4-q081",
+     "lesson": "u4-l1",
+     "type": "tf",
+     "difficulty": 2,
+     "prompt": "For int variables p and q, the expression `p < q` always has the same value as `q >= p`.",
+     "answer": false,
+     "explain": "They differ when p equals q: p < q is false but q >= p is true. Turning p < q around gives q > p; its opposite (negation) is p >= q."
+    },
+    {
+     "id": "u4-q082",
+     "lesson": "u4-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Assume `int i = 3, j = 8, k = 0;`. Which condition is FALSE?",
+     "choices": [
+      "i == 3 || j < 2",
+      "j > i && k == 0",
+      "k != 0 || i > j",
+      "!(i > j)"
+     ],
+     "answer": 2,
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int i = 3, j = 8, k = 0;\n    cout << (i == 3 || j < 2) << (j > i && k == 0) << (k != 0 || i > j) << !(i > j) << endl;\n    return 0;\n}\n",
+     "expect": "1101",
+     "explain": "k != 0 is false and i > j (3 > 8) is false, so their || is false. `i == 3 || j < 2` is true because i == 3; `j > i && k == 0` is true because both parts hold; `!(i > j)` is true because 3 > 8 is false."
+    },
+    {
+     "id": "u4-q083",
+     "lesson": "u4-l5",
+     "type": "mc",
+     "difficulty": 1,
+     "prompt": "Which statement sets `fee` to 5 when `age` is under 12 and to 10 otherwise?",
+     "choices": [
+      "fee = (age < 12) : 5 ? 10;",
+      "fee = (age < 12) ? 10 : 5;",
+      "fee = (age < 12) ? 5, 10;",
+      "fee = (age < 12) ? 5 : 10;"
+     ],
+     "answer": 3,
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int fee;\n    for (int age = 8; age <= 30; age += 22)\n    {\n        fee = (age < 12) ? 5 : 10;\n        cout << fee << \" \";\n    }\n    cout << endl;\n    return 0;\n}\n",
+     "expect": "5 10",
+     "explain": "The form is condition ? valueIfTrue : valueIfFalse. The ? comes right after the condition and the : separates the two values; swapping the values reverses the logic, and the other two forms do not compile."
+    },
+    {
+     "id": "u4-q084",
+     "lesson": "u4-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "What happens with this code?",
+     "code": "if (qty == 0)\n    cout << \"None left. \";\n    cout << \"Reorder now.\";\nelse\n    cout << \"In stock.\";",
+     "choices": [
+      "It does not compile: without braces the if ends after its first statement, so the else has no matching if",
+      "When qty is 0 it prints None left. Reorder now. and otherwise it prints In stock.",
+      "It prints Reorder now. every time, followed by In stock. when qty is not 0",
+      "It compiles, and the else pairs with the second cout statement"
+     ],
+     "answer": 0,
+     "explain": "Indentation does not make a block. The if controls only the first cout, the second cout is an ordinary statement, and an else cannot follow it (g++ reports else without a previous if). Braces around the two cout statements fix it."
+    },
+    {
+     "id": "u4-q085",
+     "lesson": "u4-l3",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Several conditions test the same variable. What is the key difference between writing them as an if/else if chain and as a series of separate if statements?",
+     "choices": [
+      "In the series, testing stops at the first true condition; in the chain, every condition is tested and several branches can run",
+      "There is no difference in what runs; the chain is only a shorter way to write the series",
+      "The chain can test at most two conditions, while the series can test any number of them",
+      "In the chain, testing stops at the first true condition and at most one branch runs; in the series, every if is tested and several can run"
+     ],
+     "answer": 3,
+     "explain": "After one branch of an if/else if chain runs, control jumps past the rest of the chain. Separate if statements are independent, so a value that satisfies several of them runs several blocks."
+    },
+    {
+     "id": "u4-q086",
+     "lesson": "u4-l3",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "Trace this pseudocode. What number is displayed?",
+     "code": "Set fee to 20\nSet weight to 7\nIf weight > 10 Then\n    Add 15 to fee\nElse If weight > 5 Then\n    Add 8 to fee\nElse\n    Add 3 to fee\nEnd If\nDisplay fee",
+     "answer": "28",
+     "accept": [
+      "28"
+     ],
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int fee = 20;\n    int weight = 7;\n    if (weight > 10)\n        fee += 15;\n    else if (weight > 5)\n        fee += 8;\n    else\n        fee += 3;\n    cout << fee << endl;\n    return 0;\n}\n",
+     "expect": "28",
+     "explain": "7 > 10 is false, so the next test runs: 7 > 5 is true, so 8 is added and the rest of the chain is skipped. 20 + 8 is 28."
+    },
+    {
+     "id": "u4-q087",
+     "lesson": "u4-l2",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "A flowchart: Start. A process box sets x to 4 and y to 9. A decision diamond asks 'x > y?': the Yes path sets big to x, the No path sets big to y, and the paths rejoin. A second diamond asks 'big % 2 == 0?': Yes displays even, No displays odd. End. What word is displayed?",
+     "answer": "odd",
+     "accept": [
+      "odd"
+     ],
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int x = 4, y = 9, big;\n    if (x > y)\n        big = x;\n    else\n        big = y;\n    if (big % 2 == 0)\n        cout << \"even\" << endl;\n    else\n        cout << \"odd\" << endl;\n    return 0;\n}\n",
+     "expect": "odd",
+     "explain": "4 > 9 is false, so the No path sets big to 9. 9 % 2 is 1, not 0, so the second diamond takes its No path and displays odd."
+    },
+    {
+     "id": "u4-q088",
+     "lesson": "u4-l2",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which flowchart description matches this code?",
+     "code": "if (temp > 100)\n{\n    cout << \"Hot \";\n    fanOn = true;\n}\ncout << \"Done\";",
+     "choices": [
+      "One diamond, temp > 100?. Yes displays Hot; No sets fanOn to true; both paths then display Done.",
+      "One diamond, temp > 100?. Yes displays Hot, sets fanOn to true and displays Done; No goes straight to End.",
+      "One diamond, temp > 100?. Yes goes through two boxes (display Hot, set fanOn to true) and rejoins No; Done is displayed after the paths meet.",
+      "Two diamonds in a row, temp > 100? and fanOn?, each with its own display box."
+     ],
+     "answer": 2,
+     "explain": "The braces put both statements on the Yes path, and there is no else, so the No path does nothing. The cout of Done comes after the if, so it sits where the two paths rejoin and runs either way."
+    },
+    {
+     "id": "u4-q089",
+     "lesson": "u4-l4",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Pseudocode: If qty is at least 1 and at most 50 Then display OK, Else display Invalid. Which C++ matches it?",
+     "choices": [
+      "if (qty >= 1 && qty <= 50) cout << \"OK\"; else cout << \"Invalid\";",
+      "if (qty >= 1 || qty <= 50) cout << \"OK\"; else cout << \"Invalid\";",
+      "if (1 <= qty <= 50) cout << \"OK\"; else cout << \"Invalid\";",
+      "if (qty > 1 && qty < 50) cout << \"OK\"; else cout << \"Invalid\";"
+     ],
+     "answer": 0,
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int tests[] = {0, 1, 50, 51};\n    for (int qty : tests)\n    {\n        if (qty >= 1 && qty <= 50) cout << \"OK\"; else cout << \"Invalid\";\n        cout << \" \";\n    }\n    cout << endl;\n    for (int qty : tests)\n    {\n        if (qty >= 1 || qty <= 50) cout << \"OK\"; else cout << \"Invalid\";\n        cout << \" \";\n    }\n    cout << endl;\n    for (int qty : tests)\n    {\n        if (1 <= qty <= 50) cout << \"OK\"; else cout << \"Invalid\";\n        cout << \" \";\n    }\n    cout << endl;\n    return 0;\n}\n",
+     "expect": "Invalid OK OK Invalid\nOK OK OK OK\nOK OK OK OK",
+     "explain": "At least means >= and at most means <=, and both must hold, so they are joined with &&. The || version and the chained `1 <= qty <= 50` version are true for every qty; the > and < version wrongly rejects 1 and 50."
+    },
+    {
+     "id": "u4-q090",
+     "lesson": "u4-l6",
+     "type": "fill",
+     "difficulty": 1,
+     "prompt": "A variable defined inside a block, such as the body of an if, has ___ scope: it can be used only from its definition to the end of that block.",
+     "answer": "local",
+     "accept": [
+      "local",
+      "block",
+      "local scope",
+      "block scope"
+     ],
+     "explain": "Such a variable is local to the block. Code before its definition or after the block's closing brace cannot use it."
+    },
+    {
+     "id": "u4-q091",
+     "lesson": "u4-l4",
+     "type": "fill",
+     "difficulty": 2,
+     "prompt": "In `a < b || c == d || e > f`, the two || operators are applied in which direction? (The && and || operators share this associativity.)",
+     "answer": "left to right",
+     "accept": [
+      "left to right",
+      "left-to-right",
+      "left",
+      "from left to right",
+      "left to right associativity",
+      "left-to-right associativity"
+     ],
+     "explain": "&& and || are left-associative, so the leftmost part is evaluated first, which is what lets short-circuit evaluation skip the rest. (The unary ! is the exception; like other unary operators it groups right to left.)"
+    },
+    {
+     "id": "u4-q092",
+     "lesson": "u4-l3",
+     "type": "tf",
+     "difficulty": 1,
+     "prompt": "In C++17, an if statement may include an initialization clause before its condition, but the clause is optional.",
+     "answer": true,
+     "explain": "The form `if (init; condition)` is allowed starting with C++17, but a plain `if (condition)` is still legal and is still the usual form. A switch may have the same optional clause."
+    },
+    {
+     "id": "u4-q093",
+     "lesson": "u4-l4",
+     "type": "output",
+     "difficulty": 1,
+     "prompt": "What does this code print if the user types 0? (Assume it is inside main.)",
+     "code": "int choice;\ncout << \"Menu: 1=Add 2=List 3=Quit\\n\";\ncin >> choice;\nif (choice < 1 || choice > 3)\n    cout << \"Invalid choice\";\nelse if (choice == 3)\n    cout << \"Bye\";\nelse\n    cout << \"Working\";",
+     "stdin": "0\n",
+     "answer": "Menu: 1=Add 2=List 3=Quit\nInvalid choice",
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int choice;\n    cout << \"Menu: 1=Add 2=List 3=Quit\\n\";\n    cin >> choice;\n    if (choice < 1 || choice > 3)\n        cout << \"Invalid choice\";\n    else if (choice == 3)\n        cout << \"Bye\";\n    else\n        cout << \"Working\";\n    return 0;\n}\n",
+     "explain": "The menu line prints first. 0 is below 1, so the validation test at the top of the chain is true, Invalid choice prints, and the other branches are skipped. Checking for an invalid choice first is a common menu pattern."
+    },
+    {
+     "id": "u4-q094",
+     "lesson": "u4-l5",
+     "type": "mc",
+     "difficulty": 2,
+     "prompt": "Which condition is true exactly when the char variable `ch` holds a digit character, '0' through '9'?",
+     "choices": [
+      "ch >= 0 && ch <= 9",
+      "ch >= '0' && ch <= '9'",
+      "ch >= '0' || ch <= '9'",
+      "'0' <= ch <= '9'"
+     ],
+     "answer": 1,
+     "program": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\nint main()\n{\n    int a = 0, b = 0, c = 0, d = 0;\n    for (int i = 1; i < 128; i++)\n    {\n        char ch = i;\n        if (ch >= 0 && ch <= 9) a++;\n        if (ch >= '0' && ch <= '9') b++;\n        if (ch >= '0' || ch <= '9') c++;\n        if ('0' <= ch <= '9') d++;\n    }\n    cout << a << \" \" << b << \" \" << c << \" \" << d << endl;\n    cout << ('5' >= '0' && '5' <= '9') << endl;\n    return 0;\n}\n",
+     "expect": "9 10 127 127\n1",
+     "explain": "Digit characters have consecutive codes, so a range test on the character constants works. Without quotes it tests codes 0 to 9, which are control characters, not digits. The || version and the chained version are true for every character."
+    }
+   ],
+   "programs": [
+    {
+     "id": "u4-p1",
+     "title": "Letter grade with validation",
+     "task": "Read an integer test score. If it is below 0 or above 100, print 'Invalid score' and stop. Otherwise print 'Grade: ' followed by A for 90 and up, B for 80 to 89, C for 70 to 79, D for 60 to 69, and F below 60. Use an if/else if chain.",
+     "stdin": "87\n",
+     "solution": "#include <iostream>\nusing namespace std;\n\nint main()\n{\n    int score;\n    cout << \"Enter score: \";\n    cin >> score;\n    if (score < 0 || score > 100)\n    {\n        cout << \"Invalid score\" << endl;\n    }\n    else if (score >= 90)\n        cout << \"Grade: A\" << endl;\n    else if (score >= 80)\n        cout << \"Grade: B\" << endl;\n    else if (score >= 70)\n        cout << \"Grade: C\" << endl;\n    else if (score >= 60)\n        cout << \"Grade: D\" << endl;\n    else\n        cout << \"Grade: F\" << endl;\n    return 0;\n}\n",
+     "sampleOutput": "Enter score: Grade: B"
+    },
+    {
+     "id": "u4-p2",
+     "title": "Shape menu with switch",
+     "task": "Show a menu: 1 = circle area, 2 = rectangle area, 3 = quit. Read the choice. For 1 read a radius and print the area (use 3.14159); for 2 read length and width and print the area; for 3 print 'Goodbye'; anything else prints 'Invalid choice'. Use a switch, and print areas with two decimal places. Input here is choice 2, then 4.5 and 3.",
+     "stdin": "2\n4.5\n3\n",
+     "solution": "#include <iostream>\n#include <iomanip>\nusing namespace std;\n\nint main()\n{\n    const double PI = 3.14159;\n    int choice;\n    cout << \"1) Circle  2) Rectangle  3) Quit\" << endl;\n    cout << \"Choice: \";\n    cin >> choice;\n    cout << fixed << setprecision(2);\n    switch (choice)\n    {\n        case 1:\n        {\n            double r;\n            cin >> r;\n            cout << \"Area: \" << PI * r * r << endl;\n            break;\n        }\n        case 2:\n        {\n            double len, wid;\n            cin >> len >> wid;\n            cout << \"Area: \" << len * wid << endl;\n            break;\n        }\n        case 3:\n            cout << \"Goodbye\" << endl;\n            break;\n        default:\n            cout << \"Invalid choice\" << endl;\n    }\n    return 0;\n}\n",
+     "sampleOutput": "1) Circle  2) Rectangle  3) Quit\nChoice: Area: 13.50"
+    },
+    {
+     "id": "u4-p3",
+     "title": "Leap year test",
+     "task": "Read a year. A year is a leap year if it is divisible by 4, except that years divisible by 100 are not leap years unless they are also divisible by 400. Print '<year> is a leap year' or '<year> is not a leap year', using logical operators in one condition. Input: 2100.",
+     "stdin": "2100\n",
+     "solution": "#include <iostream>\nusing namespace std;\n\nint main()\n{\n    int year;\n    cout << \"Year: \";\n    cin >> year;\n    if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)\n        cout << year << \" is a leap year\" << endl;\n    else\n        cout << year << \" is not a leap year\" << endl;\n    return 0;\n}\n",
+     "sampleOutput": "Year: 2100 is not a leap year"
+    },
+    {
+     "id": "u4-p4",
+     "title": "Alphabetical order of two words",
+     "task": "Read two words (strings). Print them on one line separated by a space, in ASCII order (the smaller first). If they are identical print 'Same word'. Then print 'Different case' only if the words are not equal but would be equal if you ignored case (compare after converting every letter to lowercase with tolower; include <cctype>). Input: pear Apple.",
+     "stdin": "pear Apple\n",
+     "solution": "#include <iostream>\n#include <string>\n#include <cctype>\nusing namespace std;\n\nstring lower(string s)\n{\n    for (int i = 0; i < (int)s.size(); i++)\n        s[i] = tolower(s[i]);\n    return s;\n}\n\nint main()\n{\n    string a, b;\n    cin >> a >> b;\n    if (a == b)\n        cout << \"Same word\" << endl;\n    else\n    {\n        if (a < b)\n            cout << a << \" \" << b << endl;\n        else\n            cout << b << \" \" << a << endl;\n        if (lower(a) == lower(b))\n            cout << \"Different case\" << endl;\n    }\n    return 0;\n}\n",
+     "sampleOutput": "Apple pear"
+    },
+    {
+     "id": "u4-p5",
+     "title": "Triangle checker",
+     "task": "Read three positive integers as side lengths. If any side is 0 or less print 'Invalid'. Otherwise, if the two shorter sides do not add up to more than the longest (use an if with initialization to compute the longest side), print 'Not a triangle'. Otherwise print 'Equilateral', 'Isosceles' or 'Scalene'. Input: 5 5 8.",
+     "stdin": "5 5 8\n",
+     "solution": "#include <iostream>\n#include <algorithm>\nusing namespace std;\n\nint main()\n{\n    int s1, s2, s3;\n    cin >> s1 >> s2 >> s3;\n    if (s1 <= 0 || s2 <= 0 || s3 <= 0)\n        cout << \"Invalid\" << endl;\n    else if (int longest = max(s1, max(s2, s3)); s1 + s2 + s3 - longest <= longest)\n        cout << \"Not a triangle\" << endl;\n    else if (s1 == s2 && s2 == s3)\n        cout << \"Equilateral\" << endl;\n    else if (s1 == s2 || s2 == s3 || s1 == s3)\n        cout << \"Isosceles\" << endl;\n    else\n        cout << \"Scalene\" << endl;\n    return 0;\n}\n",
+     "sampleOutput": "Isosceles"
+    }
+   ]
+  }
+ ]
+}
