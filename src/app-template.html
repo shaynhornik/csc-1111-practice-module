@@ -83,6 +83,14 @@ textarea.code { min-height: 110px; resize: vertical; white-space: pre; }
 .checklist li { display: flex; gap: 10px; align-items: baseline; }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); flex: none; transform: translateY(1px); }
 .dot.on { background: var(--good); }
+.col.wide { max-width: none; }
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.split .pane { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.split iframe { width: 100%; height: calc(100vh - 150px); border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.bookbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.bookbar .btn { padding: 5px 10px; font-size: 0.88rem; }
+input[type=file].pick { font: inherit; max-width: 100%; }
+@media (max-width: 1100px) { .split { grid-template-columns: 1fr; } .split .pane { position: static; } .split iframe { height: 75vh; } }
 details { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
 details > summary { cursor: pointer; padding: 9px 14px; color: var(--accent); font-weight: 600; }
 details > div { padding: 0 14px 12px; }
@@ -124,6 +132,64 @@ var S = { q: {}, read: {}, prog: {}, exams: [] };
 try { var raw = localStorage.getItem(KEY); if (raw) { var p = JSON.parse(raw); if (p && p.q) S = p; } } catch (e) {}
 S.q = S.q || {}; S.read = S.read || {}; S.prog = S.prog || {}; S.exams = S.exams || [];
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+// ---------- your own textbook (never part of this site; stays on this device) ----------
+// Two ways to supply it: a PDF picked once and kept in this browser's storage, or a file named
+// textbook.pdf sitting in the same folder as this page when the page is opened from disk.
+var BOOK = { url: null, name: null, mode: null };
+if (S.bookOffset == null) S.bookOffset = 33;
+var IS_DISK = location.protocol === 'file:';
+function idb(fn) {
+  return new Promise(function (res, rej) {
+    var open;
+    try { open = indexedDB.open('csc1111-course', 1); } catch (e) { rej(e); return; }
+    open.onupgradeneeded = function () { open.result.createObjectStore('files'); };
+    open.onerror = function () { rej(open.error); };
+    open.onsuccess = function () {
+      var tx = open.result.transaction('files', 'readwrite'), st = tx.objectStore('files'), r = fn(st);
+      tx.oncomplete = function () { res(r && r.result); };
+      tx.onerror = function () { rej(tx.error); };
+    };
+  });
+}
+function loadBook() {
+  if (S.bookMode === 'folder' && IS_DISK) { BOOK = { url: 'textbook.pdf', name: 'textbook.pdf (in this folder)', mode: 'folder' }; return Promise.resolve(); }
+  return idb(function (st) { return st.get('textbook'); }).then(function (rec) {
+    if (rec && rec.blob) BOOK = { url: URL.createObjectURL(rec.blob), name: rec.name, mode: 'stored' };
+  }).catch(function () {});
+}
+function storeBook(file) {
+  return idb(function (st) { return st.put({ blob: file, name: file.name }, 'textbook'); }).then(function () {
+    if (BOOK.url && BOOK.mode === 'stored') URL.revokeObjectURL(BOOK.url);
+    S.bookMode = 'stored'; save();
+    BOOK = { url: URL.createObjectURL(file), name: file.name, mode: 'stored' };
+  });
+}
+function useFolderBook() { S.bookMode = 'folder'; save(); BOOK = { url: 'textbook.pdf', name: 'textbook.pdf (in this folder)', mode: 'folder' }; }
+function forgetBook() {
+  if (BOOK.url && BOOK.mode === 'stored') URL.revokeObjectURL(BOOK.url);
+  BOOK = { url: null, name: null, mode: null }; S.bookMode = null; save();
+  return idb(function (st) { return st.delete('textbook'); }).catch(function () {});
+}
+function bookPages(l) { // printed page ranges named in a lesson's "book" line
+  var out = [], re = /pages?\s+(\d+)(?:\s*(?:to|-|–)\s*(\d+))?/gi, m;
+  while ((m = re.exec(l.book || ''))) out.push({ from: +m[1], to: m[2] ? +m[2] : +m[1] });
+  var more = /(?:,|and)\s+(\d+)(?:\s*(?:to|-|–)\s*(\d+))?/gi; more.lastIndex = 0;
+  if (out.length) { var tail = (l.book || '').slice((l.book || '').search(/pages?\s+\d/i)); while ((m = more.exec(tail))) { var f = +m[1]; if (!out.some(function (r) { return r.from === f; })) out.push({ from: f, to: m[2] ? +m[2] : f }); } }
+  return out;
+}
+function bookHref(printed) { return BOOK.url + '#page=' + (printed + (+S.bookOffset || 0)); }
+function bookSetupHtml() {
+  var h = '<p class="small muted">Show your own copy of the textbook beside the lessons. The file stays on this device: it is not uploaded and is not part of this site.</p>';
+  h += '<div class="row"><input class="pick" type="file" id="bookfile" accept="application/pdf,.pdf"></div>';
+  if (IS_DISK) h += '<div class="row"><button class="btn" id="bookfolder">Use textbook.pdf from this folder</button><span class="small muted">Put the PDF next to this page and name it textbook.pdf.</span></div>';
+  return h;
+}
+function wireBookSetup(after) {
+  var f = document.getElementById('bookfile');
+  if (f) f.onchange = function () { if (f.files && f.files[0]) storeBook(f.files[0]).then(after, after); };
+  var fb = document.getElementById('bookfolder'); if (fb) fb.onclick = function () { useFolderBook(); after(); };
+}
 
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 function rich(s) { // plain text with `inline code`
@@ -290,13 +356,44 @@ function unitView() {
 function lessonView() {
   var u = unitById(route.unit), l = LESSON_OF[route.lesson];
   var qs = u.questions.filter(function (q) { return q.lesson === l.id; });
-  var i = u.lessons.indexOf(l);
-  var h = '<div class="muted small">' + esc(u.title) + ' · lesson ' + (i + 1) + ' of ' + u.lessons.length + '</div><h2>' + esc(l.title) + '</h2><div class="muted small">In the book: ' + esc(l.book) + '</div>';
-  h += '<div class="card lesson">' + l.html + '</div>';
-  h += '<div class="row"><button class="btn primary" id="prac">Practice this lesson (' + qs.length + ' questions)</button><button class="btn" id="back">Back to unit</button></div>';
+  var i = u.lessons.indexOf(l), pages = bookPages(l), open = !!(route.book && BOOK.url && pages.length);
+  var page = route.page || (pages[0] && pages[0].from);
+  var head = '<div class="muted small">' + esc(u.title) + ' · lesson ' + (i + 1) + ' of ' + u.lessons.length + '</div><h2>' + esc(l.title) + '</h2><div class="muted small">In the book: ' + esc(l.book) + '</div>';
+  var bar = '<div class="bookbar">';
+  if (pages.length && BOOK.url) {
+    bar += '<button class="btn" id="tbook">' + (open ? 'Hide the book' : 'Show the book beside this lesson') + '</button>';
+    pages.forEach(function (r, k) { bar += '<a class="btn" target="_blank" rel="noopener" href="' + esc(bookHref(r.from)) + '">Open p. ' + r.from + (r.to !== r.from ? '–' + r.to : '') + ' in a new tab</a>'; });
+  } else if (pages.length) {
+    bar += '<button class="btn" id="addbook">Add your textbook to read it beside the lessons</button>';
+  }
+  bar += '</div>';
+  var body = '<div class="card lesson">' + l.html + '</div><div class="row"><button class="btn primary" id="prac">Practice this lesson (' + qs.length + ' questions)</button><button class="btn" id="back">Back to unit</button></div>';
+  var h;
+  if (open) {
+    var jump = '<div class="bookbar"><span class="small muted">Book page</span><button class="btn" id="pprev">◀</button><strong id="pnow">' + page + '</strong><button class="btn" id="pnext">▶</button>';
+    pages.forEach(function (r) { jump += '<button class="btn" data-pg="' + r.from + '">p. ' + r.from + '</button>'; });
+    jump += '<span class="small muted">Wrong page?</span><button class="btn" id="offm">shift −1</button><button class="btn" id="offp">shift +1</button></div>';
+    h = head + bar + '<div class="split"><div class="stackcol" style="display:flex;flex-direction:column;gap:20px;min-width:0">' + body + '</div><div class="pane">' + jump + '<iframe id="bookframe" title="Your textbook" src="' + esc(bookHref(page)) + '"></iframe></div></div>';
+  } else {
+    h = head + bar + '<div id="booksetup"></div>' + body;
+  }
+  view.className = 'col' + (open ? ' wide' : '');
   view.innerHTML = h;
   document.getElementById('prac').onclick = function () { S.read[l.id] = true; save(); startQuiz('lesson', qs, l.title, { unit: u.id, lesson: l.id }); };
   document.getElementById('back').onclick = function () { go({ name: 'unit', unit: u.id }); };
+  function reopen(p) { route = { name: 'lesson', unit: u.id, lesson: l.id, book: true, page: p }; render(); }
+  var tb = document.getElementById('tbook'); if (tb) tb.onclick = function () { route = { name: 'lesson', unit: u.id, lesson: l.id, book: !open }; render(); };
+  var ab = document.getElementById('addbook'); if (ab) ab.onclick = function () {
+    var box = document.getElementById('booksetup'); box.innerHTML = '<div class="card">' + bookSetupHtml() + '</div>';
+    wireBookSetup(function () { route = { name: 'lesson', unit: u.id, lesson: l.id, book: true }; render(); });
+  };
+  if (open) {
+    document.getElementById('pprev').onclick = function () { reopen(Math.max(1, page - 1)); };
+    document.getElementById('pnext').onclick = function () { reopen(page + 1); };
+    Array.prototype.forEach.call(view.querySelectorAll('[data-pg]'), function (b) { b.onclick = function () { reopen(+b.getAttribute('data-pg')); }; });
+    document.getElementById('offm').onclick = function () { S.bookOffset = (+S.bookOffset || 0) - 1; save(); reopen(page); };
+    document.getElementById('offp').onclick = function () { S.bookOffset = (+S.bookOffset || 0) + 1; save(); reopen(page); };
+  }
 }
 
 // ---------- quiz engine ----------
@@ -333,7 +430,10 @@ function renderAnswerUI(q, onDone, opts) {
     var h = '<div class="verdict ' + (ok ? 'right' : 'wrong') + '"><strong>' + (ok ? 'Correct.' : 'Not quite.') + '</strong>';
     if (!ok && (q.type === 'output' || q.type === 'fill')) h += '<div class="why">Expected:</div><pre><code>' + esc(q.answer) + '</code></pre>';
     else if (!ok) h += '<div class="why">Answer: ' + rich(answerText(q)) + '</div>';
-    h += '<div class="why">' + rich(q.explain) + '</div></div><div class="row" style="margin-top:12px"><button class="btn primary" id="next">Next (Enter)</button></div>';
+    h += '<div class="why">' + rich(q.explain) + '</div></div>';
+    var ql = LESSON_OF[q.lesson], qp = ql ? bookPages(ql) : [];
+    if (ql) h += '<div class="small muted" style="margin-top:8px">Covered in the lesson "' + esc(ql.title) + '"' + (ql.book ? ' · ' + esc(ql.book) : '') + (BOOK.url && qp.length ? ' · <a target="_blank" rel="noopener" href="' + esc(bookHref(qp[0].from)) + '">open the book there</a>' : '') + '</div>';
+    h += '<div class="row" style="margin-top:12px"><button class="btn primary" id="next">Next (Enter)</button></div>';
     fb.innerHTML = h;
     var nb = document.getElementById('next'); nb.onclick = function () { nextQuestion(); }; nb.focus();
   }
@@ -506,8 +606,11 @@ function helpView() {
   h += '<h4>What counts</h4><ul><li>A question counts toward a unit\'s percentage when your most recent answer to it was correct.</li><li>Output questions want exactly what the program prints. Trailing spaces and a final blank line are ignored; everything else counts.</li><li>Fill-in answers ignore capital letters and spacing.</li></ul>';
   h += '<h4>What this cannot promise</h4><p>Sinclair does not publish the exam, its length or its format. This bank is built from the syllabus and the textbook, so it should cover what can be asked, but it is not the exam itself. Ask the Prior Learning office (937-512-3000) whether the test is written, a coding project, or both, and whether a compiler is allowed.</p>';
   h += '<h4>Keys</h4><p><code>1</code> to <code>4</code> pick a choice, <code>T</code> and <code>F</code> answer true/false, <code>Enter</code> checks a fill-in or moves to the next question, <code>Ctrl+Enter</code> checks an output answer.</p></div>';
+  h += '<div class="card"><h3>Your own textbook</h3>' + (BOOK.url ? '<p>Using <strong>' + esc(BOOK.name) + '</strong>. Open any lesson and choose "Show the book beside this lesson".</p><p class="small muted">The file stays on this device. It is not uploaded and is not part of this site. Printed page numbers are matched to the PDF by adding ' + (+S.bookOffset || 0) + '; adjust that from a lesson if the book opens on the wrong page.</p><div class="row"><button class="btn" id="bookforget">Remove the textbook from this browser</button></div>' : bookSetupHtml()) + '</div>';
   h += '<div class="card"><h3>Your progress</h3><p class="muted small">Progress is saved in this browser on this computer. It does not sync anywhere.</p><div class="row"><button class="btn" id="reset">Erase all progress</button><span id="rc"></span></div></div>';
   view.innerHTML = h;
+  wireBookSetup(function () { render(); });
+  var bf = document.getElementById('bookforget'); if (bf) bf.onclick = function () { forgetBook().then(function () { render(); }); };
   document.getElementById('reset').onclick = function () {
     var rc = document.getElementById('rc');
     rc.innerHTML = '<button class="btn" id="ry">Yes, erase everything</button> <button class="btn" id="rn">Cancel</button>';
@@ -518,6 +621,7 @@ function helpView() {
 
 function render() {
   renderNav();
+  if (route.name !== 'lesson') view.className = 'col';
   if (route.name === 'home') home();
   else if (route.name === 'unit') unitView();
   else if (route.name === 'lesson') lessonView();
@@ -538,6 +642,7 @@ document.addEventListener('keydown', function (e) {
   else { var n = parseInt(e.key, 10); if (n >= 1 && n <= box._n) box._pick(n - 1); }
 });
 render();
+loadBook().then(function () { render(); });
 window.__course = { units: UNITS.length, questions: ALLQ.length };
 })();
 </script>

@@ -40,6 +40,15 @@ Each lesson names the sections of the course textbook it covers (Tony Gaddis, *S
 
 Progress is stored in the browser's local storage on the computer you use. It does not sync.
 
+## Reading your own textbook beside the lessons
+
+The textbook is not included here and never will be. If you own a PDF of it, the course can show it next to each lesson, opened at the pages that lesson covers:
+
+- Open any lesson and choose **Add your textbook**, then pick your PDF. The file is kept in your browser's storage on that device. It is not uploaded anywhere.
+- Or, if you run the course from a downloaded copy, put the PDF in the same folder as `index.html`, name it `textbook.pdf`, and choose **Use textbook.pdf from this folder**. PDF files are ignored by git in this repository.
+
+Printed page numbers are matched to PDF pages by adding an offset (33 for the 10th edition). If the book opens on the wrong page, use the shift buttons in the book pane.
+
 ## How the answers were checked
 
 - Every question that shows code and asks what it prints, and every program solution, is compiled and run by `tools/verify_unit.py` with `g++ -std=c++17 -Wall`. The stored answer must match the real output.
