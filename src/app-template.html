@@ -19,7 +19,7 @@
   --warn: #eeb768; --warn-soft: #33270f; --code-bg: #232b37; color-scheme: dark; } }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
-body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.55; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.55; font-variant-ligatures: no-common-ligatures; }
 .app { display: grid; grid-template-columns: 270px minmax(0, 1fr); min-height: 100%; }
 nav { background: var(--surface); border-right: 1px solid var(--line); padding: 18px 14px; display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
 nav h1 { font-size: 1.05rem; margin: 0 6px 10px; line-height: 1.25; }
@@ -48,7 +48,8 @@ p { margin: 0 0 10px; }
 .bar { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
 .bar > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
 .bar.good > i { background: var(--good); }
-code, pre, textarea.code { font-family: var(--mono); font-size: 0.88rem; }
+code, pre, textarea.code, input.fill, .choice .k { font-family: var(--mono); font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0, "clig" 0, "dlig" 0; }
+code, pre, textarea.code { font-size: 0.88rem; }
 code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
 pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; margin: 0 0 10px; line-height: 1.5; white-space: pre; }
 pre code { background: none; padding: 0; }
@@ -364,7 +365,8 @@ function lessonView() {
     bar += '<button class="btn" id="tbook">' + (open ? 'Hide the book' : 'Show the book beside this lesson') + '</button>';
     pages.forEach(function (r, k) { bar += '<a class="btn" target="_blank" rel="noopener" href="' + esc(bookHref(r.from)) + '">Open p. ' + r.from + (r.to !== r.from ? '–' + r.to : '') + ' in a new tab</a>'; });
   } else if (pages.length) {
-    bar += '<button class="btn" id="addbook">Add your textbook to read it beside the lessons</button>';
+    if (IS_DISK) bar += '<button class="btn" id="quickfolder">Show textbook.pdf from this folder beside the lesson</button>';
+    bar += '<button class="btn" id="addbook">' + (IS_DISK ? 'Pick a different PDF' : 'Add your textbook to read it beside the lessons') + '</button>';
   }
   bar += '</div>';
   var body = '<div class="card lesson">' + l.html + '</div><div class="row"><button class="btn primary" id="prac">Practice this lesson (' + qs.length + ' questions)</button><button class="btn" id="back">Back to unit</button></div>';
@@ -383,6 +385,7 @@ function lessonView() {
   document.getElementById('back').onclick = function () { go({ name: 'unit', unit: u.id }); };
   function reopen(p) { route = { name: 'lesson', unit: u.id, lesson: l.id, book: true, page: p }; render(); }
   var tb = document.getElementById('tbook'); if (tb) tb.onclick = function () { route = { name: 'lesson', unit: u.id, lesson: l.id, book: !open }; render(); };
+  var qf = document.getElementById('quickfolder'); if (qf) qf.onclick = function () { useFolderBook(); route = { name: 'lesson', unit: u.id, lesson: l.id, book: true }; render(); };
   var ab = document.getElementById('addbook'); if (ab) ab.onclick = function () {
     var box = document.getElementById('booksetup'); box.innerHTML = '<div class="card">' + bookSetupHtml() + '</div>';
     wireBookSetup(function () { route = { name: 'lesson', unit: u.id, lesson: l.id, book: true }; render(); });
