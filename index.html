@@ -107,6 +107,17 @@ nav #menuToggle { display: none; }
   nav.open button[data-r] { display: flex; }
   nav #menuToggle { display: flex; border: 1px solid var(--line); padding: 6px 12px; }
 }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 12px; }
+.stats .big { font-size: 1.6rem; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+@media print {
+  :root { --bg: #fff; --surface: #fff; --surface-2: #eef2f7; --fg: #000; --muted: #444; --line: #bbb; color-scheme: light; }
+  nav, .noprint { display: none !important; }
+  .app { display: block; }
+  main { padding: 0; }
+  .col { max-width: none; }
+  .card { break-inside: avoid; border-color: #bbb; }
+}
 </style>
 </head>
 <body>
@@ -132,7 +143,10 @@ var KEY = 'csc1111-course-v1';
 var S = { q: {}, read: {}, prog: {}, exams: [] };
 try { var raw = localStorage.getItem(KEY); if (raw) { var p = JSON.parse(raw); if (p && p.q) S = p; } } catch (e) {}
 S.q = S.q || {}; S.read = S.read || {}; S.prog = S.prog || {}; S.exams = S.exams || [];
+if (!S.log) { S.log = []; S.logSince = Date.now(); }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+// activity log: one entry per answer (k 'q'), lesson read ('l'), program ticked ('p') and mock exam ('x')
+function logEv(ev) { ev.t = Date.now(); S.log.push(ev); }
 
 // ---------- your own textbook (never part of this site; stays on this device) ----------
 // Two ways to supply it: a PDF picked once and kept in this browser's storage, or a file named
@@ -202,7 +216,8 @@ function st(q) { return S.q[q.id] || { seen: 0, right: 0, streak: 0, last: null 
 function mastered(q) { var s = st(q); return s.last === 'right'; }
 function solid(q) { return st(q).streak >= 2; }
 function missed(q) { var s = st(q); return s.seen > 0 && s.last === 'wrong'; }
-function record(q, ok) {
+function record(q, ok, mode) {
+  logEv({ k: 'q', id: q.id, ok: ok ? 1 : 0, m: mode || 'practice' });
   var s = S.q[q.id] || { seen: 0, right: 0, streak: 0, last: null };
   s.seen++; if (ok) { s.right++; s.streak++; s.last = 'right'; } else { s.streak = 0; s.last = 'wrong'; }
   s.at = Date.now(); S.q[q.id] = s; save();
@@ -253,6 +268,7 @@ function renderNav() {
   h += '<button data-r="review" class="' + (route.name === 'quiz' && route.kind === 'review' ? 'on' : '') + '"><span>Review my misses</span><span class="pct">' + o.missed + '</span></button>';
   h += '<button data-r="exam" class="' + (route.name === 'examsetup' || route.name === 'exam' ? 'on' : '') + '"><span>Mock exam</span><span class="pct">' + S.exams.length + ' taken</span></button>';
   h += '<button data-r="programs" class="' + (route.name === 'programs' ? 'on' : '') + '"><span>Programs to write</span><span class="pct"></span></button>';
+  h += '<button data-r="report" class="' + (route.name === 'report' ? 'on' : '') + '"><span>Progress report</span><span class="pct"></span></button>';
   h += '<button data-r="help" class="' + (route.name === 'help' ? 'on' : '') + '"><span>How this works</span><span class="pct"></span></button>';
   nav.innerHTML = h;
   nav.className = navOpen ? 'open' : '';
@@ -266,6 +282,7 @@ function renderNav() {
       else if (r === 'review') startQuiz('review', ALLQ.filter(missed), 'Review my misses');
       else if (r === 'exam') go({ name: 'examsetup' });
       else if (r === 'programs') go({ name: 'programs' });
+      else if (r === 'report') go({ name: 'report' });
       else if (r === 'help') go({ name: 'help' });
     });
   });
@@ -381,7 +398,7 @@ function lessonView() {
   }
   view.className = 'col' + (open ? ' wide' : '');
   view.innerHTML = h;
-  document.getElementById('prac').onclick = function () { S.read[l.id] = true; save(); startQuiz('lesson', qs, l.title, { unit: u.id, lesson: l.id }); };
+  document.getElementById('prac').onclick = function () { if (!S.read[l.id]) logEv({ k: 'l', id: l.id }); S.read[l.id] = true; save(); startQuiz('lesson', qs, l.title, { unit: u.id, lesson: l.id }); };
   document.getElementById('back').onclick = function () { go({ name: 'unit', unit: u.id }); };
   function reopen(p) { route = { name: 'lesson', unit: u.id, lesson: l.id, book: true, page: p }; render(); }
   var tb = document.getElementById('tbook'); if (tb) tb.onclick = function () { route = { name: 'lesson', unit: u.id, lesson: l.id, book: !open }; render(); };
@@ -559,12 +576,13 @@ function examFinish() {
   var right = 0, by = {}, rows = [];
   X.qs.forEach(function (id) {
     var q = QBY[id], a = X.ans[id], ok = !!(a && a.ok), u = UNIT_OF[id];
-    record(q, ok); if (ok) right++;
+    record(q, ok, 'exam'); if (ok) right++;
     by[u.id] = by[u.id] || { r: 0, n: 0, t: u.title }; by[u.id].n++; if (ok) by[u.id].r++;
     if (!ok) rows.push({ q: q, a: a });
   });
   var pct = Math.round(100 * right / X.qs.length);
-  S.exams.push({ at: Date.now(), pct: pct, right: right, total: X.qs.length }); save();
+  S.exams.push({ at: Date.now(), pct: pct, right: right, total: X.qs.length });
+  logEv({ k: 'x', pct: pct, right: right, total: X.qs.length }); save();
   var h = '<h2>Mock exam result</h2><div class="card"><div class="row" style="justify-content:space-between"><div><div class="big">' + pct + '%</div><div class="muted">' + right + ' of ' + X.qs.length + ' · grade ' + letter(pct) + '</div></div><span class="tag ' + (pct >= 93 ? 'good' : pct >= 90 ? 'warn' : 'bad') + '">' + (pct >= 93 ? 'At the bar' : pct >= 90 ? 'An A, but no margin' : 'Below an A') + '</span></div></div>';
   h += '<div class="card"><h3>By unit</h3><table><thead><tr><th>Unit</th><th>Right</th><th></th></tr></thead><tbody>';
   UNITS.forEach(function (u) { var b = by[u.id]; if (b) h += '<tr><td>' + esc(b.t) + '</td><td>' + b.r + ' of ' + b.n + '</td><td>' + (b.r === b.n ? '<span class="tag good">clean</span>' : '<span class="tag bad">review</span>') + '</td></tr>'; });
@@ -598,8 +616,81 @@ function programsView() {
   });
   if (route.unit) h += '<div><button class="btn" id="allp">Show every unit</button></div>';
   view.innerHTML = h;
-  Array.prototype.forEach.call(view.querySelectorAll('[data-p]'), function (c) { c.onchange = function () { S.prog[c.getAttribute('data-p')] = c.checked; save(); renderNav(); }; });
+  Array.prototype.forEach.call(view.querySelectorAll('[data-p]'), function (c) { c.onchange = function () { S.prog[c.getAttribute('data-p')] = c.checked; logEv({ k: 'p', id: c.getAttribute('data-p'), on: c.checked ? 1 : 0 }); save(); renderNav(); }; });
   var ap = document.getElementById('allp'); if (ap) ap.onclick = function () { go({ name: 'programs' }); };
+}
+
+// ---------- progress report ----------
+function pad2(n) { return ('0' + n).slice(-2); }
+function dayKey(t) { var d = new Date(t); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function byDay() {
+  var days = {};
+  S.log.forEach(function (e) {
+    var k = dayKey(e.t), d = days[k] = days[k] || { day: k, answered: 0, right: 0, lessons: 0, programs: 0, exams: 0 };
+    if (e.k === 'q') { d.answered++; if (e.ok) d.right++; }
+    else if (e.k === 'l') d.lessons++;
+    else if (e.k === 'p' && e.on) d.programs++;
+    else if (e.k === 'x') d.exams++;
+  });
+  return Object.keys(days).sort().map(function (k) { return days[k]; });
+}
+function reportData() {
+  var o = overall(), r = readiness(), lessons = 0, read = 0;
+  UNITS.forEach(function (u) { u.lessons.forEach(function (l) { lessons++; if (S.read[l.id]) read++; }); });
+  var attempted = ALLQ.filter(function (q) { return st(q).seen > 0; }).length;
+  var best = S.exams.reduce(function (m, e) { return Math.max(m, e.pct); }, 0);
+  var beforeLog = ALLQ.filter(function (q) { var s = S.q[q.id]; return s && s.at && s.at < S.logSince; }).length;
+  return {
+    generated: new Date().toISOString(), name: S.name || '', logSince: new Date(S.logSince).toISOString(),
+    summary: { questionsCorrect: o.mastered, questions: o.n, attempted: attempted, lessonsRead: read, lessons: lessons,
+      programsWritten: r.progs, programs: r.progN, mockExams: S.exams.length, bestMockExam: S.exams.length ? best : null, answeredBeforeLog: beforeLog },
+    units: UNITS.map(function (u, i) { var s = unitStats(u), pw = u.programs.filter(function (p) { return S.prog[p.id]; }).length;
+      return { unit: (i + 1) + '. ' + u.title, correct: s.mastered, questions: s.n, pct: s.pct, lessonsRead: s.read, lessons: s.lessons, programsWritten: pw, programs: u.programs.length }; }),
+    days: byDay(),
+    exams: S.exams.map(function (e) { return { at: new Date(e.at).toISOString(), pct: e.pct, right: e.right, total: e.total }; })
+  };
+}
+function download(name, text) {
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+function reportView() {
+  var d = reportData(), s = d.summary;
+  var h = '<div class="row noprint" style="justify-content:space-between"><h2>Progress report</h2><div class="row"><button class="btn primary" id="rprint">Print or save as PDF</button><button class="btn" id="rdl">Download progress file</button></div></div>';
+  h += '<div class="card noprint"><label class="small">Name on the report <input id="rname" value="' + esc(d.name) + '" style="font:inherit;padding:4px 8px;margin-left:6px"></label><p class="muted small" style="margin:0">The progress file holds this report plus everything the course has saved, including the full activity log. Save it somewhere you keep your coursework to keep a dated record.</p></div>';
+  h += '<div><h2>CSC 1111 progress report' + (d.name ? ': ' + esc(d.name) : '') + '</h2><div class="muted small">Generated ' + esc(new Date(d.generated).toLocaleString()) + ' · activity logged since ' + esc(new Date(S.logSince).toLocaleDateString()) + '</div></div>';
+  h += '<div class="card"><div class="stats">';
+  h += '<div><div class="big">' + s.questionsCorrect + ' / ' + s.questions + '</div><div class="muted small">questions right on latest try</div></div>';
+  h += '<div><div class="big">' + s.attempted + '</div><div class="muted small">questions attempted</div></div>';
+  h += '<div><div class="big">' + s.lessonsRead + ' / ' + s.lessons + '</div><div class="muted small">lessons read</div></div>';
+  h += '<div><div class="big">' + s.programsWritten + ' / ' + s.programs + '</div><div class="muted small">programs written</div></div>';
+  h += '<div><div class="big">' + s.mockExams + '</div><div class="muted small">mock exams' + (s.mockExams ? ', best ' + s.bestMockExam + '%' : '') + '</div></div>';
+  h += '</div></div>';
+  h += '<div class="card"><h3>By unit</h3><table><thead><tr><th>Unit</th><th class="num">Questions right</th><th class="num">Lessons read</th><th class="num">Programs</th></tr></thead><tbody>';
+  d.units.forEach(function (u) { h += '<tr><td>' + esc(u.unit) + '</td><td class="num">' + u.correct + ' of ' + u.questions + ' (' + u.pct + '%)</td><td class="num">' + u.lessonsRead + ' of ' + u.lessons + '</td><td class="num">' + u.programsWritten + ' of ' + u.programs + '</td></tr>'; });
+  h += '</tbody></table></div>';
+  h += '<div class="card"><h3>Study activity by day</h3>';
+  if (d.days.length) {
+    h += '<table><thead><tr><th>Date</th><th class="num">Answered</th><th class="num">Right</th><th class="num">Lessons</th><th class="num">Programs</th><th class="num">Mock exams</th></tr></thead><tbody>';
+    d.days.slice().reverse().forEach(function (x) { h += '<tr><td>' + x.day + '</td><td class="num">' + x.answered + '</td><td class="num">' + x.right + (x.answered ? ' (' + Math.round(100 * x.right / x.answered) + '%)' : '') + '</td><td class="num">' + x.lessons + '</td><td class="num">' + x.programs + '</td><td class="num">' + x.exams + '</td></tr>'; });
+    h += '</tbody></table>';
+  } else h += '<p class="muted">Nothing logged yet. Every answer from now on is recorded here with its date.</p>';
+  if (s.answeredBeforeLog) h += '<p class="muted small">' + s.answeredBeforeLog + (s.answeredBeforeLog === 1 ? ' question was' : ' questions were') + ' last answered before the activity log started, so only their latest result is counted above, not each attempt.</p>';
+  h += '</div>';
+  if (d.exams.length) {
+    h += '<div class="card"><h3>Mock exams</h3><table><thead><tr><th>When</th><th class="num">Score</th><th class="num">Right</th></tr></thead><tbody>';
+    S.exams.slice().reverse().forEach(function (e) { h += '<tr><td>' + esc(new Date(e.at).toLocaleString()) + '</td><td class="num">' + e.pct + '% (' + letter(e.pct) + ')</td><td class="num">' + e.right + ' of ' + e.total + '</td></tr>'; });
+    h += '</tbody></table></div>';
+  }
+  view.innerHTML = h;
+  document.getElementById('rprint').onclick = function () { window.print(); };
+  document.getElementById('rdl').onclick = function () {
+    var out = reportData(); out.progress = S;
+    download('csc1111-progress-' + dayKey(Date.now()) + '.json', JSON.stringify(out, null, 1));
+  };
+  document.getElementById('rname').onchange = function (e) { S.name = e.target.value.trim(); save(); reportView(); };
 }
 
 function helpView() {
@@ -617,7 +708,7 @@ function helpView() {
   document.getElementById('reset').onclick = function () {
     var rc = document.getElementById('rc');
     rc.innerHTML = '<button class="btn" id="ry">Yes, erase everything</button> <button class="btn" id="rn">Cancel</button>';
-    document.getElementById('ry').onclick = function () { S = { q: {}, read: {}, prog: {}, exams: [] }; save(); go({ name: 'home' }); };
+    document.getElementById('ry').onclick = function () { S = { q: {}, read: {}, prog: {}, exams: [], log: [], logSince: Date.now() }; save(); go({ name: 'home' }); };
     document.getElementById('rn').onclick = function () { rc.innerHTML = ''; };
   };
 }
@@ -632,6 +723,7 @@ function render() {
   else if (route.name === 'examsetup') examSetup();
   else if (route.name === 'exam') examView();
   else if (route.name === 'programs') programsView();
+  else if (route.name === 'report') reportView();
   else if (route.name === 'help') helpView();
 }
 document.addEventListener('keydown', function (e) {
