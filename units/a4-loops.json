@@ -9,43 +9,43 @@
      "id": "u5-l1",
      "title": "Increment and decrement operators",
      "book": "Section 5.1, pages 237 to 241",
-     "html": "\n<p>The <strong>increment operator</strong> <code>++</code> adds 1 to its operand and the <strong>decrement operator</strong> <code>--</code> subtracts 1. The operand must be a modifiable variable (an lvalue).</p>\n<p>Each has two forms. In <strong>prefix mode</strong> (<code>++x</code>) the variable changes first and the expression's value is the new value. In <strong>postfix mode</strong> (<code>x++</code>) the expression's value is the old value, and the variable changes afterward.</p>\n<pre><code>int x = 5;\nint a = x++;   // a is 5, x is 6\nint b = ++x;   // x is 7, b is 7\nint c = x--;   // c is 7, x is 6\nint d = --x;   // x is 5, d is 5</code></pre>\n<p>Used as a stand-alone statement, <code>x++;</code> and <code>++x;</code> do exactly the same thing. The difference only shows when the value of the expression is used, such as in an assignment, a test or an output statement.</p>\n<h4>Precedence and traps</h4>\n<ul>\n<li>Postfix and prefix ++ and -- have higher precedence than arithmetic: <code>n-- - 3</code> uses the old n in the subtraction.</li>\n<li>Modifying one variable more than once in a single expression, such as <code>i++ + ++i</code> or <code>n * n++</code>, is undefined behavior: there is no reliable result. Keep to one modification per statement.</li>\n<li>In a relational test, postfix compares the old value: <code>while (t++ &lt; 3)</code> tests 0, 1, 2, 3 and leaves t at 4. Prefix compares the new value.</li>\n<li>The operand must be a variable: <code>++(a + b)</code> and <code>5++</code> do not compile.</li>\n<li>++ and -- are also used in loop counters and the update part of a for loop, where only the side effect matters.</li>\n</ul>\n<table><thead><tr><th>Form</th><th>Value of the expression</th><th>Final x</th></tr></thead>\n<tbody><tr><td><code>y = x++</code> (x is 5)</td><td>5</td><td>6</td></tr><tr><td><code>y = ++x</code> (x is 5)</td><td>6</td><td>6</td></tr></tbody></table>\n<p>Compound assignments like <code>x += 2</code> are the usual way to step by amounts other than 1.</p>"
+     "html": "<h4>The idea: adding or taking away exactly 1</h4>\n<p>Programs change a variable by exactly 1 all the time: counting how many numbers were read, moving on to the next item, taking a life away in a game. You can already write that as <code>count = count + 1;</code> or <code>count += 1;</code>. C++ has an even shorter way:</p>\n<pre><code>count++;   // add 1 to count\ncount--;   // subtract 1 from count</code></pre>\n<p><code>++</code> is the <strong>increment operator</strong>. To increment means to increase by one. <code>--</code> is the <strong>decrement operator</strong>: to decrement means to decrease by one. The variable an operator works on is called its <strong>operand</strong>. In <code>count++</code> the operand is <code>count</code>.</p>\n<p>If you know Python: Python has no <code>++</code> or <code>--</code> operator, so you write <code>count += 1</code>. In C++ both forms work, and <code>count++</code> is the one you will see most, especially in loops.</p>\n<h4>Two ways to write it: prefix and postfix</h4>\n<p>The operator can go after the variable or before it.</p>\n<ul>\n<li><strong>Postfix mode</strong>: the operator comes after the variable, as in <code>x++</code> or <code>x--</code>. \"Post\" means after.</li>\n<li><strong>Prefix mode</strong>: the operator comes before the variable, as in <code>++x</code> or <code>--x</code>. \"Pre\" means before.</li>\n</ul>\n<p>Written as a statement on its own line, the two modes do exactly the same thing. Both of these lines add 1 to <code>count</code>:</p>\n<pre><code>int count = 0;\ncount++;          // count is 1\n++count;          // count is 2</code></pre>\n<p>So why have two? Because <code>x++</code> is also an <strong>expression</strong>: a piece of code that produces a value, the way <code>x + 1</code> produces a value. A statement can use that value: store it in another variable, print it, or compare it. That is the only place where prefix and postfix differ.</p>\n<h4>The value it hands back: old or new</h4>\n<p><code>x++</code> does two jobs at once. It changes <code>x</code>, and it hands back a value for the rest of the statement to use. A change to a variable made while an expression is worked out is called a <strong>side effect</strong>. Both modes have the same side effect. They differ only in which value they hand back:</p>\n<table><thead><tr><th>Written</th><th>What happens to x</th><th>Value handed back</th></tr></thead><tbody>\n<tr><td><code>++x</code></td><td>goes up by 1</td><td>the <strong>new</strong> value</td></tr>\n<tr><td><code>x++</code></td><td>goes up by 1</td><td>the <strong>old</strong> value, what x held before</td></tr>\n<tr><td><code>--x</code></td><td>goes down by 1</td><td>the <strong>new</strong> value</td></tr>\n<tr><td><code>x--</code></td><td>goes down by 1</td><td>the <strong>old</strong> value</td></tr>\n</tbody></table>\n<p>A way to remember it: read left to right. In <code>++x</code> the <code>++</code> comes first, so the change comes first and you get the new value. In <code>x++</code> the variable comes first, so you get x as it is now, and the change follows.</p>\n<p>Trace this one line at a time. Each line starts from the values the line before it left.</p>\n<pre><code>int x = 5;\nint a = x++;   // a gets old x, 5.     then x is 6\nint b = ++x;   // x becomes 7 first.   b is 7\nint c = x--;   // c gets old x, 7.     then x is 6\nint d = --x;   // x becomes 5 first.   d is 5</code></pre>\n<p>Notice that <strong>x changes on every line</strong>, whichever mode is used. The mode only decides what <code>a</code>, <code>b</code>, <code>c</code> and <code>d</code> receive.</p>\n<p>The same thing happens when the expression is printed:</p>\n<pre><code>int s = 7;\ncout &lt;&lt; s++ &lt;&lt; endl;   // prints 7, then s is 8\ncout &lt;&lt; s &lt;&lt; endl;     // prints 8\nint t = 7;\ncout &lt;&lt; ++t &lt;&lt; endl;   // t becomes 8, prints 8</code></pre>\n<h4>Inside a bigger expression</h4>\n<p>When <code>x++</code> sits inside arithmetic, the arithmetic uses the value that <code>x++</code> hands back. <strong>Precedence</strong> is the rule for which operator is applied first. <code>++</code> and <code>--</code> have higher precedence than <code>*</code>, <code>/</code>, <code>+</code> and <code>-</code>: they attach to their variable before any arithmetic is done. So <code>p++ * 10</code> means <code>(p++) * 10</code>.</p>\n<pre><code>int p = 3;\nint q = p++ * 10;\nint r = ++p * 10;\ncout &lt;&lt; p &lt;&lt; \" \" &lt;&lt; q &lt;&lt; \" \" &lt;&lt; r;</code></pre>\n<table><thead><tr><th>Statement</th><th>What happens</th><th>p</th><th>q</th><th>r</th></tr></thead><tbody>\n<tr><td><code>int p = 3;</code></td><td>p starts at 3</td><td>3</td><td>?</td><td>?</td></tr>\n<tr><td><code>int q = p++ * 10;</code></td><td><code>p++</code> hands back 3, so q is 3 * 10 = 30. Then p goes up.</td><td>4</td><td>30</td><td>?</td></tr>\n<tr><td><code>int r = ++p * 10;</code></td><td>p goes up to 5 first, so r is 5 * 10 = 50.</td><td>5</td><td>30</td><td>50</td></tr>\n</tbody></table>\n<p>The output is <code>5 30 50</code>. The second line starts from p = 4, not 3, because the first line already changed it.</p>\n<p>The decrement works the same way. Write a space between <code>n--</code> and a minus sign so the two do not run together:</p>\n<pre><code>int n = 8;\nint m = n-- - 2;          // means (n--) - 2\ncout &lt;&lt; n &lt;&lt; \" \" &lt;&lt; m;   // prints 7 6</code></pre>\n<p><code>n--</code> hands back the old value 8, so m is 8 - 2 = 6. Then n drops to 7. Getting m = 5 means the 1 was taken away before the subtraction. That is what the prefix form <code>--n - 2</code> would do.</p>\n<h4>Inside a loop condition</h4>\n<p>The next lesson covers the <strong>while loop</strong> in full. For now you need only this much. <code>while (condition) statement;</code> checks the condition. If it is true, the statement runs once and the condition is checked again. As soon as the condition is false, the loop ends and the program goes on to the next statement.</p>\n<p>When the condition contains <code>k++</code>, the comparison uses the old value, and k still goes up by 1 <strong>every time the test runs, including the last test, the one that comes out false</strong>.</p>\n<pre><code>int k = 0;\nwhile (k++ &lt; 2)\n    cout &lt;&lt; k &lt;&lt; \" \";\ncout &lt;&lt; k;</code></pre>\n<table><thead><tr><th>Test</th><th>Compares old k</th><th>Result</th><th>k after the test</th><th>Then</th></tr></thead><tbody>\n<tr><td>1st</td><td>0 &lt; 2</td><td>true</td><td>1</td><td>prints 1</td></tr>\n<tr><td>2nd</td><td>1 &lt; 2</td><td>true</td><td>2</td><td>prints 2</td></tr>\n<tr><td>3rd</td><td>2 &lt; 2</td><td>false</td><td>3</td><td>loop ends</td></tr>\n</tbody></table>\n<p>After the loop, <code>cout &lt;&lt; k;</code> prints 3, so the output is <code>1 2 3</code>. Two things catch people. The body prints the new k, one more than the value that was compared. And k ends at 3, not 2, because the false test still added 1.</p>\n<p>With prefix, <code>while (++k &lt; 2)</code>, k goes up first and the new value is compared: 1 &lt; 2 is true and 1 is printed, then 2 &lt; 2 is false. The output is <code>1 2</code>.</p>\n<h4>The operand must be a variable</h4>\n<p><code>++</code> and <code>--</code> store a new value, so the operand needs a place to store it. C++ calls something that names a storage location you can change an <strong>lvalue</strong>, because it can appear on the left side of <code>=</code>. An ordinary variable is an lvalue. A number such as <code>5</code>, or a calculation such as <code>a + b</code>, is only a value. There is nowhere to put the result.</p>\n<pre><code>x++;          // fine: x is a variable\n5++;          // error: the number 5 cannot change\n++(a + b);    // error: a + b is a result, not a variable</code></pre>\n<p>g++ reports both errors as <code>lvalue required as increment operand</code>. A named constant such as <code>const int MAX = 10;</code> cannot be incremented either, because <code>const</code> means it may not change. If you want one more than <code>a + b</code>, write <code>a + b + 1</code>.</p>\n<h4>Do not increment a variable and use it again in the same expression</h4>\n<pre><code>int r = i++ + ++i;   // do not write this\nint w = n * n++;     // or this</code></pre>\n<p>You might expect C++ to work from left to right. It does not promise to. C++ does not fix the order in which it works out the two sides of <code>+</code> or <code>*</code>, so nothing says whether the other use of the variable sees the value before or after the change. The result is <strong>undefined behavior</strong>: the language makes no promise about what happens, and different compilers can give different answers. With <code>-Wall</code>, g++ warns <code>operation on 'i' may be undefined</code>. The code compiles, but the answer cannot be trusted. Put each change in its own statement.</p>\n<h4>Where you will use them</h4>\n<ul>\n<li>Counting: <code>count++;</code> every time something happens.</li>\n<li>Loops: the loop lessons in this unit use <code>i++</code> to move a counter on each time around.</li>\n<li>For steps other than 1, use combined assignment: <code>x += 2;</code> or <code>x -= 5;</code>.</li>\n</ul>\n<h4>Mistakes students make</h4>\n<ul>\n<li>Thinking postfix does not change the variable. <code>x++</code> always adds 1 to x. Postfix only means the expression hands back the old value.</li>\n<li>Giving the new value to the receiving variable: with x = 5, <code>y = x++;</code> makes y 5, not 6.</li>\n<li>Starting the next line from the original value instead of the value the previous line left.</li>\n<li>Reading <code>n-- - 3</code> as \"subtract 1, then subtract 3\". The old n is used in the subtraction.</li>\n<li>Forgetting that the final, false test in <code>while (t++ &lt; 3)</code> still adds 1.</li>\n<li>Writing <code>5++</code> or <code>++(a + b)</code>. The operand must be a variable.</li>\n<li>Expecting a definite answer from an expression that changes a variable and uses it again, such as <code>i++ + ++i</code>.</li>\n</ul>\n<h4>What to remember for the test</h4>\n<ul>\n<li><code>++</code> is the increment operator (adds 1). <code>--</code> is the decrement operator (subtracts 1).</li>\n<li>Prefix <code>++x</code>: change first, hand back the <strong>new</strong> value. Postfix <code>x++</code>: hand back the <strong>old</strong> value, the variable still changes.</li>\n<li>As a statement on its own, <code>x++;</code> and <code>++x;</code> are identical.</li>\n<li>They bind tighter than arithmetic: <code>a++ * 2</code> means <code>(a++) * 2</code>.</li>\n<li>In <code>while (t++ &lt; n)</code> the test compares the old value, and t goes up on every test, the last one included.</li>\n<li>The operand must be an lvalue (a changeable variable). <code>5++</code> and <code>++(a + b)</code> do not compile.</li>\n<li>Using <code>++</code> or <code>--</code> on a variable and using that same variable again in the same expression, as in <code>i++ + ++i</code>, is undefined behavior.</li>\n<li>For a \"what does this print\" question, keep one column per variable and update it after every statement.</li>\n</ul>"
     },
     {
      "id": "u5-l2",
      "title": "The while loop, input validation and counters",
      "book": "Sections 5.2 to 5.4, pages 242 to 252",
-     "html": "\n<p>A <strong>loop</strong> repeats a block of statements. The <code>while</code> loop has the form <code>while (condition) statement;</code>. The first line is the <strong>loop header</strong>; the statement or block it repeats is the <strong>body</strong>, also called a conditionally executed statement because it runs only while the condition is true. The condition is tested first. If it is true the body runs, then the condition is tested again. If it is false from the start, the body never runs. That is why while is a <strong>pretest loop</strong>. One pass through the body is an <strong>iteration</strong>. A variable that the condition tests and the body changes, like <code>n</code> below, is the <strong>loop control variable</strong>.</p>\n<pre><code>int n = 1;\nwhile (n &lt;= 3) {\n    cout &lt;&lt; n &lt;&lt; \" \";\n    n++;\n}                    // prints 1 2 3</code></pre>\n<p>A body made of several statements needs braces. Without them only the first statement after the condition is in the loop.</p>\n<h4>Infinite loops</h4>\n<p>A loop whose condition never becomes false is an <strong>infinite loop</strong>. Typical causes: forgetting to change the variable the condition tests, a semicolon right after <code>while (...)</code> (an empty body), using <code>=</code> where <code>==</code> was meant, and testing equality with <code>!=</code> or <code>==</code> when a step can jump over the target value (<code>i != 10</code> while adding 3).</p>\n<h4>Input validation</h4>\n<p>Read a value <em>before</em> the loop (the <strong>priming read</strong>), then loop while it is invalid, prompting and reading again inside:</p>\n<pre><code>cin &gt;&gt; age;\nwhile (age &lt; 0 || age &gt; 120) {\n    cout &lt;&lt; \"Try again: \";\n    cin &gt;&gt; age;\n}</code></pre>\n<h4>Counters</h4>\n<p>A <strong>counter</strong> is a variable that goes up or down by a fixed step on every iteration to track how many times something happened. Initialize it before the loop; an uninitialized local variable holds garbage, not 0. Counting can also be done by 2, 5, or -1; the step does not have to be 1.</p>\n<p>Pseudocode maps directly: <em>While count &lt; 3: display, add 1</em> becomes a while with braces holding both steps. In a flowchart, a while is a diamond at the top whose Yes branch goes through the body and back to the diamond.</p>\n<h4>Assignment inside a condition</h4>\n<p>An assignment is itself an expression, and its value is the value that was stored. So <code>while (x = 0)</code> stores 0 in x, and the condition's value is 0, which counts as false. Any nonzero value counts as true. The compiler accepts this (g++ only warns), so the loop silently does the wrong thing. To compare, write <code>==</code>.</p>\n<pre><code>int x = 3;\nwhile (x = 0)         // assigns 0; condition is false; body skipped\n    cout &lt;&lt; \"hi\";\nwhile (x = 1)         // assigns 1; condition is true forever</code></pre>\n<h4>Integer division in loops</h4>\n<p>Dividing two ints discards the fraction, so <code>n /= 2</code> on 7 gives 3. A loop that halves an int repeatedly eventually reaches 1, then 0, which is how such loops stop.</p>"
+     "html": "<h4>The idea: do it again while something is true</h4>\n<p>Suppose a program must print the numbers 1 to 100, or keep asking for an age until the user types a sensible one. Writing the same statement 100 times is not an answer, and you cannot know in advance how many tries the user needs. A <strong>loop</strong> solves both problems. It is a <strong>control structure</strong> (a statement, like <code>if</code>, that controls which other statements run and how often) that makes a statement or group of statements run again and again.</p>\n<p>The <code>while</code> loop reads almost like English: \"while this is true, keep doing this\". If you know Python, it is the same idea as Python's <code>while</code>. The differences are spelling: C++ needs parentheses around the condition, and it uses braces <code>{ }</code>, not indentation, to mark what is repeated.</p>\n<h4>The parts of a while loop</h4>\n<pre><code>while (condition)          // the loop header\n{\n    statement;             // the body:\n    statement;             // what gets repeated\n}</code></pre>\n<ul>\n<li>The <strong>loop header</strong> is the first line, <code>while (condition)</code>. The condition is any true-or-false test, like the ones you wrote for <code>if</code>.</li>\n<li>The <strong>body</strong> is the statement, or block of statements in braces, that the loop repeats. It is also called a <strong>conditionally executed</strong> statement, because it runs only when the condition is true.</li>\n<li>One pass through the body is one <strong>iteration</strong>. \"How many times does the loop run?\" means \"how many iterations are there?\"</li>\n</ul>\n<h4>How it runs, step by step</h4>\n<ol>\n<li>Test the condition.</li>\n<li>If it is false, skip the body and carry on with the statement after the loop. The loop is over.</li>\n<li>If it is true, run the whole body once, then go back to step 1.</li>\n</ol>\n<pre><code>int n = 1;\nwhile (n &lt;= 3)\n{\n    cout &lt;&lt; n &lt;&lt; \" \";\n    n++;\n}\ncout &lt;&lt; \"done\";</code></pre>\n<table><thead><tr><th>Test</th><th>n</th><th>n &lt;= 3?</th><th>What happens</th></tr></thead><tbody>\n<tr><td>1</td><td>1</td><td>true</td><td>prints 1, n becomes 2</td></tr>\n<tr><td>2</td><td>2</td><td>true</td><td>prints 2, n becomes 3</td></tr>\n<tr><td>3</td><td>3</td><td>true</td><td>prints 3, n becomes 4</td></tr>\n<tr><td>4</td><td>4</td><td>false</td><td>loop ends</td></tr>\n</tbody></table>\n<p>Then <code>done</code> is printed. The output is <code>1 2 3 done</code>. There were 3 iterations but 4 tests: the last test is the one that comes out false. The condition is checked only at the top. Changing n halfway through the body does not stop the loop on the spot. The rest of the body still runs, and the new value is tested next time round.</p>\n<p>Here <code>n</code> is the <strong>loop control variable</strong>: the variable the condition tests and the body changes, so it decides how many times the loop runs. It needs three things, and a loop goes wrong when one is missing: a starting value before the loop, a test in the header, and a change inside the body that moves it toward making the test false.</p>\n<h4>A pretest loop can run zero times</h4>\n<p>The while loop tests <strong>before</strong> each iteration, so it is called a <strong>pretest loop</strong>. If the condition is false the very first time, the body never runs at all.</p>\n<pre><code>int k = 5, runs = 0;\nwhile (k &lt; 5)       // 5 &lt; 5 is false at once\n{\n    runs++;\n}\ncout &lt;&lt; runs;       // prints 0</code></pre>\n<p>The next lesson covers the do-while loop, which tests after the body and so always runs at least once.</p>\n<h4>Braces decide what is in the body</h4>\n<p>Without braces, the body is only the <strong>one</strong> statement right after the header. Indenting a second line does not put it in the loop. The compiler ignores indentation, unlike Python.</p>\n<pre><code>int n = 1;\nwhile (n &lt;= 3)\n    cout &lt;&lt; n &lt;&lt; \" \";   // the whole body\n    n++;                  // NOT in the loop, despite the indent</code></pre>\n<p>The body only prints, n stays 1, and the loop prints <code>1 1 1 1</code> without end. The <code>n++</code> would run once after the loop, but the loop never finishes. Rule: if the body has more than one statement, use braces. Many programmers use them every time.</p>\n<h4>Infinite loops</h4>\n<p>An <strong>infinite loop</strong> is a loop that never stops, because its condition never becomes false. The program seems to freeze, or prints the same thing forever. In a terminal, Ctrl+C stops it. Four causes come up again and again.</p>\n<p><strong>1. The control variable never changes.</strong> The example above is one: the <code>n++</code> was outside the loop.</p>\n<p><strong>2. A semicolon right after the header.</strong></p>\n<pre><code>int i = 0;\nwhile (i &lt; 5);      // this ; is the whole body\n{\n    cout &lt;&lt; i;\n    i++;\n}</code></pre>\n<p>A semicolon on its own is an <strong>empty statement</strong>: a statement that does nothing. Placed after <code>while (i &lt; 5)</code>, it becomes the body. The loop tests 0 &lt; 5, does nothing, tests again, forever. The block in braces is a separate statement that would run after the loop, so it is never reached and nothing is printed.</p>\n<p><strong>3. <code>=</code> where <code>==</code> was meant.</strong> <code>=</code> stores a value. An assignment is also an expression whose value is the value just stored. In a condition, 0 counts as false and any other number counts as true.</p>\n<pre><code>int x = 3;\nwhile (x = 0)       // stores 0 in x. Value 0: false\n    cout &lt;&lt; \"hi\";   // never runs\ncout &lt;&lt; \"done\";     // prints done</code></pre>\n<p>That one skips the body. <code>while (x = 1)</code> does the opposite: it stores 1 every time, 1 counts as true, and the loop never ends. Both compile. g++ with <code>-Wall</code> only warns <code>suggest parentheses around assignment used as truth value</code>. To compare, write <code>==</code>.</p>\n<p><strong>4. Testing with <code>!=</code> when the steps jump over the target.</strong></p>\n<pre><code>int i = 0;\nwhile (i != 10)     // i is 0, 3, 6, 9, 12, 15, ...\n    i += 3;         // never exactly 10, so never stops</code></pre>\n<p>Write <code>while (i &lt; 10)</code> instead. That stops at 12 after 4 iterations. When the step is bigger than 1, test with <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code> or <code>&gt;=</code>, not <code>!=</code>.</p>\n<h4>Counters</h4>\n<p>A <strong>counter</strong> is a variable that counts how many times something happens. It is set to a starting value, usually 0, before the loop, and changed by a fixed amount, usually 1, each time the thing happens. This loop counts how many times 40 can be halved before it reaches 1:</p>\n<pre><code>int steps = 0;       // counter starts at 0\nint m = 40;\nwhile (m &gt; 1)\n{\n    m /= 2;          // int division: drops any fraction\n    steps++;         // count this halving\n}\ncout &lt;&lt; steps &lt;&lt; \" \" &lt;&lt; m;</code></pre>\n<table><thead><tr><th>m at the test</th><th>m &gt; 1?</th><th>m after <code>m /= 2</code></th><th>steps</th></tr></thead><tbody>\n<tr><td>40</td><td>true</td><td>20</td><td>1</td></tr>\n<tr><td>20</td><td>true</td><td>10</td><td>2</td></tr>\n<tr><td>10</td><td>true</td><td>5</td><td>3</td></tr>\n<tr><td>5</td><td>true</td><td>2 (5 / 2 is 2, not 2.5)</td><td>4</td></tr>\n<tr><td>2</td><td>true</td><td>1</td><td>5</td></tr>\n<tr><td>1</td><td>false</td><td>loop ends</td><td>5</td></tr>\n</tbody></table>\n<p>The output is <code>5 1</code>. Dividing two <code>int</code> values throws away the fraction, so a halving loop always reaches 1 and then, if the test allows it, 0. That is how such loops stop.</p>\n<p><strong>Always initialize a counter.</strong> A local variable that was never given a value holds whatever bits were left in that memory, often called garbage. <code>count++</code> adds 1 to the garbage, it does not start from 0. Reading a variable that has no value is undefined behavior: the language makes no promise about the result. Write <code>int count = 0;</code>.</p>\n<h4>Input validation and the priming read</h4>\n<p><strong>Input validation</strong> means checking what the user typed and refusing values that make no sense. A while loop does it well: keep asking while the value is bad.</p>\n<pre><code>int age;\ncout &lt;&lt; \"Enter age (0 to 120): \";\ncin &gt;&gt; age;                    // the priming read\nwhile (age &lt; 0 || age &gt; 120)   // true while age is BAD\n{\n    cout &lt;&lt; \"Invalid. Enter age (0 to 120): \";\n    cin &gt;&gt; age;                // read again\n}\ncout &lt;&lt; \"Age: \" &lt;&lt; age;</code></pre>\n<p>The read before the loop is the <strong>priming read</strong>. Like priming a pump, it gets things started: the condition needs a value to test before it can decide whether the loop should run even once. Without it, the first test would look at an age that was never set. The read at the bottom of the body gets each new try, which is tested at the top before the program uses it.</p>\n<p>If the user types 150, then -3, then 42: 150 fails the range, so the loop prints the message and reads -3. That fails too, so it prints the message again and reads 42. 42 is in range, the condition is false, the loop ends, and the program prints <code>Age: 42</code>. The condition is written to be true for <strong>bad</strong> input, using <code>||</code> (or), because the loop should repeat while the value is bad.</p>\n<h4>Pseudocode and flowcharts</h4>\n<p>In pseudocode, everything indented under a \"While\" line is the body. In C++ that means braces around those lines.</p>\n<pre><code>Pseudocode              C++\nSet n to 5              int n = 5;\nWhile n &gt; 0             while (n &gt; 0)\n                        {\n    Display n               cout &lt;&lt; n &lt;&lt; \" \";\n    Subtract 2 from n       n -= 2;\n                        }</code></pre>\n<p>This prints <code>5 3 1</code>: after 1, n becomes -1 and the test fails. \"Add k to total\" means <code>total += k;</code> and \"Add 1 to count\" means <code>count++;</code>.</p>\n<p>In a flowchart, a rectangle (process box) is an action and a diamond is a yes-or-no decision. A while loop is a diamond with the test, whose Yes arrow runs through the body's boxes and then back up to the diamond. The No arrow leads out of the loop. Because the diamond comes <strong>before</strong> the body, it is a pretest loop. Example: x starts at 30, the diamond asks \"x &gt; 3?\", Yes leads to \"Display x\" and then \"Set x to x / 2\" (integer division). Displayed: 30, 15, 7. Then x becomes 3, the diamond says No, and 3 is never displayed.</p>\n<h4>Mistakes students make</h4>\n<ul>\n<li>Assuming the body runs at least once. A while loop whose first test is false runs zero times.</li>\n<li>Leaving out the braces around a body of two statements, so only the first one repeats.</li>\n<li>Putting a semicolon right after <code>while (...)</code>.</li>\n<li>Writing <code>=</code> in a condition where <code>==</code> was meant. It compiles.</li>\n<li>Testing <code>!=</code> with a step that can jump over the target.</li>\n<li>Forgetting to initialize a counter, or forgetting to change the control variable.</li>\n<li>Leaving out the priming read, or forgetting the second read inside the validation loop, which makes it infinite.</li>\n<li>Forgetting that <code>int</code> division drops the fraction when tracing a loop such as <code>n /= 2</code>.</li>\n</ul>\n<h4>What to remember for the test</h4>\n<ul>\n<li>Header, body, iteration: <code>while (cond)</code> is the header, what it repeats is the body, one pass is an iteration.</li>\n<li>while is a <strong>pretest</strong> loop: test first, so zero iterations is possible.</li>\n<li>When a loop ends because its test fails, the number of tests is one more than the number of iterations. The last test is the false one.</li>\n<li>No braces means only one statement is in the body. Indentation means nothing to the compiler.</li>\n<li>Infinite loop causes: control variable never changes, <code>;</code> after the header, <code>=</code> for <code>==</code>, <code>!=</code> with a step that skips the target.</li>\n<li>Counter: initialize before the loop, change by a fixed step inside it.</li>\n<li>Validation: priming read before the loop, condition true for bad input, read again inside.</li>\n<li>To trace any loop, make a table: one row per test, one column per variable.</li>\n</ul>"
     },
     {
      "id": "u5-l3",
      "title": "The do-while loop",
      "book": "Section 5.5, pages 252 to 256",
-     "html": "\n<p>The <code>do-while</code> loop tests <em>after</em> the body, so it is a <strong>posttest loop</strong>. The body always executes at least once.</p>\n<pre><code>do {\n    cout &lt;&lt; \"Enter a number: \";\n    cin &gt;&gt; num;\n} while (num &lt; 0);     // required semicolon</code></pre>\n<p>The semicolon after the closing parenthesis is required. A while loop is the opposite: no semicolon after its condition (adding one makes the body empty).</p>\n<table><thead><tr><th></th><th>while</th><th>do-while</th></tr></thead>\n<tbody><tr><td>Test</td><td>before body</td><td>after body</td></tr><tr><td>Minimum runs</td><td>0</td><td>1</td></tr><tr><td>Semicolon at end</td><td>no</td><td>yes</td></tr></tbody></table>\n<h4>Equivalence</h4>\n<p>If the starting values make the condition true on entry, a while and a do-while with the same body behave the same. Otherwise they differ: with <code>int i = 5; while (i &lt; 5)</code> the body is skipped; with <code>do ... while (i &lt; 5)</code> it runs once. A do-while is the same as one unconditional copy of the body followed by a while loop.</p>\n<h4>When to choose it</h4>\n<p>Use it when something must happen before it can be tested: menus, \"run again?\" prompts, password entry. A loop that goes around until the user chooses to quit (<code>while (again == 'y')</code>) is a <strong>user-controlled loop</strong>. In pseudocode, <em>Repeat ... Until cond</em> is a posttest loop that stops when cond becomes true, so it becomes <code>do { ... } while (!(cond));</code> with the test reversed. Be careful with sentinels: <code>do { cin &gt;&gt; n; sum += n; } while (n != -1);</code> adds the sentinel to the total, because the test comes after the addition.</p>\n<h4>Flowchart shape</h4>\n<p>In a flowchart a do-while is recognized because the process boxes come first and the decision diamond is at the bottom, with its Yes branch looping back up to the start of the body. A while loop's diamond is at the top.</p>\n<p>Tracing tip: write the variable's value at each test, and count tests, not just body runs. A do-while with <code>n++</code> and test <code>n &lt; 5</code> starting at 10 still prints 10 once.</p>\n<h4>Two more traps</h4>\n<ul>\n<li><strong>Testing a value never set.</strong> If a loop's first test reads a variable that has no value yet (such as an answer variable declared but not read), the result is unpredictable. A do-while avoids this: the body reads the answer, then the test uses it.</li>\n<li><strong>= instead of ==.</strong> In <code>while (choice = 1);</code> the assignment stores 1 and its value is 1, which is true, so the test is always true and the loop never ends, whatever the user types. The code still compiles; g++ only warns. Write <code>choice == 1</code>.</li>\n</ul>"
+     "html": "<h4>The idea: do it first, then ask</h4>\n<p>Some jobs must happen once before there is anything to test. A menu has to be shown before the user can choose Quit. \"Play again?\" can only be asked after one game has been played. A while loop tests first, so it needs a value before the loop starts, which is why the last lesson needed a priming read.</p>\n<p>The <strong>do-while loop</strong> turns the order around: it runs the body first and tests the condition afterwards. Python has no do-while. Python programmers write <code>while True:</code> with a <code>break</code> to get the same effect. C++ has a loop built for it.</p>\n<h4>The form, and its semicolon</h4>\n<pre><code>do\n{\n    statement;\n    statement;\n} while (condition);   // this semicolon is required</code></pre>\n<p>The body sits between <code>do</code> and <code>while</code>. The condition comes last, and the whole thing ends with a semicolon after the closing parenthesis. Leave that semicolon out and the program does not compile. g++ reports something like <code>expected ';' before 'cout'</code>.</p>\n<p>This is the exact opposite of the while loop. In a while loop the line <code>while (condition)</code> is the start, and the body still has to follow it. A semicolon there becomes an empty body and causes an infinite loop. In a do-while the line <code>} while (condition);</code> is the <strong>end</strong> of the statement, so it ends with a semicolon like any other statement.</p>\n<h4>How it runs</h4>\n<ol>\n<li>Run the body.</li>\n<li>Test the condition.</li>\n<li>If it is true, go back to step 1. If it is false, the loop ends.</li>\n</ol>\n<pre><code>int n = 1;\ndo\n{\n    cout &lt;&lt; n &lt;&lt; \" \";\n    n *= 2;\n} while (n &lt; 10);</code></pre>\n<table><thead><tr><th>Pass</th><th>Body prints</th><th>n after the body</th><th>Test n &lt; 10</th></tr></thead><tbody>\n<tr><td>1</td><td>1</td><td>2</td><td>true, go again</td></tr>\n<tr><td>2</td><td>2</td><td>4</td><td>true</td></tr>\n<tr><td>3</td><td>4</td><td>8</td><td>true</td></tr>\n<tr><td>4</td><td>8</td><td>16</td><td>false, loop ends</td></tr>\n</tbody></table>\n<p>The output is <code>1 2 4 8</code>. Each pass ends with exactly one test, so a do-while makes as many tests as it makes iterations.</p>\n<h4>A posttest loop always runs at least once</h4>\n<p>Because the test comes after the body, the do-while is a <strong>posttest loop</strong>. (\"Post\" means after.) A while loop tests first, so it is a pretest loop. The practical difference shows when the condition is false from the start:</p>\n<pre><code>int a = 50;\nwhile (a &lt; 10)           // 50 &lt; 10 is false at once\n{\n    cout &lt;&lt; \"W\";         // never runs\n    a++;\n}\nint b = 50;\ndo\n{\n    cout &lt;&lt; \"D\";         // runs once: prints D\n    b++;                 // b is 51\n} while (b &lt; 10);        // 51 &lt; 10 is false, loop ends</code></pre>\n<p>The while loop prints nothing. The do-while prints <code>D</code> once, because the body ran before anything was tested. The minimum number of iterations of a do-while is therefore <strong>1</strong>, and the minimum for a while loop is 0.</p>\n<table><thead><tr><th></th><th>while</th><th>do-while</th></tr></thead><tbody>\n<tr><td>Condition is tested</td><td>before the body</td><td>after the body</td></tr>\n<tr><td>Kind of loop</td><td>pretest</td><td>posttest</td></tr>\n<tr><td>Fewest iterations</td><td>0</td><td>1</td></tr>\n<tr><td>Semicolon after <code>while (...)</code></td><td>no (it would empty the body)</td><td>yes, required</td></tr>\n<tr><td>Flowchart diamond</td><td>at the top, before the body</td><td>at the bottom, after the body</td></tr>\n</tbody></table>\n<h4>When do the two loops act the same?</h4>\n<p>If the condition is true at the start, a while loop and a do-while with the same body and condition behave the same. They differ only when the condition is false at the start: the while loop skips the body, the do-while runs it once.</p>\n<p>A useful way to see it: a do-while is the body written once on its own, followed by a while loop.</p>\n<pre><code>do { BODY } while (COND);\n\n// does exactly the same as\n\nBODY\nwhile (COND) { BODY }</code></pre>\n<p>The first copy of the body always runs, then the while loop decides about the rest. This is true for every starting value. Changing the order of the statements inside the body does not give the same loop: <code>k += 2; cout &lt;&lt; k;</code> prints the value after the change, so the output shifts.</p>\n<h4>Where do-while fits: menus and \"again?\" loops</h4>\n<p>A <strong>user-controlled loop</strong> is a loop that keeps going until the user chooses to stop, usually by answering a question. A do-while fits it well, because the answer is read inside the body, before the test needs it.</p>\n<pre><code>char again;\ndo\n{\n    cout &lt;&lt; \"Hello!\\n\";\n    cout &lt;&lt; \"Again? (y/n) \";\n    cin &gt;&gt; again;\n} while (again == 'y' || again == 'Y');</code></pre>\n<p>If the user types <code>y</code> and then <code>n</code>, the body runs twice: once before any test, once more because the first answer was y. The test uses <code>||</code> so that a capital Y also repeats.</p>\n<p>Now see what goes wrong with a while loop here:</p>\n<pre><code>char again;                            // no value yet\nwhile (again == 'y' || again == 'Y')   // tests garbage\n{ ... cin &gt;&gt; again; }</code></pre>\n<p>The first test reads <code>again</code> before it has ever been given a value. A local variable with no value holds leftover garbage, so whether the loop runs even once is unpredictable. Reading it is undefined behavior. Two fixes: use a do-while, or give the variable a value before the loop (<code>char again = 'y';</code>, or read it first).</p>\n<p>The same shape works for a menu: show the menu, read the choice, act on it, and repeat while the choice is not Quit. It also works for input validation without a priming read:</p>\n<pre><code>do\n{\n    cout &lt;&lt; \"Enter a positive number: \";\n    cin &gt;&gt; num;\n} while (num &lt;= 0);    // ask again while the number is bad</code></pre>\n<h4>Two traps</h4>\n<p><strong><code>=</code> instead of <code>==</code>.</strong> In <code>} while (choice = 1);</code> the assignment stores 1 in <code>choice</code> every time, and the value of the assignment is 1. A nonzero value counts as true, so the test is always true. The loop never ends, whatever the user typed, because the typed value is overwritten before it is looked at. It compiles. g++ only warns. Write <code>choice == 1</code>.</p>\n<p><strong>A stop value that gets processed.</strong> A <strong>sentinel</strong> is a special input value that means \"stop\", such as -1. In a do-while the test comes after the body, so the body has already used the sentinel before the loop notices it:</p>\n<pre><code>do\n{\n    cin &gt;&gt; n;\n    sum += n;            // the -1 is added too\n} while (n != -1);</code></pre>\n<p>With input <code>4 5 -1</code>, sum ends at 4 + 5 + (-1) = 8, not 9. The sentinel lesson later in this unit shows the correct pattern.</p>\n<h4>Translating \"Repeat ... Until\"</h4>\n<p>Pseudocode often writes a posttest loop as <strong>Repeat ... Until condition</strong>. It runs the body first and <strong>stops</strong> when the condition becomes true. A C++ do-while <strong>keeps going</strong> while its condition is true. So the test must be reversed. Opposites: <code>&gt;</code> becomes <code>&lt;=</code>, <code>&lt;</code> becomes <code>&gt;=</code>, <code>==</code> becomes <code>!=</code>. You can also write <code>while (!(condition))</code>.</p>\n<pre><code>Set n to 100              int n = 100;\nRepeat                    do\n                          {\n    Display n                 cout &lt;&lt; n &lt;&lt; \" \";\n    Set n to n - 30           n -= 30;\nUntil n &lt; 0               } while (n &gt;= 0);</code></pre>\n<p>This prints <code>100 70 40 10</code>. After 10, n becomes -20, <code>-20 &gt;= 0</code> is false, and the loop stops. If you copy the Until test unchanged, <code>while (n &lt; 0)</code>, the loop stops after printing only 100, because 70 &lt; 0 is false.</p>\n<h4>Flowchart shape</h4>\n<p>In a flowchart, a do-while has the process boxes (rectangles) first and the decision diamond at the <strong>bottom</strong>. The diamond's Yes arrow goes back up to the first box of the body, and No leads on. A while loop has its diamond at the <strong>top</strong>, before the body. Look for where the diamond is, and you know which loop it is.</p>\n<h4>A preview: the for loop is also a pretest loop</h4>\n<p>The next lesson covers the <code>for</code> loop. You may meet one before then, so here is enough to read it. <code>for (int n = 1; n &gt; 50; n *= 3)</code> sets n to 1 once, then tests <code>n &gt; 50</code> <strong>before</strong> every pass, like a while loop, and does <code>n *= 3</code> after each pass. Here 1 &gt; 50 is false at the first test, so its body never runs.</p>\n<h4>Mistakes students make</h4>\n<ul>\n<li>Leaving off the semicolon after <code>} while (condition)</code>. It is a compile error.</li>\n<li>Thinking the condition is checked before the first pass. It is not, so the body runs at least once even when the condition starts out false.</li>\n<li>Copying a \"Repeat ... Until\" test straight into <code>while (...)</code> instead of reversing it.</li>\n<li>Testing a variable in a while loop before it has a value, when a do-while would read it first.</li>\n<li>Writing <code>while (choice = 1);</code> instead of <code>==</code>, which never ends.</li>\n<li>Assuming that a while loop and a do-while always act the same. They differ when the condition starts out false.</li>\n</ul>\n<h4>What to remember for the test</h4>\n<ul>\n<li>do-while: body first, then test. It is a <strong>posttest</strong> loop and runs <strong>at least once</strong>.</li>\n<li>Form: <code>do { ... } while (condition);</code> with a required semicolon at the end.</li>\n<li>A do-while equals one copy of the body followed by a while loop with the same body and condition.</li>\n<li>Best fit: menus, \"run again?\" questions and other user-controlled loops, where the body must run before the test makes sense.</li>\n<li>\"Repeat ... Until X\" becomes <code>do { ... } while (!(X));</code>, so reverse the test.</li>\n<li>Flowchart: diamond at the bottom means do-while, diamond at the top means while.</li>\n<li>To trace it, run the body first, then write the variables and the test result after each pass.</li>\n</ul>"
     },
     {
      "id": "u5-l4",
      "title": "The for loop",
      "book": "Section 5.6, pages 257 to 266",
-     "html": "\n<p>A <strong>conditional loop</strong> repeats while a condition holds (input validation), so its number of iterations is not known in advance. A <strong>count-controlled loop</strong> repeats a known number of times and needs three things: initialize a counter, test it against a limit, update it each iteration. The <code>for</code> loop packs those three parts into one header:</p>\n<pre><code>for (initialization; test; update)\n    statement;</code></pre>\n<ol><li>The <strong>initialization expression</strong> runs once, before anything else.</li>\n<li>The <strong>test expression</strong> is evaluated before every iteration, including the first. If false, the loop ends. So a for is a pretest loop.</li>\n<li>The body runs, then the <strong>update expression</strong> runs, then back to the test.</li></ol>\n<pre><code>for (int i = 0; i &lt; 4; i++)      // i = 0,1,2,3 : 4 iterations\n    cout &lt;&lt; i;</code></pre>\n<p>It is equivalent to <code>int i = 0; while (i &lt; 4) { cout &lt;&lt; i; i++; }</code>.</p>\n<h4>What each part may contain</h4>\n<ul>\n<li>Initialization and update may hold several expressions separated by commas: <code>for (int lo = 0, hi = 9; lo &lt; hi; lo++, hi--)</code>. The test is one expression.</li>\n<li>Any part may be omitted, but both semicolons stay. <code>for (;;)</code> loops forever unless break or return stops it. An omitted test counts as true.</li>\n<li>Counting down: <code>for (int i = 10; i &gt;= 1; i--)</code>. Other steps: <code>i += 5</code>, <code>i *= 2</code>.</li>\n</ul>\n<h4>Scope</h4>\n<p>A variable declared in the initialization (<code>int i = 0</code>) exists only in the loop. Using it after the loop is a compile error. To use the final value afterward, declare the variable before the loop.</p>\n<h4>Traps</h4>\n<ul>\n<li>A semicolon after the header gives an empty body: <code>for (...);</code> then the next statement runs once.</li>\n<li>Number of iterations of <code>for (i = a; i &lt; b; i++)</code> is <code>b - a</code> (when a is at most b). With <code>&lt;=</code> it is <code>b - a + 1</code>. With a step s, count the values visited.</li>\n<li>Change the counter only in the update expression. Changing it in the body too (an extra <code>i++</code>) makes the loop skip values and stop at an unexpected point.</li>\n<li>Variables may be defined inside the body, but they exist only inside that block.</li>\n</ul>\n<h4>More details</h4>\n<ul>\n<li>The test runs one more time than the body does: <code>for (int k = 0; k &lt; 8; k++)</code> runs the body 8 times but evaluates the test 9 times (the last fails). Initialization runs once; the update runs once per iteration.</li>\n<li>A variable defined inside the body of any loop (for, while or do-while) lives only inside that block. After the closing brace the name no longer exists and using it is a compile error.</li>\n<li><strong>Flowchart shape.</strong> Because the test comes before the body, a for loop is drawn like a while: a process box initializes the counter, then a decision diamond holds the test. The Yes branch goes through the body, then a box that applies the update, then back to the diamond. The No branch leaves the loop.</li>\n</ul>"
+     "html": "<h4>The idea: a loop that counts</h4>\n<p>Loops come in two kinds, depending on whether you know in advance how many times they will run.</p>\n<ul>\n<li>A <strong>conditional loop</strong> repeats while some condition holds, and nobody knows beforehand how many passes that will take. \"Keep asking until the password is right\" is one. The while and do-while loops in the last two lessons were mostly of this kind.</li>\n<li>A <strong>count-controlled loop</strong> repeats a specific number of times that is known before the loop starts: print 10 lines, read 5 scores, count down from 3.</li>\n</ul>\n<p>A count-controlled loop always needs the same three things: <strong>initialize</strong> a counter, <strong>test</strong> the counter against a limit, and <strong>update</strong> the counter on every pass. With a while loop those three are spread out: one before the loop, one in the header, one at the bottom of the body. The <code>for</code> loop puts all three in one header line, where you can see them at once.</p>\n<p>If you know Python: <code>for i in range(4):</code> becomes <code>for (int i = 0; i &lt; 4; i++)</code> in C++. <code>range(a, b, s)</code> with a positive step s becomes <code>for (int i = a; i &lt; b; i += s)</code>. The C++ form is more general, because the test and the update can be anything.</p>\n<h4>The header</h4>\n<pre><code>for (initialization; test; update)\n    statement;</code></pre>\n<ul>\n<li>The <strong>initialization expression</strong> sets the counter's starting value, as in <code>int i = 0</code>.</li>\n<li>The <strong>test expression</strong> is the condition that decides whether the body runs (again), as in <code>i &lt; 4</code>.</li>\n<li>The <strong>update expression</strong> changes the counter after each pass, as in <code>i++</code>.</li>\n</ul>\n<p>Two semicolons separate the three parts. There is no semicolon after the update, and none after the closing parenthesis. As with while, a body of more than one statement needs braces.</p>\n<h4>The order things happen</h4>\n<ol>\n<li>The initialization runs, <strong>once</strong>.</li>\n<li>The test is checked. If it is false, the loop ends.</li>\n<li>The body runs.</li>\n<li>The update runs.</li>\n<li>Back to step 2.</li>\n</ol>\n<pre><code>for (int i = 0; i &lt; 4; i++)\n    cout &lt;&lt; i &lt;&lt; \" \";</code></pre>\n<table><thead><tr><th>Step</th><th>i</th><th>What happens</th></tr></thead><tbody>\n<tr><td>initialization</td><td>0</td><td>i is created and set to 0</td></tr>\n<tr><td>test 0 &lt; 4</td><td>0</td><td>true: body prints 0, then update makes i 1</td></tr>\n<tr><td>test 1 &lt; 4</td><td>1</td><td>true: prints 1, i becomes 2</td></tr>\n<tr><td>test 2 &lt; 4</td><td>2</td><td>true: prints 2, i becomes 3</td></tr>\n<tr><td>test 3 &lt; 4</td><td>3</td><td>true: prints 3, i becomes 4</td></tr>\n<tr><td>test 4 &lt; 4</td><td>4</td><td>false: loop ends</td></tr>\n</tbody></table>\n<p>The output is <code>0 1 2 3</code>. Count the parts: the initialization ran 1 time, the test 5 times, the body 4 times and the update 4 times. The test always runs one more time than the body, because the last test is the one that fails.</p>\n<p>The test comes before the body, so the for loop is a <strong>pretest</strong> loop, like while. <code>for (int i = 5; i &lt; 3; i++)</code> never runs its body, because 5 &lt; 3 is false at the first test.</p>\n<h4>The same loop written with while</h4>\n<pre><code>int i = 0;                // initialization: before the loop\nwhile (i &lt; 4)             // test\n{\n    cout &lt;&lt; i &lt;&lt; \" \";     // body\n    i++;                  // update: at the END of the body\n}</code></pre>\n<p>This prints <code>0 1 2 3</code> too. The update must go <strong>last</strong> in the body. Put <code>i++</code> before the <code>cout</code> and the loop prints <code>1 2 3 4</code>, because each value is printed after it has changed.</p>\n<h4>How many times does it run?</h4>\n<ul>\n<li><code>for (i = a; i &lt; b; i++)</code> runs <code>b - a</code> times. From 0 to below 10 is 10 times.</li>\n<li><code>for (i = a; i &lt;= b; i++)</code> runs <code>b - a + 1</code> times. From 1 to 10 inclusive is 10 times.</li>\n<li>With a step other than 1, list the values. <code>for (int i = 1; i &lt;= 20; i += 5)</code> visits 1, 6, 11, 16. The next value, 21, fails the test. So it runs 4 times and prints <code>1 6 11 16</code>.</li>\n</ul>\n<p>Notice in the last example that the last value printed is 16, but the value of i when the loop ends is 21: the first value that failed.</p>\n<h4>Counting down, and other steps</h4>\n<pre><code>for (int i = 5; i &gt;= 1; i--)      // prints 5 4 3 2 1\n    cout &lt;&lt; i &lt;&lt; \" \";\nfor (int p = 1; p &lt; 100; p *= 2)  // prints 1 2 4 8 16 32 64\n    cout &lt;&lt; p &lt;&lt; \" \";</code></pre>\n<p>When counting down, pick the test with care. <code>i &gt;= 1</code> is still true at 1, so 1 is printed. <code>i &gt; 1</code> stops before 1 and prints <code>5 4 3 2</code>. <code>i &lt;= 1</code> is false at the start (5 is not at most 1), so nothing prints. A step that moves away from the limit, such as starting at 1 with <code>i--</code> and testing <code>i &lt;= 10</code>, never makes the test false.</p>\n<h4>Scope: where the counter exists</h4>\n<p>A variable's <strong>scope</strong> is the stretch of code in which its name can be used. A variable declared in the initialization part, such as <code>int i = 0</code>, exists only inside the loop: in the header and the body. After the loop the name is gone.</p>\n<pre><code>for (int i = 0; i &lt; 3; i++) { }\ncout &lt;&lt; i;     // error: 'i' was not declared in this scope</code></pre>\n<p>If you need the counter after the loop, declare it <strong>before</strong> the loop and only give it a value in the initialization part:</p>\n<pre><code>int x;\nfor (x = 1; x &lt; 10; x += 4) { }   // empty body: the loop only moves x\ncout &lt;&lt; x;                        // prints 13</code></pre>\n<p>x takes 1, 5, 9, then 13 fails the test. The loop stops with x at 13, and x still exists, so 13 is printed.</p>\n<p>The same rule covers any variable declared inside the braces of a loop body, in a for, while or do-while loop. You may declare variables there, but they exist only inside that block. Using the name after the closing brace is a compile error.</p>\n<h4>Several variables, and empty parts</h4>\n<p>The initialization and update parts may each hold several expressions separated by commas. The test is still a single condition.</p>\n<pre><code>for (int a = 1, b = 10; a &lt; b; a += 2, b -= 2)\n    cout &lt;&lt; a &lt;&lt; \"-\" &lt;&lt; b &lt;&lt; \" \";</code></pre>\n<p>The pairs are (1, 10), (3, 8), (5, 6). Next comes (7, 4), and 7 &lt; 4 is false. Output: <code>1-10 3-8 5-6</code>.</p>\n<p>Any of the three parts may be left out, but both semicolons must stay.</p>\n<pre><code>int j = 2;\nfor ( ; j &lt; 30; )     // no initialization, no update\n    j *= 2;           // so the body must change j\ncout &lt;&lt; j;            // j went 2, 4, 8, 16, 32. Prints 32</code></pre>\n<p>A missing test counts as true, so <code>for (;;)</code> runs forever unless something inside the body stops it, such as a <code>break</code> statement (covered later in this unit) or a <code>return</code>.</p>\n<h4>Traps</h4>\n<p><strong>A semicolon after the header.</strong> It becomes an empty body, as with while.</p>\n<pre><code>int hits = 0;\nfor (int i = 0; i &lt; 5; i++);   // body is the lone ;\n    hits++;                     // runs once, after the loop\ncout &lt;&lt; hits;                   // prints 1</code></pre>\n<p>The loop does nothing 5 times and ends. The indented line is not in the loop, it runs once afterwards. The loop is not infinite, because the update still runs.</p>\n<p><strong>Changing the counter in the body as well as in the update.</strong></p>\n<pre><code>for (int i = 0; i &lt; 8; i++)\n{\n    cout &lt;&lt; i &lt;&lt; \" \";\n    i++;               // extra change\n}                      // prints 0 2 4 6</code></pre>\n<p>Each pass adds 1 in the body and 1 more in the update, so i goes 0, 2, 4, 6, then 8 fails. Half the values are skipped. In a loop meant to read 8 numbers, only 4 would be read. Change a for loop's counter only in the update part.</p>\n<h4>Flowchart of a for loop</h4>\n<p>A for loop is drawn like a while loop: a process box sets the counter, then a diamond holds the test. The Yes arrow runs through the body's boxes, then through a box for the update, and back up to the diamond. The No arrow leaves the loop. The order of the boxes matters: body first, update second.</p>\n<h4>Mistakes students make</h4>\n<ul>\n<li>Thinking the update runs before the body on the first pass. The first pass uses the starting value.</li>\n<li>Using the counter after the loop when it was declared in the header.</li>\n<li>Off-by-one tests: <code>&lt;</code> where <code>&lt;=</code> was needed, or the other way round.</li>\n<li>Counting down with the wrong test, such as <code>i &lt;= 1</code> when starting at 10.</li>\n<li>Putting a semicolon after <code>for (...)</code>.</li>\n<li>Changing the counter inside the body as well as in the update.</li>\n<li>Writing <code>n + 5</code> as the update. That works out a value but stores nothing, so n never changes. Write <code>n += 5</code>.</li>\n</ul>\n<h4>What to remember for the test</h4>\n<ul>\n<li><code>for (initialization; test; update)</code>. Initialization runs once. Then test, body, update, test, body, update, and so on.</li>\n<li>The for loop is a pretest loop. The test runs once more than the body.</li>\n<li><code>i = a; i &lt; b</code> runs <code>b - a</code> times. With <code>&lt;=</code>, <code>b - a + 1</code> times. With another step, list the values.</li>\n<li>A counter declared in the header, or any variable declared inside a loop body, does not exist after the loop.</li>\n<li>Commas allow several initializations and updates. Any part can be empty. <code>for (;;)</code> is infinite.</li>\n<li>Count-controlled loop: known number of passes, usually a for. Conditional loop: unknown number of passes, usually a while or do-while.</li>\n</ul>"
     },
     {
      "id": "u5-l5",
      "title": "Accumulators, sentinels and choosing a loop",
      "book": "Sections 5.7 to 5.9, pages 267 to 272",
-     "html": "\n<p>A <strong>running total</strong> is a sum that gets bigger every time the loop body runs. The variable that holds it is an <strong>accumulator</strong>. It must be initialized before the loop, almost always to 0 for sums and to 1 for products. An uninitialized accumulator starts with garbage.</p>\n<pre><code>int sum = 0;\nfor (int i = 1; i &lt;= 5; i++)\n    sum += i * i;          // 1+4+9+16+25 = 55</code></pre>\n<p>For an average, divide the sum by the count. With two int variables the division truncates: 17 / 4 is 4, not 4.25. Cast one operand to double to keep the fraction.</p>\n<h4>Sentinels</h4>\n<p>A <strong>sentinel</strong> is a special value, impossible as real data, that tells the loop to stop. Read with a priming read so the sentinel is tested before it is processed:</p>\n<pre><code>cin &gt;&gt; n;\nwhile (n != -1) {\n    sum += n;\n    cin &gt;&gt; n;\n}</code></pre>\n<p>Putting the add inside a do-while before the test processes the sentinel too, a classic mistake.</p>\n<h4>Which loop?</h4>\n<ul>\n<li><strong>for</strong>: you know the number of iterations or a range of values to step through.</li>\n<li><strong>while</strong>: the loop may need to run zero times, such as validating input or reading until a sentinel.</li>\n<li><strong>do-while</strong>: the body must run at least once, such as menus and \"again?\" prompts.</li>\n</ul>\n<p>All three are interchangeable in power; choosing is about clarity. Also note both while and for are pretest loops, so either may run zero times.</p>\n<p>The book (5.9) sums it up: while and do-while are <em>conditional</em> loops, good for validation, sentinel lists (while) and menus (do-while); for is the pretest loop with built-in initialize, test and update, ideal when the precise pass count is known in advance. When an algorithm is given in pseudocode, find its initialization, test and update and place them in whichever form fits.</p>\n<h4>User-controlled counts</h4>\n<p>The number of passes can come from the user: read it first, then use it as the limit of a for loop. This is a user-controlled loop that is still count-controlled. Every value read is data, including negative ones, because the loop counts passes instead of watching for a sentinel.</p>\n<pre><code>int count, value, total = 0;\ncin &gt;&gt; count;\nfor (int i = 1; i &lt;= count; i++) {\n    cin &gt;&gt; value;\n    total += value;\n}</code></pre>\n<p>Compare the two: with a sentinel, a value such as -1 means stop and is never added; with a counted loop, -1 is just another number to add.</p>"
+     "html": "<h4>The idea: loops that add things up</h4>\n<p>Most useful loops do something with each value they see: add it to a total, count it, work out an average at the end. This lesson covers three ideas that go with that: keeping a <strong>running total</strong>, stopping a list of unknown length with a <strong>sentinel</strong>, and <strong>choosing</strong> which of the three loops to use.</p>\n<h4>Running totals and accumulators</h4>\n<p>A <strong>running total</strong> is a sum that grows each time the loop body runs. The variable that holds it is called an <strong>accumulator</strong>, because it accumulates (collects) the values. The pattern always has three steps:</p>\n<ol>\n<li>Before the loop, set the accumulator to a starting value. For a sum that is 0.</li>\n<li>Inside the loop, add each new value: <code>total += value;</code></li>\n<li>After the loop, use the result.</li>\n</ol>\n<pre><code>int sum = 0;                        // step 1\nfor (int i = 2; i &lt;= 8; i += 2)\n    sum += i;                       // step 2\ncout &lt;&lt; sum;                        // step 3: prints 20</code></pre>\n<table><thead><tr><th>i</th><th>sum before</th><th><code>sum += i</code></th><th>sum after</th></tr></thead><tbody>\n<tr><td>2</td><td>0</td><td>0 + 2</td><td>2</td></tr>\n<tr><td>4</td><td>2</td><td>2 + 4</td><td>6</td></tr>\n<tr><td>6</td><td>6</td><td>6 + 6</td><td>12</td></tr>\n<tr><td>8</td><td>12</td><td>12 + 8</td><td>20</td></tr>\n</tbody></table>\n<p>An accumulator is not the same as a counter. A counter goes up by a fixed amount, usually 1 (<code>count++</code>), to record how many times something happened. An accumulator goes up by whatever the current value is (<code>sum += i</code>). Many loops keep both.</p>\n<p><strong>Why the starting value matters.</strong> The first pass combines the starting value with the first real value, so the start must be a value that changes nothing. Adding 0 changes nothing, so a sum starts at 0. Multiplying by 1 changes nothing, so a product starts at 1.</p>\n<pre><code>int prod = 1;\nfor (int i = 1; i &lt;= 4; i++)\n    prod *= i;          // 1*1=1, 1*2=2, 2*3=6, 6*4=24\ncout &lt;&lt; prod;           // prints 24</code></pre>\n<p>Start <code>prod</code> at 0 and every multiplication gives 0, so it prints 0. Start it at 5 and the answer is 5 times too big, 120. Leave it with no value and it starts from garbage: whatever bits were left in that memory. <code>*=</code> and <code>+=</code> always use the old value, so a bad start is never overwritten.</p>\n<p>Declare the accumulator <strong>before</strong> the loop. Declared inside the body, it would be set back to 0 on every pass, and it would not exist after the loop.</p>\n<h4>Averages and integer division</h4>\n<p>An average is the sum divided by the count. If both are <code>int</code>, C++ does integer division and drops the fraction: <code>17 / 4</code> is 4, not 4.25. Convert one of them to <code>double</code> first: <code>static_cast&lt;double&gt;(17) / 4</code> is 4.25. Also make sure the count is not 0 before dividing.</p>\n<h4>Sentinels: lists of unknown length</h4>\n<p>Suppose the user types in test scores, and the program does not know how many there will be. One way to mark the end is a <strong>sentinel</strong>: a special value that means \"the list is over\". It is not real data, so it must be a value that real data can never take. Scores are never negative, so -1 works for scores.</p>\n<p>The safe pattern is the priming read from the while loop lesson:</p>\n<pre><code>int n, sum = 0;\ncin &gt;&gt; n;              // priming read\nwhile (n != -1)        // stop at the sentinel\n{\n    sum += n;          // process the value\n    cin &gt;&gt; n;          // read the next value LAST\n}\ncout &lt;&lt; sum;</code></pre>\n<p>Trace it with the input <code>5 8 3 -1</code>:</p>\n<table><thead><tr><th>n just read</th><th>n != -1?</th><th>sum after the body</th></tr></thead><tbody>\n<tr><td>5 (priming read)</td><td>true</td><td>5</td></tr>\n<tr><td>8</td><td>true</td><td>13</td></tr>\n<tr><td>3</td><td>true</td><td>16</td></tr>\n<tr><td>-1</td><td>false</td><td>loop ends, sum stays 16</td></tr>\n</tbody></table>\n<p>It prints 16. The key is the order inside the body: the read is the <strong>last</strong> statement, so every new value goes straight to the test before anything is done with it. When the sentinel arrives, the test stops the loop before the sentinel can be added.</p>\n<p>Two more things to notice. If the very first value is the sentinel, the loop runs zero times and the sum is 0, which is correct, because the while loop tests first. And anything typed after the sentinel is never read at all.</p>\n<p><strong>The wrong way: a do-while.</strong></p>\n<pre><code>do\n{\n    cin &gt;&gt; n;\n    sum += n;          // adds before the test looks at n\n} while (n != -1);</code></pre>\n<p>With the same input <code>5 8 3 -1</code>, this reads -1, adds it, and only then tests. The sum is 5 + 8 + 3 + (-1) = 15, one too small. The sentinel was processed as data, which is exactly what a sentinel must not be.</p>\n<p>A full example with a counter, an accumulator and an average:</p>\n<pre><code>int score, total = 0, count = 0;\ncin &gt;&gt; score;\nwhile (score != -1)\n{\n    total += score;    // accumulator\n    count++;           // counter\n    cin &gt;&gt; score;\n}\nif (count &gt; 0)\n    cout &lt;&lt; fixed &lt;&lt; setprecision(2)\n         &lt;&lt; static_cast&lt;double&gt;(total) / count;</code></pre>\n<p>With input <code>90 85 72 -1</code>: total is 247, count is 3, and it prints <code>82.33</code>. Without the cast, <code>247 / 3</code> would give 82.</p>\n<p>Pseudocode often describes the same pattern: \"Input value. While value is not 0: add value to sum, input value.\" The first \"Input value\" is the priming read, and 0 is the sentinel.</p>\n<h4>Another way: ask how many first</h4>\n<p>The program can also ask the user how many values there are, and use that number as the limit of a for loop:</p>\n<pre><code>int count, value, total = 0;\ncin &gt;&gt; count;                    // how many values?\nfor (int i = 1; i &lt;= count; i++)\n{\n    cin &gt;&gt; value;\n    total += value;\n}\ncout &lt;&lt; total;</code></pre>\n<p>With input <code>3</code> and then <code>7 -2 5</code>, the loop runs 3 times and prints 7 + (-2) + 5 = 10. The user decides the count, but the loop itself is count-controlled: the count is known before the loop starts. Here there is no sentinel, so every value is data, negative ones included. With a sentinel, -1 means stop. With a counted loop, -1 is just another number to add.</p>\n<h4>Choosing a loop</h4>\n<p>Any of the three loops can be made to do any job. The choice is about which one says what you mean most clearly.</p>\n<table><thead><tr><th>Loop</th><th>Tests</th><th>Fewest passes</th><th>Best when</th></tr></thead><tbody>\n<tr><td><code>for</code></td><td>before the body</td><td>0</td><td>The number of passes is known before the loop starts: exactly 30 scores, the numbers 1 to 100, a count the user typed in.</td></tr>\n<tr><td><code>while</code></td><td>before the body</td><td>0</td><td>The loop may need to run zero times and the number of passes is unknown: input validation, reading until a sentinel.</td></tr>\n<tr><td><code>do-while</code></td><td>after the body</td><td>1</td><td>The body must run at least once: menus, \"again?\" questions.</td></tr>\n</tbody></table>\n<p>Both for and while are pretest loops, so either one runs zero times when its test is false at the start. <code>for (int i = 10; i &lt; 5; i++)</code> never runs its body. The while and do-while loops are the <strong>conditional</strong> loops. The for loop is the natural <strong>count-controlled</strong> loop, because its header keeps the initialization, test and update in one place.</p>\n<p>You will also meet <strong>nested loops</strong>, a loop inside another loop, in the next lesson. They are for jobs where each pass contains a repeated job of its own, such as rows and columns. A single list of values needs only one loop.</p>\n<h4>Mistakes students make</h4>\n<ul>\n<li>Forgetting to set the accumulator to 0 (or 1 for a product) before the loop.</li>\n<li>Starting a product at 0, which makes the answer 0.</li>\n<li>Declaring the accumulator inside the loop body, so it resets every pass.</li>\n<li>Adding the sentinel to the total, which is what a do-while sentinel loop does.</li>\n<li>Putting the second read at the top of the while body instead of the bottom, which skips the first value and processes the sentinel.</li>\n<li>Choosing a sentinel that could be real data, such as 0 in a list where 0 is a valid value.</li>\n<li>Dividing two ints for an average and losing the fraction.</li>\n</ul>\n<h4>What to remember for the test</h4>\n<ul>\n<li>Running total: the sum. Accumulator: the variable that holds it. Set it before the loop: 0 for sums, 1 for products.</li>\n<li>Sentinel: a special end-of-list value that is never real data.</li>\n<li>Sentinel pattern: priming read, <code>while (value != sentinel)</code>, process, read again as the last statement.</li>\n<li>A do-while sentinel loop processes the sentinel. A while loop with a priming read does not.</li>\n<li>A counted loop (read the count, then a for loop) treats every value as data.</li>\n<li>for: known count. while: may run zero times, unknown count. do-while: at least once.</li>\n<li>To trace an accumulator, write one row per pass: the value, the total before, the total after.</li>\n</ul>"
     },
     {
      "id": "u5-l6",
      "title": "Nested loops, break and continue",
      "book": "Sections 5.10 and 5.12, pages 272 to 275 and 294 to 296",
-     "html": "\n<p>A <strong>nested loop</strong> is a loop inside another. Each time the outer loop goes around once, the inner loop begins again from its start and finishes all of its passes. The inner body runs <em>outer count times inner count</em> in total.</p>\n<pre><code>for (int r = 1; r &lt;= 3; r++) {      // 3 rows\n    for (int c = 1; c &lt;= r; c++)    // inner count depends on r\n        cout &lt;&lt; '*';\n    cout &lt;&lt; '\\n';\n}                                   // 1 + 2 + 3 = 6 stars</code></pre>\n<p>If the inner limit depends on the outer variable, add the inner counts instead of multiplying: <code>1 + 2 + 3 + 4 = 10</code> for limits 1 to 4. The inner loop's counter changes fastest, like the second hand of a clock. Use different variable names for each loop (<code>i</code>, <code>j</code>). Reusing the same counter breaks both loops.</p>\n<h4>break</h4>\n<p><code>break</code> immediately leaves the <em>innermost</em> loop (or switch) containing it. Execution continues with the statement after that loop. In nested loops, the outer loop keeps going.</p>\n<h4>continue</h4>\n<p><code>continue</code> skips the rest of the current iteration and goes on to the next one. In a <code>for</code>, control goes to the <em>update expression</em>, then the test. In a <code>while</code> or <code>do-while</code>, control goes directly to the test, so if the update was skipped by the continue the loop can run forever.</p>\n<pre><code>for (int i = 1; i &lt;= 6; i++) {\n    if (i % 2 == 0) continue;   // skip evens\n    cout &lt;&lt; i;                  // 135\n}\nint i = 0;\nwhile (i &lt; 5) {\n    if (i == 2) continue;       // BUG: i++ is skipped, infinite\n    i++;\n}</code></pre>\n<p>Tracing nested loops: write a table with a column per variable and one row per inner test. Count the final values of loop variables carefully: after a normal exit from <code>for (i = 1; i &lt;= 3; i++)</code>, i is 4. After a break, i keeps the value it had when break ran.</p>"
+     "html": "<h4>The idea: repetition inside repetition</h4>\n<p>Some jobs repeat a job that itself repeats. A clock: for each hour, the minutes go round from 0 to 59. A table: for each row, print every column. A <strong>nested loop</strong> is a loop placed inside the body of another loop. The one on the outside is the <strong>outer loop</strong>, the one inside is the <strong>inner loop</strong>.</p>\n<p>This lesson also covers two statements that change the normal flow of any loop: <code>break</code>, which leaves a loop early, and <code>continue</code>, which skips to the next pass.</p>\n<h4>How a nested loop runs</h4>\n<p>One rule explains everything: <strong>each time the outer loop makes one pass, the inner loop starts again from its beginning and runs all of its passes.</strong> Only when the inner loop has finished does the outer loop move on to its next pass.</p>\n<pre><code>for (int i = 1; i &lt;= 2; i++)\n{\n    for (int j = 1; j &lt;= 3; j++)\n        cout &lt;&lt; i &lt;&lt; j &lt;&lt; \" \";\n    cout &lt;&lt; endl;            // after the inner loop: ends the row\n}</code></pre>\n<table><thead><tr><th>Outer pass</th><th>Inner loop does</th><th>Then</th></tr></thead><tbody>\n<tr><td>i = 1</td><td>j = 1, 2, 3: prints 11 12 13. j = 4 fails.</td><td>new line</td></tr>\n<tr><td>i = 2</td><td>j starts again at 1: prints 21 22 23. j = 4 fails.</td><td>new line</td></tr>\n<tr><td>i = 3</td><td>3 &lt;= 2 is false: the outer loop ends.</td><td>nothing</td></tr>\n</tbody></table>\n<pre><code>11 12 13\n21 22 23</code></pre>\n<p>Look at how the two counters move. j runs through all its values while i stays the same. i changes only once per full run of the inner loop. The inner counter changes fastest, like the second hand of a clock, which goes all the way round for each single step of the minute hand.</p>\n<p>Give each loop its own counter name, such as <code>i</code> and <code>j</code>. If the inner loop changed the outer loop's counter, both loops would go wrong.</p>\n<h4>Where the newline goes</h4>\n<p>In the example, <code>cout &lt;&lt; endl;</code> sits inside the outer loop's braces but after the inner loop. So it runs once per outer pass, and each row ends up on its own line. Move it inside the inner loop's body and every single value goes on its own line. Move it after both loops and everything prints on one line. When reading nested code, check which braces each statement is inside.</p>\n<h4>Counting the passes</h4>\n<p><strong>When the inner loop always runs the same number of times, multiply.</strong> An outer loop of 2 passes with an inner loop of 5 passes runs the inner body 2 x 5 = 10 times, not 2 + 5 = 7. The inner loop does its 5 passes once for every outer pass.</p>\n<pre><code>int count = 0;\nfor (int i = 0; i &lt; 2; i++)\n    for (int j = 0; j &lt; 5; j++)\n        count++;\ncout &lt;&lt; count;        // prints 10</code></pre>\n<p><strong>When the inner limit depends on the outer counter, add the rows.</strong> Here the inner loop runs r times, and r changes:</p>\n<pre><code>for (int r = 3; r &gt;= 1; r--)\n{\n    for (int c = 1; c &lt;= r; c++)\n        cout &lt;&lt; '#';\n    cout &lt;&lt; '\\n';\n}</code></pre>\n<p>Row 1 has r = 3, so 3 marks. Then 2, then 1. Output:</p>\n<pre><code>###\n##\n#</code></pre>\n<p>The inner body ran 3 + 2 + 1 = 6 times. You cannot multiply here, because each row has a different length.</p>\n<p>Pseudocode for nested loops reads the same way. \"For row from 1 to 3\" becomes <code>for (int row = 1; row &lt;= 3; row++)</code>. \"From 1 to row\" includes row, so its test is <code>&lt;= row</code>. Each \"End For\" closes the body of its own loop, so a line between the inner \"End For\" and the outer \"End For\" runs once per outer pass.</p>\n<h4>break: leave the loop now</h4>\n<p>You met <code>break</code> in the switch statement. Inside a loop, <code>break;</code> ends the loop <strong>at once</strong>. The rest of the body is skipped, the update does not run, the test is not checked again, and the program carries on with the first statement after the loop. It is almost always inside an <code>if</code>.</p>\n<pre><code>int i;\nfor (i = 1; i &lt;= 10; i++)\n{\n    if (i * i &gt; 50)\n        break;\n    cout &lt;&lt; i &lt;&lt; \" \";\n}\ncout &lt;&lt; \"| i = \" &lt;&lt; i;</code></pre>\n<p>For i = 1 to 7, the square is at most 49, so each value is printed. At i = 8, 64 &gt; 50, so <code>break</code> runs. The <code>cout</code> below it is skipped, and so is <code>i++</code>. The program prints <code>1 2 3 4 5 6 7 | i = 8</code>. Compare: if the loop had ended normally, i would hold 11, the first value that failed <code>i &lt;= 10</code>. After a break, the counter keeps the value it had when the break ran.</p>\n<p><strong>In nested loops, break leaves only the innermost loop that contains it.</strong> The outer loop carries on with its next pass, and the inner loop starts fresh on that pass.</p>\n<pre><code>for (int a = 1; a &lt;= 2; a++)\n{\n    for (int b = 1; b &lt;= 5; b++)\n    {\n        if (b == 3)\n            break;             // leaves the b loop only\n        cout &lt;&lt; a &lt;&lt; b &lt;&lt; \" \";\n    }\n    cout &lt;&lt; \"/ \";              // still runs, every outer pass\n}</code></pre>\n<p>Output: <code>11 12 / 21 22 / </code>. Each inner run prints b = 1 and 2, then stops at 3. The outer loop still makes both of its passes. To leave both loops at once, a program usually sets a flag (a <code>bool</code> variable) before the break and has the outer loop test it.</p>\n<h4>continue: skip to the next pass</h4>\n<p><code>continue;</code> skips the rest of the <strong>current</strong> pass only. The loop does not end. Where it jumps depends on the loop:</p>\n<ul>\n<li>In a <strong>for</strong> loop, it jumps to the <strong>update</strong> expression, then the test. The update still happens.</li>\n<li>In a <strong>while</strong> or <strong>do-while</strong> loop, it jumps straight to the <strong>test</strong>. There is no separate update part, so anything in the body after the <code>continue</code> is skipped, including an update written there.</li>\n</ul>\n<pre><code>for (int q = 1; q &lt;= 7; q++)\n{\n    if (q % 3 == 0)\n        continue;          // skip multiples of 3\n    cout &lt;&lt; q &lt;&lt; \" \";\n}                          // prints 1 2 4 5 7</code></pre>\n<p>When q is 3 or 6, the <code>cout</code> is skipped, but <code>q++</code> still runs, so the loop moves on normally.</p>\n<p><strong>The while loop trap.</strong></p>\n<pre><code>int k = 0;\nwhile (k &lt; 4)\n{\n    if (k == 1)\n        continue;   // jumps to the test: k++ below is skipped\n    cout &lt;&lt; k;\n    k++;\n}</code></pre>\n<p>When k reaches 1, <code>continue</code> jumps back to the test. <code>k++</code> never runs, so k stays 1, the test is true again, and the same thing happens forever: an infinite loop. The fix is to change k <strong>before</strong> the <code>continue</code> can skip the update: write <code>if (k == 1) { k++; continue; }</code>. Now the pass for 1 moves k on without printing, and the loop prints <code>023</code>. Another way is to update inside the condition, as in <code>while (k++ &lt; 4)</code>, so the update runs at every test. That also changes which values the body sees, so trace it again.</p>\n<table><thead><tr><th></th><th><code>break</code></th><th><code>continue</code></th></tr></thead><tbody>\n<tr><td>Ends the loop?</td><td>Yes, at once</td><td>No, only the current pass</td></tr>\n<tr><td>Goes next to</td><td>the first statement after the loop</td><td>for: the update, then the test. while and do-while: the test</td></tr>\n<tr><td>In nested loops</td><td>leaves the innermost loop only</td><td>affects the innermost loop only</td></tr>\n</tbody></table>\n<p>Both make a loop harder to follow, because the body no longer always runs from top to bottom. Use them sparingly.</p>\n<h4>Mistakes students make</h4>\n<ul>\n<li>Adding the two loop counts (4 + 3) instead of multiplying them (4 x 3).</li>\n<li>Multiplying when the inner limit depends on the outer counter. Add the rows instead.</li>\n<li>Thinking the inner loop carries on from where it stopped. It starts again from its initialization on every outer pass.</li>\n<li>Thinking the outer counter changes faster. The inner counter changes fastest.</li>\n<li>Thinking <code>break</code> leaves every loop. It leaves only the innermost one.</li>\n<li>Mixing up break (end the loop) and continue (skip to the next pass).</li>\n<li>Thinking <code>continue</code> skips the update of a for loop. It does not. It does skip an update written in a while loop's body.</li>\n<li>Forgetting that after a <code>break</code> the counter is not updated again.</li>\n</ul>\n<h4>What to remember for the test</h4>\n<ul>\n<li>Nested loop: for each outer pass, the inner loop runs completely, starting from scratch.</li>\n<li>Total inner passes: multiply when the inner count is fixed, add row by row when it depends on the outer counter.</li>\n<li>The inner counter changes fastest.</li>\n<li><code>break</code>: leave the innermost loop now. The rest of the body and the update are skipped.</li>\n<li><code>continue</code>: skip the rest of this pass. A for loop then runs its update and test. A while or do-while goes straight to the test.</li>\n<li>A <code>continue</code> that skips a while loop's update makes an infinite loop.</li>\n<li>To trace nested loops, write one line per inner pass with both counters, and mark where each inner loop ends.</li>\n</ul>"
     },
     {
      "id": "u5-l7",
      "title": "Reading and writing files (not on syllabus)",
      "book": "Section 5.11, pages 275 to 294",
-     "html": "\n<p>This section is outside the course syllabus; know the vocabulary only.</p>\n<p>File streams come from the header <code>&lt;fstream&gt;</code>. <code>ofstream</code> writes to a file (output file stream), <code>ifstream</code> reads from one (input file stream). You can use <code>&lt;&lt;</code> and <code>&gt;&gt;</code> on them just as with cout and cin.</p>\n<pre><code>#include &lt;fstream&gt;\nofstream out;\nout.open(\"scores.txt\");   // creates the file, or erases an existing one\nout &lt;&lt; 90 &lt;&lt; endl;\nout.close();\n\nifstream in(\"scores.txt\");\nint v;\nwhile (in &gt;&gt; v)           // false at end of file or a failed read\n    cout &lt;&lt; v;\nin.close();</code></pre>\n<p><code>open</code> connects the stream to a file. Opening an existing file with an ofstream erases its old contents. An input file keeps a <strong>read position</strong>, the next byte to be read; it starts at the beginning of the file and moves forward with each read. <code>close</code> disconnects it and flushes buffered output. An input stream cannot read a file that does not exist, so check that the open succeeded (for example <code>if (!in)</code>). The idiom <code>while (in &gt;&gt; v)</code> reads until end of file because the extraction expression becomes false when no value could be read.</p>\n<p>Files are one way to supply data to loops: a sum or search loop works the same whether it reads from cin or from a file stream.</p>"
+     "html": "<h4>The idea: data that outlives the program</h4>\n<p>This section is outside the course syllabus, so you need the vocabulary and the basic pattern, not every detail. A few questions do test it.</p>\n<p>Everything a program keeps in variables disappears when it ends. To keep data for next time, or to read a long list of numbers without typing them, a program uses a <strong>file</strong> on the disk. C++ handles files with the same tools you already use for the keyboard and the screen.</p>\n<p>A <strong>stream</strong> is a flow of characters going into or out of a program. <code>cin</code> is a stream that flows in from the keyboard. <code>cout</code> is a stream that flows out to the screen. A <strong>file stream</strong> is a stream connected to a file instead. Once it is connected, you use <code>&gt;&gt;</code> and <code>&lt;&lt;</code> on it exactly as you do on <code>cin</code> and <code>cout</code>.</p>\n<h4>The two file stream types</h4>\n<p>Both come from the header <code>&lt;fstream&gt;</code> (file stream), so a program that uses files starts with <code>#include &lt;fstream&gt;</code> as well as <code>#include &lt;iostream&gt;</code>.</p>\n<table><thead><tr><th>Type</th><th>Stands for</th><th>Job</th><th>Works like</th></tr></thead><tbody>\n<tr><td><code>ofstream</code></td><td>output file stream</td><td>writes data <strong>into</strong> a file</td><td><code>cout</code>, with <code>&lt;&lt;</code></td></tr>\n<tr><td><code>ifstream</code></td><td>input file stream</td><td>reads data <strong>from</strong> a file</td><td><code>cin</code>, with <code>&gt;&gt;</code></td></tr>\n</tbody></table>\n<p>Read the first letter: <strong>o</strong> for output, <strong>i</strong> for input. \"Output\" is from the program's point of view: data goes out of the program into the file.</p>\n<p>Do not confuse them with <code>istream</code>, the general input stream type that <code>cin</code> belongs to, or with <code>iostream</code>, the header you include to get <code>cin</code> and <code>cout</code>. Neither of those opens a file.</p>\n<h4>Three steps: open, use, close</h4>\n<p><strong>1. Open.</strong> Declare a stream variable and connect it to a file with the <code>open</code> member function. (A member function is a function that belongs to an object and is called with a dot, like <code>cin.ignore()</code>.) You can also give the file name when you declare the stream.</p>\n<pre><code>ofstream outFile;\noutFile.open(\"scores.txt\");     // two steps\nifstream inFile(\"scores.txt\");  // or one step</code></pre>\n<p><strong>2. Use.</strong> Write with <code>&lt;&lt;</code> or read with <code>&gt;&gt;</code>.</p>\n<p><strong>3. Close.</strong> Call <code>close()</code> when you are done: <code>outFile.close();</code>. Output is held in memory (a buffer) and written to the disk in chunks. Closing makes sure everything still waiting in the buffer is actually written, and it releases the file so other code can use it. Always close a file when you have finished with it.</p>\n<h4>What open does to the file</h4>\n<ul>\n<li>An <code>ofstream</code> opening a file that does <strong>not exist</strong> creates it, empty.</li>\n<li>An <code>ofstream</code> opening a file that <strong>already exists</strong> erases its old contents and starts it empty. That is the default. (Adding to the end of a file instead needs a different open mode, which this course does not require.) Python's <code>open(name, \"w\")</code> behaves the same way.</li>\n<li>An <code>ifstream</code> opening a file that does not exist <strong>fails</strong>: there is nothing to read. Python would stop with an error here. C++ does not stop. The stream just goes into a fail state, so the program must check.</li>\n</ul>\n<pre><code>ifstream inFile(\"scores.txt\");\nif (!inFile)                    // true if the open failed\n{\n    cout &lt;&lt; \"Could not open scores.txt\\n\";\n    return 1;\n}</code></pre>\n<p><code>inFile.fail()</code> asks the same question in words: it is true when the open failed.</p>\n<h4>The read position</h4>\n<p>An input file stream keeps a <strong>read position</strong>: the next byte (character) it will read. When the file is opened, the read position is at the <strong>first byte</strong> of the file. Each read moves it forward past what was read, so the next read picks up where the last one stopped. This is the same idea as the keyboard input buffer, where each <code>cin &gt;&gt;</code> starts where the previous one stopped.</p>\n<h4>Reading until the end of the file</h4>\n<p>A program usually does not know how many values a file holds. The standard loop is:</p>\n<pre><code>int value, total = 0, count = 0;\nwhile (inFile &gt;&gt; value)     // read, then test whether it worked\n{\n    total += value;\n    count++;\n}\ninFile.close();</code></pre>\n<p>Why this works: the expression <code>inFile &gt;&gt; value</code> does two things. It tries to read a value, and then it counts as <strong>true if the read worked</strong> and <strong>false if it failed</strong>. At the end of the file there is nothing left to read, so the read fails and the loop ends. The read is in the condition, so every value is tested before the body uses it. It plays the part of both the priming read and the read at the bottom of the body.</p>\n<h4>A complete example</h4>\n<pre><code>#include &lt;iostream&gt;\n#include &lt;fstream&gt;\nusing namespace std;\n\nint main()\n{\n    ofstream outFile(\"scores.txt\");   // create the file\n    outFile &lt;&lt; 90 &lt;&lt; endl;\n    outFile &lt;&lt; 75 &lt;&lt; endl;\n    outFile &lt;&lt; 82 &lt;&lt; endl;\n    outFile.close();                  // make sure it is written\n\n    ifstream inFile(\"scores.txt\");    // read it back\n    if (!inFile)\n    {\n        cout &lt;&lt; \"Could not open the file\\n\";\n        return 1;\n    }\n    int value, total = 0, count = 0;\n    while (inFile &gt;&gt; value)\n    {\n        total += value;\n        count++;\n    }\n    inFile.close();\n    cout &lt;&lt; count &lt;&lt; \" values, total \" &lt;&lt; total &lt;&lt; endl;\n    return 0;\n}</code></pre>\n<p>This prints <code>3 values, total 247</code>. The summing loop is the same accumulator loop as before. Only the source of the data changed, from <code>cin</code> to <code>inFile</code>.</p>\n<h4>Mistakes students make</h4>\n<ul>\n<li>Mixing up the types: <code>ifstream</code> is for reading, <code>ofstream</code> is for writing.</li>\n<li>Forgetting <code>#include &lt;fstream&gt;</code>.</li>\n<li>Using <code>&lt;&lt;</code> on an <code>ifstream</code>, or <code>&gt;&gt;</code> on an <code>ofstream</code>. Neither compiles. You read with <code>&gt;&gt;</code> and write with <code>&lt;&lt;</code>, just as with <code>cin</code> and <code>cout</code>.</li>\n<li>Expecting an <code>ofstream</code> to keep a file's old contents. By default it erases them.</li>\n<li>Reading from a file without checking that it opened.</li>\n<li>Forgetting to <code>close()</code> the file.</li>\n</ul>\n<h4>What to remember for the test</h4>\n<ul>\n<li>Header <code>&lt;fstream&gt;</code>. <code>ofstream</code> writes (output), <code>ifstream</code> reads (input).</li>\n<li>Open, use with <code>&lt;&lt;</code> or <code>&gt;&gt;</code>, then <code>close()</code>. Closing writes out anything still buffered.</li>\n<li>ofstream: creates a missing file, erases an existing one. ifstream: fails on a missing file, so check with <code>if (!inFile)</code>.</li>\n<li>The read position starts at the first byte and moves forward with each read.</li>\n<li><code>while (inFile &gt;&gt; value)</code> reads every value until the end of the file.</li>\n</ul>"
     }
    ],
    "questions": [
@@ -58,7 +58,7 @@
      "code": "int x = 5;\nint y = x++;\ncout << x << \" \" << y;",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int x = 5;\n    int y = x++;\n    cout << x << \" \" << y;\n    return 0;\n}\n",
      "answer": "6 5",
-     "explain": "Postfix `x++` yields the old value (5) for `y`, then x becomes 6. So x is 6 and y is 5."
+     "explain": "Postfix `x++` hands back the old value of x, and then x goes up by 1.\n```\nint x = 5      x is 5\nint y = x++    y gets the old value, 5. Then x becomes 6\n```\nThe output prints x first, then y, so it is `6 5`. If you answered `6 6`, you gave y the new value, which is what `y = ++x;` would do. If you answered `5 5`, remember that `x++` always changes x. Postfix only decides that y receives the value from before the change."
     },
     {
      "id": "u5-q002",
@@ -69,7 +69,7 @@
      "code": "int a = 4;\nint b = a++ * 2;\nint c = ++a * 2;\ncout << a << \" \" << b << \" \" << c;",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int a = 4;\n    int b = a++ * 2;\n    int c = ++a * 2;\n    cout << a << \" \" << b << \" \" << c;\n    return 0;\n}\n",
      "answer": "6 8 12",
-     "explain": "`a++ * 2` uses 4 then a becomes 5, so b is 8. `++a` makes a 6 first, so c is 12. Final a is 6."
+     "explain": "Keep a running value for a and update it after every statement.\n```\nint a = 4          a is 4\nint b = a++ * 2    a++ hands back 4, so b = 4 * 2 = 8. a is now 5\nint c = ++a * 2    ++a makes a 6 first, so c = 6 * 2 = 12\n```\nThe output lists a, b and c: `6 8 12`. The usual slip is forgetting that the first line already changed a to 5, so `++a` starts from 5, not 4. Another is printing a as 4 or 5: both lines add 1 to a, so it ends at 6."
     },
     {
      "id": "u5-q003",
@@ -87,7 +87,7 @@
      "answer": 0,
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int n = 10;\n    int m = n-- - 3;\n    cout << n << \" \" << m;\n    return 0;\n}\n",
      "expect": "9 7",
-     "explain": "`n--` yields the old value 10 in the expression, so m = 10 - 3 = 7. The decrement still happens afterward, leaving n at 9."
+     "explain": "`n-- - 3` is read as `(n--) - 3`: a postfix decrement, then an ordinary subtraction.\n```\nn-- hands back the old value   10\nm = 10 - 3                     m is 7\nn has 1 taken away             n is 9\n```\nSo n is 9 and m is 7. \"m is 6\" comes from taking the 1 away before the subtraction, which is what the prefix form `--n - 3` would do. \"n is 10\" forgets that postfix still decreases n. Postfix only decides that the subtraction gets the old value."
     },
     {
      "id": "u5-q004",
@@ -96,7 +96,7 @@
      "difficulty": 1,
      "prompt": "As complete statements by themselves, `count++;` and `++count;` have exactly the same effect on count.",
      "answer": true,
-     "explain": "The prefix/postfix difference matters only when the expression's value is used. Standing alone, both just add 1."
+     "explain": "True. As a statement by itself, `count++;` and `++count;` both add 1 to count, and nothing else happens. The two modes differ only in the value the expression hands back: postfix gives the old value, prefix gives the new one. On a line by itself nothing uses that value, so the two are identical. The difference shows only when the value is used, as in `y = count++;` or `cout << ++count;`."
     },
     {
      "id": "u5-q005",
@@ -110,7 +110,7 @@
       "decrement operator",
       "the decrement operator"
      ],
-     "explain": "`--` subtracts 1 from its operand; `++` is the increment operator."
+     "explain": "`--` is the decrement operator. To decrement means to decrease by one, so `lives--;` does the same as `lives = lives - 1;`. Its partner `++` is the increment operator, which adds 1. Both come in a prefix form (`--lives`) and a postfix form (`lives--`)."
     },
     {
      "id": "u5-q006",
@@ -125,7 +125,7 @@
       "It is fine; C++ evaluates strictly left to right so the result is well-defined"
      ],
      "answer": 1,
-     "explain": "Changing the same variable more than once in one expression without sequencing is undefined behavior. Use one modification per statement."
+     "explain": "In `i++ + ++i`, i is changed twice inside one expression. C++ does not fix the order in which it works out the two sides of `+`, so nothing says which value of i each side sees. That is undefined behavior: there is no reliable result, and different compilers can give different numbers. g++ with -Wall warns \"operation on 'i' may be undefined\".\n\nThe other choices are wrong. The statement does compile, since no rule forbids prefix and postfix in one statement. It does not always give 0, or any fixed number. And C++ does not promise strict left-to-right order here, which is exactly why the result cannot be trusted. Fix it by putting each change in its own statement."
     },
     {
      "id": "u5-q007",
@@ -134,7 +134,7 @@
      "difficulty": 2,
      "prompt": "The statement `5++;` is legal because 5 is a value that can be increased.",
      "answer": false,
-     "explain": "The operand of ++ and -- must be a modifiable variable (an lvalue). A literal cannot be changed."
+     "explain": "False. `++` has to store the new value somewhere, so its operand must be a variable: a storage location that can be changed, which C++ calls an lvalue. 5 is a literal, a fixed number with nowhere to keep a 6, so `5++;` does not compile. g++ says \"lvalue required as increment operand\". To get 6, write `5 + 1`, or put 5 in a variable and increment that: `int n = 5; n++;`."
     },
     {
      "id": "u5-q008",
@@ -145,7 +145,7 @@
      "code": "int n = 1;\nwhile (n <= 4) {\n    cout << n * n << \" \";\n    n++;\n}\ncout << \"end\";",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int n = 1;\n    while (n <= 4) {\n        cout << n * n << \" \";\n        n++;\n    }\n    cout << \"end\";\n    return 0;\n}\n",
      "answer": "1 4 9 16 end",
-     "explain": "The body runs for n = 1, 2, 3, 4, printing the squares 1 4 9 16. When n becomes 5 the test fails and the loop exits, then end prints."
+     "explain": "Track n at each test. The body prints `n * n`, the square of n, then adds 1 to n.\n```\nn = 1   1 <= 4 true    prints 1\nn = 2   2 <= 4 true    prints 4\nn = 3   3 <= 4 true    prints 9\nn = 4   4 <= 4 true    prints 16\nn = 5   5 <= 4 false   loop ends\n```\nAfter the loop, `end` is printed. Output: `1 4 9 16 end`. Two slips to avoid: printing n instead of its square, and printing 25. When n is 5 the test fails before the body can run."
     },
     {
      "id": "u5-q009",
@@ -163,7 +163,7 @@
      "answer": 2,
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int k = 10;\n    int runs = 0;\n    while (k > 10) {\n        runs++;\n        k--;\n    }\n    cout << runs;\n    return 0;\n}\n",
      "expect": "0",
-     "explain": "while tests first. k > 10 is false when k is 10, so the body never runs. That is the meaning of a pretest loop."
+     "explain": "Zero. A while loop tests its condition before the body. The first test is `10 > 10`, and 10 is not greater than itself, so the test is false at once. The body is skipped completely and `runs` stays 0.\n\n\"1\" assumes the body always runs at least once, which is true of a do-while loop, not a while loop. \"10\" assumes the loop counts k down from 10. \"It is an infinite loop\" is wrong too: a loop whose first test is false ends immediately."
     },
     {
      "id": "u5-q010",
@@ -172,7 +172,7 @@
      "difficulty": 1,
      "prompt": "A while loop is a pretest loop: its condition is evaluated before each execution of the body, so the body might never execute.",
      "answer": true,
-     "explain": "Contrast with do-while, which tests after the body and always runs at least once."
+     "explain": "True. A while loop checks its condition first, before every iteration. If the condition is false the very first time, the body is skipped and runs zero times. For example, `int n = 5; while (n < 3) cout << n;` prints nothing. That is what \"pretest\" means. The do-while loop is the posttest version: it runs the body first and tests afterwards, so its body always runs at least once."
     },
     {
      "id": "u5-q011",
@@ -188,7 +188,7 @@
       "The semicolon after the condition makes the loop body empty, so i never changes"
      ],
      "answer": 3,
-     "explain": "`while (i < 5);` loops on an empty statement forever. The block after it is a separate statement that is never reached."
+     "explain": "Look at the end of the header: `while (i < 5);`. A semicolon on its own is an empty statement, a statement that does nothing, and it becomes the entire body. The loop tests `0 < 5`, does nothing, tests again, forever. i never changes because `i++` is not in the loop. The block in braces is a separate statement after the loop, so it is never reached and nothing is printed.\n\nThe other explanations are wrong: int works fine for a counter, the braces correctly come after the header, and cout can be used inside any loop. The fix is to delete that semicolon."
     },
     {
      "id": "u5-q012",
@@ -206,7 +206,7 @@
      "answer": 0,
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int x = 3;\n    while (x = 0)\n        cout << \"hi\";\n    cout << \"done\";\n    return 0;\n}\n",
      "expect": "done",
-     "explain": "`x = 0` is an assignment, not a comparison. It stores 0 in x and the expression's value is 0, which is false, so the body is skipped."
+     "explain": "`x = 0` uses one equals sign, so it is an assignment, not a comparison. It stores 0 in x, and the value of the whole assignment is 0. In a condition, 0 counts as false. So the very first test is false, the body is skipped, and the program goes on to print `done`.\n\n\"hi forever\" would happen with a nonzero value such as `while (x = 1)`, because any nonzero value counts as true. \"hidone\" assumes the body runs once, but it never runs. The code does compile: g++ only warns \"suggest parentheses around assignment used as truth value\". To compare, write `x == 0`."
     },
     {
      "id": "u5-q013",
@@ -218,7 +218,7 @@
      "stdin": "120 -5 88",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int score;\n    cin >> score;\n    while (score < 0 || score > 100) {\n        cout << \"bad\\n\";\n        cin >> score;\n    }\n    cout << score;\n    return 0;\n}\n",
      "answer": "bad\nbad\n88",
-     "explain": "The first two entries are out of range, so bad prints twice. The third passes the test, the loop ends, and 88 prints. The first read before the loop is the priming read."
+     "explain": "The condition is true while the score is BAD (below 0 or above 100), so each bad value prints `bad` and reads again.\n```\ncin >> score     score = 120   (the priming read)\ntest 120         120 > 100, bad   prints bad, reads -5\ntest -5          -5 < 0, bad      prints bad, reads 88\ntest 88          in range         condition false, loop ends\ncout << score    prints 88\n```\nEach `bad` is followed by `\\n`, so the output is three lines: `bad`, `bad`, `88`."
     },
     {
      "id": "u5-q014",
@@ -233,7 +233,7 @@
       "The value must be read twice to be stored"
      ],
      "answer": 1,
-     "explain": "The priming read gives the condition something to examine. The loop body then re-reads inside, so each new value is tested before it is used."
+     "explain": "The while loop tests its condition before it runs the body even once. To test whether the value is valid, there must already be a value. The priming read before the loop supplies it, and the read inside the loop supplies each later try. Without the priming read, the first test would look at a variable that was never given a value.\n\nThe other reasons are false. cin works inside a while loop, and the second read sits inside the body. Reading first has nothing to do with speed. And the value is not read twice to store it once: each read stores a new value typed by the user."
     },
     {
      "id": "u5-q015",
@@ -247,7 +247,7 @@
       "a counter",
       "loop counter"
      ],
-     "explain": "A counter is usually initialized to 0 (or a start value) before the loop and changed by a fixed amount each iteration."
+     "explain": "It is a counter: a variable that counts how many times something happens. It starts at a known value before the loop, here 0, and changes by a fixed amount each time, here `passes++` adds 1 per iteration. So after the loop, `passes` holds the number of times the body ran. For example, if the body ran 4 times, passes is 4. A counter must be initialized, or `++` adds 1 to garbage."
     },
     {
      "id": "u5-q016",
@@ -258,7 +258,7 @@
      "code": "int c = 0;\nint n = 100;\nwhile (n > 1) {\n    n /= 2;\n    c++;\n}\ncout << c << \" \" << n;",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int c = 0;\n    int n = 100;\n    while (n > 1) {\n        n /= 2;\n        c++;\n    }\n    cout << c << \" \" << n;\n    return 0;\n}\n",
      "answer": "6 1",
-     "explain": "n goes 100, 50, 25, 12, 6, 3, 1 using integer division. That is 6 divisions, so c is 6, and the loop stops when n is 1."
+     "explain": "Make a table. Remember that `n /= 2` is integer division, so any fraction is dropped.\n```\nn at test   n > 1?   n after /= 2   c\n100         true     50             1\n50          true     25             2\n25          true     12             3   (not 12.5)\n12          true     6              4\n6           true     3              5\n3           true     1              6   (not 1.5)\n1           false    loop ends\n```\nOutput: `6 1`. If you got `7 0`, you let the loop run once more. That would happen with `n > 0`, but `1 > 1` is false, so the loop stops with n at 1."
     },
     {
      "id": "u5-q017",
@@ -274,7 +274,7 @@
       "It does not compile because != is invalid in a while"
      ],
      "answer": 2,
-     "explain": "i takes 0, 3, 6, 9, 12, ... and the test `i != 10` is always true. Use a relational test like `i < 10` when stepping by more than 1."
+     "explain": "It never stops. i goes 0, 3, 6, 9, 12, 15 and so on. It jumps from 9 straight to 12, so it is never exactly 10, and `i != 10` is true forever.\n\n\"It stops when i equals 10\" assumes i lands on 10, which it never does. \"It stops after 4 iterations\" is wrong too: after 4 iterations i is 12, and 12 is not 10, so the loop keeps going. And `!=` is perfectly valid in a while condition. The fix is to test `i < 10`, which does stop at 12 after 4 iterations."
     },
     {
      "id": "u5-q018",
@@ -283,7 +283,7 @@
      "difficulty": 2,
      "prompt": "If a while loop's body has two statements and the braces are left off, both statements are still part of the loop.",
      "answer": false,
-     "explain": "Without braces only the single statement right after the condition belongs to the loop. The second statement runs once, after the loop ends. Indenting it does not change this; the compiler ignores indentation."
+     "explain": "False. Without braces, the body of a while loop is only the one statement right after the header. The second statement is outside the loop, even if it is indented to look like part of it. The C++ compiler ignores indentation, unlike Python.\n```\nwhile (n <= 3)\n    cout << n;    // the whole body\n    n++;          // after the loop, not in it\n```\nHere n never changes inside the loop, so it runs forever. Braces around both statements fix it."
     },
     {
      "id": "u5-q019",
@@ -298,7 +298,7 @@
       "int count = 0;\nwhile (count < 3) {\n    cout << count * 2 << \" \";\n    count++;\n}"
      ],
      "answer": 3,
-     "explain": "It prints 0 2 4. The wrong choices drop the braces (infinite loop), use <= (one extra pass), or start at 1 (misses the first value)."
+     "explain": "The pseudocode starts count at 0, tests `count < 3`, and repeats two indented lines. In C++ both lines must sit inside braces. The matching code is `int count = 0;` then `while (count < 3)` with a braced body holding the `cout` and `count++`. It prints `0 2 4`.\n\nThe version without braces repeats only the `cout`. count never changes, so it prints 0 forever. The `count <= 3` version runs one extra time and prints `0 2 4 6`. The version that starts count at 1 does not match \"Set count to 0\" and prints only `2 4`."
     },
     {
      "id": "u5-q020",
@@ -309,7 +309,7 @@
      "code": "int n = 10;\ndo {\n    cout << n << \" \";\n    n++;\n} while (n < 5);",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int n = 10;\n    do {\n        cout << n << \" \";\n        n++;\n    } while (n < 5);\n    return 0;\n}\n",
      "answer": "10",
-     "explain": "The body runs once before the condition is tested. It prints 10, then 11 < 5 is false and the loop ends."
+     "explain": "A do-while runs its body before it tests anything.\n```\nn = 10\nbody:  prints 10, then n++ makes n 11\ntest:  11 < 5 is false, so the loop ends\n```\nThe output is `10`. If you answered that nothing prints, you treated it as a while loop, which would test `10 < 5` first and skip the body. In a do-while the test is not looked at until the first pass is done, so the body always runs at least once."
     },
     {
      "id": "u5-q021",
@@ -323,7 +323,7 @@
       "post-test",
       "post test"
      ],
-     "explain": "Because the test comes last, the body of a do-while always runs at least once."
+     "explain": "The do-while is a posttest loop. \"Post\" means after: the condition is tested after each pass through the body. Because nothing is tested before the first pass, the body always runs at least once. The while loop is the opposite, a pretest loop, which tests first and can run zero times. Example: `do { cout << \"hi\"; } while (false);` still prints hi once."
     },
     {
      "id": "u5-q022",
@@ -332,7 +332,7 @@
      "difficulty": 1,
      "prompt": "A do-while statement must end with a semicolon after the closing parenthesis of its condition.",
      "answer": true,
-     "explain": "`do { ... } while (cond);` The semicolon is required; leaving it off is a syntax error."
+     "explain": "True. A do-while ends with `} while (condition);` and the semicolon is required, because that line is the end of the whole statement. Without it the program does not compile. g++ reports an error such as \"expected ';' before ...\". The while loop is the opposite: a semicolon right after `while (condition)` compiles but creates an empty body, which usually means an infinite loop."
     },
     {
      "id": "u5-q023",
@@ -348,7 +348,7 @@
       "x++ cannot be used in a do-while"
      ],
      "answer": 0,
-     "explain": "A do-while must end with `;`. Compare with a while loop, which must NOT have a semicolon after its condition."
+     "explain": "The do-while ends with `} while (x < 5)` and no semicolon. A do-while must end `} while (condition);`, because that line closes the whole statement. Without the semicolon the code does not compile.\n\nThe other complaints are wrong. Braces around the body are allowed, and needed when the body has more than one statement. In a do-while the condition belongs after the body, not before the word `do`. And `x++` is fine in any loop."
     },
     {
      "id": "u5-q024",
@@ -363,7 +363,7 @@
       "It depends on the condition"
      ],
      "answer": 1,
-     "explain": "The body runs first and the test happens afterward, so at least one pass is guaranteed."
+     "explain": "At least 1 time. The body runs first and the condition is tested only afterwards, so the first pass happens no matter what the condition says.\n\n\"0\" is the answer for a while loop, which tests first and can skip the body. \"2\" has no basis: if the first test is false, the loop stops after one pass. \"It depends on the condition\" is half true: the condition decides how many passes come after the first one, but it cannot stop the first one, so the minimum is still 1."
     },
     {
      "id": "u5-q025",
@@ -374,7 +374,7 @@
      "code": "int i = 5;\nwhile (i < 5) {\n    cout << \"A\";\n    i++;\n}\ndo {\n    cout << \"B\";\n    i++;\n} while (i < 5);\ncout << i;",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int i = 5;\n    while (i < 5) {\n        cout << \"A\";\n        i++;\n    }\n    do {\n        cout << \"B\";\n        i++;\n    } while (i < 5);\n    cout << i;\n    return 0;\n}\n",
      "answer": "B6",
-     "explain": "The while loop does not run (5 < 5 is false). The do-while prints B once and increments i to 6. Then 6 is printed, giving B6."
+     "explain": "Take the two loops one at a time. i starts at 5.\n```\nwhile (i < 5)    5 < 5 is false at the first test, body skipped\ndo-while body    prints B, i++ makes i 6\ntest i < 5       6 < 5 is false, loop ends\ncout << i        prints 6\n```\nThe output is `B6`, with no space between them. No A is printed because the while loop tests first. The B prints once because the do-while runs its body before testing."
     },
     {
      "id": "u5-q026",
@@ -389,7 +389,7 @@
       "a nested loop"
      ],
      "answer": 2,
-     "explain": "A posttest loop guarantees the first pass, so the menu appears before the test. A while would need a duplicated first display or a priming trick."
+     "explain": "The do-while fits best. The menu must appear at least once before there is a choice to test, and a do-while runs its body (show the menu, read the choice) before it tests whether the choice was Quit.\n\nA while loop tests first, so you would have to show the menu once before the loop as well, or set the choice to a fake value. A for loop that repeats exactly 5 times takes the decision away from the user: the menu should repeat until they choose Quit, however many times that is. A nested loop is a loop inside another loop, and it does not address showing the menu first."
     },
     {
      "id": "u5-q027",
@@ -405,7 +405,7 @@
       "cout << k; k += 2;\nwhile (k < 6) { cout << k; k += 2; }"
      ],
      "answer": 3,
-     "explain": "A do-while is a while loop whose body is run once unconditionally first. Only the choice that writes the body once before a while loop does this. The plain while skips the body when k starts at 6 or more, and the others change the order of the statements."
+     "explain": "A do-while is one copy of the body that always runs, followed by a while loop. The matching choice writes `cout << k; k += 2;` once and then the same while loop. It gives the same output for every starting k.\n\nCheck the others with test values. If k starts at 6, the do-while prints 6, but the plain `while (k < 6)` version prints nothing, because it tests first. If k starts at 0, the do-while prints 0, 2 and 4 (shown as `024`, since nothing separates them). Both versions that do `k += 2` before `cout` print 2, 4 and 6 (`246`), because they print the value after it has changed."
     },
     {
      "id": "u5-q028",
@@ -420,7 +420,7 @@
       "int n = 3;\ndo {\n    cout << n << \" \";\n    n--;\n} while (n < 0);"
      ],
      "answer": 0,
-     "explain": "The decision comes after the process boxes, which is the shape of a do-while. It prints 3 2 1. The pretest version that decrements first prints 2 1 0, the version with a semicolon after `while (n > 0)` loops forever, and the version testing `n < 0` ends after one pass."
+     "explain": "In this flowchart the two process boxes come first and the diamond comes after them, with Yes looping back up. Diamond at the bottom means a do-while: `do { cout << n << \" \"; n--; } while (n > 0);`. It prints `3 2 1`.\n\nThe others: the while version that decrements before printing gives `2 1 0`. The version with a semicolon after `while (n > 0)` has an empty body and loops forever without printing. The do-while that tests `n < 0` prints 3, then `2 < 0` is false, so it stops after one pass."
     },
     {
      "id": "u5-q029",
@@ -437,7 +437,7 @@
       "condition expression",
       "test condition"
      ],
-     "explain": "A for header holds initialization; test; update. The test is evaluated before every iteration, like a while condition."
+     "explain": "It is the test expression. A for header holds three parts separated by semicolons: initialization, test, update. In `for (int i = 0; i < 10; i++)` the test is `i < 10`. It is checked before every pass, including the first. When it is true the body runs, and when it is false the loop ends, just like the condition of a while loop."
     },
     {
      "id": "u5-q030",
@@ -448,7 +448,7 @@
      "code": "for (int i = 2; i <= 10; i += 4)\n    cout << i << \" \";",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    for (int i = 2; i <= 10; i += 4)\n        cout << i << \" \";\n    return 0;\n}\n",
      "answer": "2 6 10",
-     "explain": "i takes 2, 6, 10 (10 <= 10 is true), then 14 which fails the test."
+     "explain": "List the values i takes. It starts at 2 and goes up by 4.\n```\ni = 2    2 <= 10 true    prints 2\ni = 6    6 <= 10 true    prints 6\ni = 10   10 <= 10 true   prints 10\ni = 14   14 <= 10 false  loop ends\n```\nOutput: `2 6 10`. 10 is printed because the test is `<=`, and 10 is equal to 10. With `i < 10` the loop would print only `2 6`."
     },
     {
      "id": "u5-q031",
@@ -466,7 +466,7 @@
      "answer": 1,
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int runs = 0;\n    for (int i = 0; i < 10; i += 3)\n        runs++;\n    cout << runs;\n    return 0;\n}\n",
      "expect": "4",
-     "explain": "i is 0, 3, 6, 9, and 12 fails i < 10. That is 4 iterations."
+     "explain": "The body runs 4 times. List the values of i, adding 3 each time:\n```\ni = 0    0 < 10 true     runs is 1\ni = 3    3 < 10 true     runs is 2\ni = 6    6 < 10 true     runs is 3\ni = 9    9 < 10 true     runs is 4\ni = 12   12 < 10 false   loop ends\n```\n\"3\" forgets either the first pass at 0 or the pass at 9. \"10\" counts as if the step were 1. \"5\" counts the value 12 as well, but 12 fails the test, so its pass never happens."
     },
     {
      "id": "u5-q032",
@@ -477,7 +477,7 @@
      "code": "for (int i = 3; i > 0; i--)\n    cout << i << \" \";\ncout << \"Go\";",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    for (int i = 3; i > 0; i--)\n        cout << i << \" \";\n    cout << \"Go\";\n    return 0;\n}\n",
      "answer": "3 2 1 Go",
-     "explain": "The loop counts down 3, 2, 1 and stops when i reaches 0. Then Go prints."
+     "explain": "The loop counts down. The test `i > 0` is checked before each pass.\n```\ni = 3   3 > 0 true    prints 3\ni = 2   true          prints 2\ni = 1   true          prints 1\ni = 0   0 > 0 false   loop ends\n```\nThen `cout << \"Go\"` runs once, after the loop. Output: `3 2 1 Go`. 0 is not printed, because the test fails before the body can run with i at 0."
     },
     {
      "id": "u5-q033",
@@ -493,7 +493,7 @@
       "It prints 0"
      ],
      "answer": 2,
-     "explain": "A variable declared in the for header exists only inside the loop. The cout after the loop cannot see i."
+     "explain": "It does not compile. `int i = 0` is declared in the for header, so i exists only inside the loop: the header and the body. After the loop the name i is gone, and `cout << i;` fails with \"'i' was not declared in this scope\".\n\n\"It prints 3\" would be right if i had been declared before the loop, as in `int i; for (i = 0; i < 3; i++) { }`. Then the loop would end with i at 3, the first value that fails the test. \"2\" and \"0\" are not the final value in any version."
     },
     {
      "id": "u5-q034",
@@ -504,7 +504,7 @@
      "code": "int x;\nfor (x = 0; x < 20; x += 6) { }\ncout << x;",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int x;\n    for (x = 0; x < 20; x += 6) { }\n    cout << x;\n    return 0;\n}\n",
      "answer": "24",
-     "explain": "x is declared outside, so it survives the loop. It goes 0, 6, 12, 18, 24. At 24 the test fails, so 24 prints."
+     "explain": "Here x is declared before the loop, so it still exists afterwards. The loop body is empty: the loop only moves x.\n```\nx = 0    0 < 20 true\nx = 6    6 < 20 true\nx = 12   12 < 20 true\nx = 18   18 < 20 true\nx = 24   24 < 20 false, loop ends\n```\n`cout << x` prints `24`. The tempting answer is 18, the last value that passed the test. But the update runs once more after the pass with 18, and the loop ends holding the first value that failed."
     },
     {
      "id": "u5-q035",
@@ -513,7 +513,7 @@
      "difficulty": 2,
      "prompt": "All three expressions in a for loop header are optional, and `for (;;)` is a loop that runs until something like break stops it.",
      "answer": true,
-     "explain": "An omitted test is treated as true. The two semicolons are still required."
+     "explain": "True. Each of the three parts of a for header may be left out, as long as both semicolons stay. Leaving out the initialization works when the variable was given its value before the loop. A missing update means the body must change things. A missing test counts as true, so `for (;;)` never ends by itself. Something inside the body has to stop it, such as a `break` statement or a `return`."
     },
     {
      "id": "u5-q036",
@@ -528,7 +528,7 @@
       "int i = 1;\nwhile (i <= 5) {\n    cout << i << \" \";\n    i++;\n}"
      ],
      "answer": 3,
-     "explain": "The initialization goes before the loop and the update goes at the end of the body, so it prints 1 2 3 4 5. Updating first prints 2 3 4 5 6, starting at 0 prints an extra 0, and the do-while testing `i < 5` stops after 4.",
+     "explain": "To turn a for loop into a while loop, move the initialization before the loop, keep the test as the while condition, and put the update at the END of the body. That gives `int i = 1;` then `while (i <= 5)` with `cout` first and `i++` last. It prints `1 2 3 4 5`.\n\nThe version with `i++` before the `cout` prints `2 3 4 5 6`, because each value is printed after it has changed. The version starting at 0 prints an extra 0. The do-while with `i < 5` stops after printing 4, because 5 < 5 is false.",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    for (int i = 1; i <= 5; i++) cout << i << \" \";\n    cout << endl;\n    int i = 1;\n    while (i <= 5) {\n        cout << i << \" \";\n        i++;\n    }\n    return 0;\n}\n",
      "expect": "1 2 3 4 5\n1 2 3 4 5"
     },
@@ -541,7 +541,7 @@
      "code": "for (int lo = 0, hi = 5; lo < hi; lo++, hi--)\n    cout << lo << hi << \" \";",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    for (int lo = 0, hi = 5; lo < hi; lo++, hi--)\n        cout << lo << hi << \" \";\n    return 0;\n}\n",
      "answer": "05 14 23",
-     "explain": "The comma lets the header initialize and update two variables. Pairs: (0,5), (1,4), (2,3). Next is (3,2), where 3 < 2 is false."
+     "explain": "The commas let the header set up and update two variables. lo goes up and hi goes down on each pass.\n```\nlo = 0, hi = 5   0 < 5 true   prints 05\nlo = 1, hi = 4   1 < 4 true   prints 14\nlo = 2, hi = 3   2 < 3 true   prints 23\nlo = 3, hi = 2   3 < 2 false  loop ends\n```\n`cout << lo << hi` prints the two numbers with nothing between them, then a space follows. Output: `05 14 23`."
     },
     {
      "id": "u5-q038",
@@ -559,7 +559,7 @@
      "answer": 0,
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int count = 0;\n    for (int i = 0; i < 3; i++);\n        count++;\n    cout << count;\n    return 0;\n}\n",
      "expect": "1",
-     "explain": "The semicolon right after the header is the loop body (an empty statement). The loop runs 3 times doing nothing, then `count++;` runs once, after the loop. The indentation is misleading; the compiler ignores it."
+     "explain": "Look at the end of the header: `for (int i = 0; i < 3; i++);`. That semicolon is an empty statement, and it is the whole body of the loop. The loop runs 3 times doing nothing, then ends. `count++;` comes after it, so it runs exactly once, and the program prints 1. The indentation only makes it look as if it is inside.\n\n\"3\" would be right without the stray semicolon. \"0\" assumes `count++` is inside a loop that never runs. It is not an infinite loop, because the update `i++` still runs on each pass and i reaches 3."
     },
     {
      "id": "u5-q039",
@@ -574,7 +574,7 @@
       "for (int i = 1; i <= 10; i--)"
      ],
      "answer": 1,
-     "explain": "Counting down to 1 needs a decrement and a test that is still true at 1, such as `i >= 1`. With `i > 1` the loop stops before printing 1; with `i <= 1` the test is false at the start so nothing prints; starting at 1 and decrementing moves away from 10, so that test never fails."
+     "explain": "To print 10 down to 1, start at 10, subtract 1 each pass, and use a test that is still true when i is 1: `for (int i = 10; i >= 1; i--)`.\n\nWith `i > 1` the test fails when i reaches 1, so it prints 10 down to 2 and misses 1. With `i <= 1` the first test is `10 <= 1`, which is false, so nothing prints. Starting at 1 with `i--` moves i down to 0, -1, -2 and so on, away from 10. The test `i <= 10` stays true and the loop never ends."
     },
     {
      "id": "u5-q040",
@@ -589,7 +589,7 @@
       "n = n + 5",
       "n=n+5"
      ],
-     "explain": "The update expression adds 5 each pass, which stays within the test limit of 100."
+     "explain": "The update must add 5 to n and store it back: `n += 5` (or `n = n + 5`). Then n goes 0, 5, 10 and so on up to 100, and 105 fails the test.\n```\nfor (int n = 0; n <= 100; n += 5)\n```\n`n++` would visit every number, 0, 1, 2 and so on. `n + 5` alone works out a value but stores nothing, so n would stay 0 and the loop would never end. g++ warns \"for increment expression has no effect\"."
     },
     {
      "id": "u5-q041",
@@ -600,7 +600,7 @@
      "code": "int j = 1;\nfor (; j < 50; )\n    j *= 3;\ncout << j;",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int j = 1;\n    for (; j < 50; )\n        j *= 3;\n    cout << j;\n    return 0;\n}\n",
      "answer": "81",
-     "explain": "Initialization and update are omitted here, which is legal. j goes 1, 3, 9, 27, 81. At 81 the test fails."
+     "explain": "This for header has no initialization and no update, only a test: `for (; j < 50; )`. That is legal. j was set before the loop, and the body changes it.\n```\nj = 1    1 < 50 true    j becomes 3\nj = 3    true           j becomes 9\nj = 9    true           j becomes 27\nj = 27   true           j becomes 81\nj = 81   81 < 50 false  loop ends\n```\nOutput: `81`. The tempting answer is 27, the last value that passed the test. But the body ran with 27 and changed j to 81 before the next test."
     },
     {
      "id": "u5-q042",
@@ -611,7 +611,7 @@
      "code": "int total = 0;\nfor (int i = 1; i <= 5; i++)\n    total += i * i;\ncout << total;",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int total = 0;\n    for (int i = 1; i <= 5; i++)\n        total += i * i;\n    cout << total;\n    return 0;\n}\n",
      "answer": "55",
-     "explain": "The accumulator adds 1 + 4 + 9 + 16 + 25 = 55."
+     "explain": "total is an accumulator: each pass adds `i * i`, the square of i.\n```\ni = 1   adds 1    total 1\ni = 2   adds 4    total 5\ni = 3   adds 9    total 14\ni = 4   adds 16   total 30\ni = 5   adds 25   total 55\n```\ni = 6 fails `i <= 5`, so the loop ends and the program prints `55`. If you got 15, you added i instead of `i * i`."
     },
     {
      "id": "u5-q043",
@@ -629,7 +629,7 @@
      "answer": 2,
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int prod = 1;\n    for (int i = 1; i <= 5; i++)\n        prod *= i;\n    cout << prod;\n    return 0;\n}\n",
      "expect": "120",
-     "explain": "An accumulator for a product starts at 1, the value that does not change a product. Start at 0 and the product stays 0 forever; leave it uninitialized and it starts with garbage. Starting at 1 gives 1 x 2 x 3 x 4 x 5 = 120."
+     "explain": "A product must start at 1, because multiplying by 1 changes nothing. Then the loop builds 1 x 1 x 2 x 3 x 4 x 5 = 120.\n\nStarting at 0 makes every step 0 x something, so the answer stays 0 forever. Starting at 5 gives 5 x 120 = 600. \"Any value, it will be overwritten\" is wrong because `prod *= i` means `prod = prod * i`: every step uses the old value, so the starting value is never replaced, it is multiplied into the answer."
     },
     {
      "id": "u5-q044",
@@ -642,7 +642,7 @@
       "sentinel",
       "sentinel value"
      ],
-     "explain": "The loop tests for it; it must be a value that can never be valid data, such as -1 for an age."
+     "explain": "It is a sentinel: a special value whose only job is to say the list is over. The loop tests each value against it and stops when it appears, without processing it. It must be something real data can never be. For example, ages and test scores are never negative, so -1 works as a sentinel: `while (score != -1) { ... }`."
     },
     {
      "id": "u5-q045",
@@ -654,7 +654,7 @@
      "stdin": "4 9 2 -1",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int n, sum = 0;\n    cin >> n;\n    while (n != -1) {\n        sum += n;\n        cin >> n;\n    }\n    cout << sum;\n    return 0;\n}\n",
      "answer": "15",
-     "explain": "The sentinel -1 ends the loop before it is added. The sum is 4 + 9 + 2 = 15."
+     "explain": "This is the safe sentinel pattern: a priming read, then the next read as the last statement of the body, so each value is tested before it is added.\n```\nn = 4    4 != -1 true     sum = 4,  reads 9\nn = 9    true             sum = 13, reads 2\nn = 2    true             sum = 15, reads -1\nn = -1   -1 != -1 false   loop ends\n```\nIt prints `15`. The -1 reaches the test before it can be added, so it never touches the sum."
     },
     {
      "id": "u5-q046",
@@ -666,7 +666,7 @@
      "stdin": "4 9 2 -1",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int n, sum = 0;\n    do {\n        cin >> n;\n        sum += n;\n    } while (n != -1);\n    cout << sum;\n    return 0;\n}\n",
      "answer": "14",
-     "explain": "This do-while adds each value before testing it, including the sentinel. 4 + 9 + 2 + (-1) = 14. The while version with a priming read avoids this."
+     "explain": "In this do-while the body reads a value and adds it BEFORE the test looks at it, so the sentinel gets added too.\n```\nreads 4,  sum 4    4 != -1, go again\nreads 9,  sum 13   go again\nreads 2,  sum 15   go again\nreads -1, sum 14   -1 != -1 is false, loop ends\n```\nIt prints `14`. The tempting answer is 15, the answer you would get if the -1 were not added. That is what the while loop with a priming read does, which is why that is the correct pattern for sentinels."
     },
     {
      "id": "u5-q047",
@@ -675,7 +675,7 @@
      "difficulty": 1,
      "prompt": "Like a while loop, a for loop whose condition is false at the very start runs its body zero times.",
      "answer": true,
-     "explain": "A for loop evaluates its test before the first iteration, so the body can run zero times."
+     "explain": "True. A for loop checks its test before every pass, including the first one, just as a while loop does. Both are pretest loops. So if the test is false at the start, the body never runs. For example, `for (int i = 10; i < 5; i++) cout << i;` prints nothing, because 10 < 5 is false at the first test. Only the do-while is guaranteed to run at least once."
     },
     {
      "id": "u5-q048",
@@ -688,7 +688,7 @@
       "accumulator",
       "an accumulator"
      ],
-     "explain": "The sum itself is the running total; the variable that holds it is the accumulator. It must be initialized (usually to 0) before the loop starts."
+     "explain": "It is an accumulator: the variable that collects a running total. It is set to a starting value before the loop, usually 0, and each pass adds the new value to it: `total += value;`. Example: with `int total = 0;` and the values 3, 5 and 2, total goes 3, 8, 10. The running total is the sum itself. The accumulator is the variable that holds it."
     },
     {
      "id": "u5-q049",
@@ -699,7 +699,7 @@
      "code": "for (int i = 1; i <= 3; i++) {\n    for (int j = 1; j <= 2; j++)\n        cout << i * j << \" \";\n    cout << endl;\n}",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    for (int i = 1; i <= 3; i++) {\n        for (int j = 1; j <= 2; j++)\n            cout << i * j << \" \";\n        cout << endl;\n    }\n    return 0;\n}\n",
      "answer": "1 2 \n2 4 \n3 6",
-     "explain": "For each i the inner loop runs j = 1 and 2. Row 1: 1 2, row 2: 2 4, row 3: 3 6."
+     "explain": "For each value of i, the inner loop runs j = 1 and j = 2, printing `i * j` and a space. After the inner loop ends, `endl` finishes the row.\n```\ni = 1:   1*1 = 1,  1*2 = 2    row: 1 2\ni = 2:   2*1 = 2,  2*2 = 4    row: 2 4\ni = 3:   3*1 = 3,  3*2 = 6    row: 3 6\n```\nSo there are three lines: `1 2`, `2 4`, `3 6`. Three rows because the outer loop runs 3 times. Two numbers per row because the inner loop runs 2 times for each row."
     },
     {
      "id": "u5-q050",
@@ -717,7 +717,7 @@
      "answer": 3,
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int count = 0;\n    for (int i = 0; i < 4; i++)\n        for (int j = 0; j < 3; j++)\n            count++;\n    cout << count;\n    return 0;\n}\n",
      "expect": "12",
-     "explain": "The inner loop runs completely, 3 times, for each of the 4 outer iterations. Multiply, do not add: 4 x 3 = 12."
+     "explain": "12. For every one of the 4 outer passes (i = 0 to 3), the inner loop starts again and runs its 3 passes (j = 0 to 2), so `count++` runs 4 x 3 = 12 times.\n\n\"7\" adds the counts instead of multiplying them. \"4\" counts only the outer passes, and \"3\" only the inner passes of a single outer pass. Remember that the inner loop does not run 3 times in total: it runs 3 times for each outer pass."
     },
     {
      "id": "u5-q051",
@@ -728,7 +728,7 @@
      "code": "int n = 0;\nfor (int i = 1; i <= 4; i++)\n    for (int j = 1; j <= i; j++)\n        n++;\ncout << n;",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int n = 0;\n    for (int i = 1; i <= 4; i++)\n        for (int j = 1; j <= i; j++)\n            n++;\n    cout << n;\n    return 0;\n}\n",
      "answer": "10",
-     "explain": "The inner loop runs 1, 2, 3, then 4 times: 1 + 2 + 3 + 4 = 10."
+     "explain": "Here the inner limit is i, so the inner loop runs a different number of times on each outer pass. Add them up row by row.\n```\ni = 1   j = 1             n goes up 1 time\ni = 2   j = 1, 2          2 times\ni = 3   j = 1, 2, 3       3 times\ni = 4   j = 1, 2, 3, 4    4 times\n```\nTotal: 1 + 2 + 3 + 4 = 10, so it prints `10`. Multiplying 4 x 4 = 16 would be wrong, because only the last row has 4 passes."
     },
     {
      "id": "u5-q052",
@@ -739,7 +739,7 @@
      "code": "for (int r = 1; r <= 3; r++) {\n    for (int c = 1; c <= r; c++)\n        cout << '*';\n    cout << '\\n';\n}",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    for (int r = 1; r <= 3; r++) {\n        for (int c = 1; c <= r; c++)\n            cout << '*';\n        cout << '\\n';\n    }\n    return 0;\n}\n",
      "answer": "*\n**\n***",
-     "explain": "Row r prints r stars, giving a triangle of 1, 2 and 3 stars."
+     "explain": "The outer loop makes 3 rows. On row r, the inner loop prints r stars, and then `'\\n'` ends the line.\n```\nr = 1   c = 1          *\nr = 2   c = 1, 2       **\nr = 3   c = 1, 2, 3    ***\n```\nThe output is a triangle of three lines: `*`, `**`, `***`. The newline is after the inner loop but inside the outer loop, so each row ends on its own line."
     },
     {
      "id": "u5-q053",
@@ -748,7 +748,7 @@
      "difficulty": 1,
      "prompt": "An outer loop runs 4 times and, on each of those passes, an inner loop runs 3 times. The inner loop's body therefore executes 7 times in total.",
      "answer": false,
-     "explain": "The inner loop starts over and completes for every outer pass, so the counts multiply: 4 * 3 = 12, not 4 + 3."
+     "explain": "False. The inner loop does not run 3 times in total. It runs 3 times for EACH outer pass, starting again from the beginning every time. So the counts multiply: 4 x 3 = 12 executions of the inner body. 7 comes from adding 4 + 3, which treats the loops as if they ran one after the other instead of one inside the other."
     },
     {
      "id": "u5-q054",
@@ -762,7 +762,7 @@
       "break;",
       "the break statement"
      ],
-     "explain": "Execution continues with the first statement after that loop."
+     "explain": "`break` ends the loop at once. The rest of the body is skipped, the update does not run, and the program continues with the first statement after the loop. In nested loops it leaves only the innermost loop containing it. Example: `for (i = 1; i <= 10; i++) { if (i == 4) break; }` stops with i at 4."
     },
     {
      "id": "u5-q055",
@@ -773,7 +773,7 @@
      "code": "for (int i = 1; i <= 6; i++) {\n    if (i % 2 == 0)\n        continue;\n    cout << i;\n}",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    for (int i = 1; i <= 6; i++) {\n        if (i % 2 == 0)\n            continue;\n        cout << i;\n    }\n    return 0;\n}\n",
      "answer": "135",
-     "explain": "continue skips the rest of the body for even values, so only 1, 3 and 5 print."
+     "explain": "`i % 2 == 0` is true for even numbers. For those, `continue` skips the `cout`, and the for loop goes on to its update and the next value.\n```\ni = 1   odd    prints 1\ni = 2   even   skipped\ni = 3   odd    prints 3\ni = 4   even   skipped\ni = 5   odd    prints 5\ni = 6   even   skipped\n```\nNo spaces are printed, so the output is `135`. continue does not end the loop. It only skips the rest of that one pass."
     },
     {
      "id": "u5-q056",
@@ -784,7 +784,7 @@
      "code": "int last = 0;\nint i;\nfor (i = 1; i <= 10; i++) {\n    if (i * i > 30)\n        break;\n    last = i;\n}\ncout << last << \" \" << i;",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int last = 0;\n    int i;\n    for (i = 1; i <= 10; i++) {\n        if (i * i > 30)\n            break;\n        last = i;\n    }\n    cout << last << \" \" << i;\n    return 0;\n}\n",
      "answer": "5 6",
-     "explain": "At i = 6, 36 > 30 triggers break before last is updated, and i is not incremented again. So last is 5 and i is 6."
+     "explain": "Trace i, i * i and last. The `break` comes before `last = i`.\n```\ni = 1..5   squares 1, 4, 9, 16, 25   all <= 30, last = i each time\ni = 5      last = 5\ni = 6      36 > 30, break\n```\nAt i = 6 the break runs before `last = i`, so last stays 5. The break also skips the update, so i is not increased again and stays 6. Since i was declared before the loop, it still exists after it. Output: `5 6`. If you said `6 7`, you let the update and the assignment run after the break."
     },
     {
      "id": "u5-q057",
@@ -795,7 +795,7 @@
      "code": "for (int i = 1; i <= 3; i++) {\n    for (int j = 1; j <= 3; j++) {\n        if (j == 2)\n            break;\n        cout << i << j << \" \";\n    }\n}",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    for (int i = 1; i <= 3; i++) {\n        for (int j = 1; j <= 3; j++) {\n            if (j == 2)\n                break;\n            cout << i << j << \" \";\n        }\n    }\n    return 0;\n}\n",
      "answer": "11 21 31",
-     "explain": "break leaves only the inner loop. Each time the outer loop runs, j = 1 prints and j = 2 breaks. The outer loop still goes on to i = 2 and 3."
+     "explain": "break leaves only the inner loop. The outer loop still makes all its passes.\n```\ni = 1:  j = 1 prints 11,  j = 2 break\ni = 2:  j = 1 prints 21,  j = 2 break\ni = 3:  j = 1 prints 31,  j = 2 break\n```\nEach inner run starts again at j = 1, prints one pair, and stops at j = 2. Output: `11 21 31`. If you answered just `11`, you assumed break ends both loops. It does not."
     },
     {
      "id": "u5-q058",
@@ -811,7 +811,7 @@
       "It ends after skipping the value 2"
      ],
      "answer": 0,
-     "explain": "continue in a while loop jumps straight to the condition test. With i stuck at 2, the same path repeats forever."
+     "explain": "It never ends. In a while loop, `continue` jumps straight back to the test, skipping everything after it in the body, including `i++`.\n```\ni = 0   not 2, i++   i = 1\ni = 1   not 2, i++   i = 2\ni = 2   continue: back to the test, i++ skipped\ni = 2   2 < 5 true, continue again ... forever\n```\ni is stuck at 2. \"It ends when i reaches 5\" and \"It ends after skipping the value 2\" would only be true if i still went up on the continue pass, as it does in a for loop. \"It prints nothing and ends\" is half right: there is no cout, but the loop never ends."
     },
     {
      "id": "u5-q059",
@@ -820,7 +820,7 @@
      "difficulty": 3,
      "prompt": "In a for loop, the continue statement skips the update expression, so i is not incremented on that pass.",
      "answer": false,
-     "explain": "continue jumps to the update expression of a for loop, then the test. That is a major difference from while, where there is no automatic update."
+     "explain": "False. In a for loop, `continue` skips the rest of the body but then jumps to the update expression, so i IS incremented, and then the test runs. That is why `for (int i = 1; i <= 6; i++) { if (i % 2 == 0) continue; cout << i; }` still finishes and prints 135. The while loop is different: it has no update part, so a `continue` there jumps straight to the test and skips any update written in the body."
     },
     {
      "id": "u5-q060",
@@ -835,7 +835,7 @@
       "It restarts the inner loop from its initialization"
      ],
      "answer": 1,
-     "explain": "break exits the one loop it is directly inside. Leaving several loops needs a flag, a return, or a goto."
+     "explain": "break exits only the innermost loop that contains it. The program carries on after that inner loop, still inside the outer loop, which goes on with its next pass.\n\nIt does not exit all enclosing loops. To leave both, a program usually sets a flag variable that the outer loop also tests. It does not skip an iteration of the outer loop, and skipping a pass is what continue does anyway, not break. It does not restart the inner loop either. The inner loop starts again only when the outer loop makes its next pass and reaches it."
     },
     {
      "id": "u5-q061",
@@ -849,7 +849,7 @@
       "<fstream>",
       "#include <fstream>"
      ],
-     "explain": "Both classes are declared in the `<fstream>` header."
+     "explain": "The header is `<fstream>`, short for file stream. It declares both `ifstream` (input file stream, for reading a file) and `ofstream` (output file stream, for writing one). A program that uses files includes it next to `<iostream>`:\n```\n#include <iostream>\n#include <fstream>\n```\n`<iostream>` alone gives you `cin` and `cout`, but not the file stream types."
     },
     {
      "id": "u5-q062",
@@ -864,7 +864,7 @@
       "iostream"
      ],
      "answer": 2,
-     "explain": "The o stands for output: an ofstream writes to a file. ifstream reads from a file, and istream and iostream are the console stream types used by cin and cout."
+     "explain": "`ofstream`, the output file stream. The o stands for output: data goes out of the program into the file, using `<<` just like `cout`. Example: `ofstream outFile(\"data.txt\"); outFile << 42;`.\n\n`ifstream` is the input file stream, used to read a file, not write one. `istream` is the general input stream type that `cin` belongs to. `iostream` is best known as the header that gives you `cin` and `cout`. Neither of the last two opens a file for writing."
     },
     {
      "id": "u5-q063",
@@ -873,7 +873,7 @@
      "difficulty": 1,
      "prompt": "After you finish using a file stream you should call its `close` member function.",
      "answer": true,
-     "explain": "Closing flushes any buffered data and releases the file."
+     "explain": "True. Call `close()` when you have finished, as in `outFile.close();`. Output to a file is held in a memory buffer and written to the disk in chunks. Closing makes sure everything still in the buffer is actually written to the file, and it releases the file so it can be used again, for example reopened for reading. It applies to both `ifstream` and `ofstream`."
     },
     {
      "id": "u5-q064",
@@ -888,7 +888,7 @@
       "while (inFile >> value) { ... }"
      ],
      "answer": 3,
-     "explain": "The extraction expression evaluates to false when a read fails, including at end of file, so the loop ends naturally."
+     "explain": "`while (inFile >> value)` is the standard end-of-file loop. The expression `inFile >> value` tries to read a value, and then counts as true if the read worked and false if it failed. At the end of the file there is nothing left to read, so the read fails and the loop stops.\n\nThe others: `inFile.close()` closes the file and gives back no true or false value, so it cannot be a condition and does not compile. The `EOF` version reads from `cin`, the keyboard, not from inFile at all. And `inFile << value` uses the output operator on an input stream, which does not compile. You read with `>>`."
     },
     {
      "id": "u5-q065",
@@ -897,7 +897,7 @@
      "difficulty": 2,
      "prompt": "If an ofstream opens a file name that does not exist yet, the file is created; if an ifstream opens a file name that does not exist, the open fails.",
      "answer": true,
-     "explain": "An output stream creates the file it is asked to open. An input stream cannot read a file that is not there, so check that the open worked, for example with `if (!inFile)`, before reading."
+     "explain": "True. Opening a file for output with an ofstream creates the file if it does not exist yet, ready to be written. Opening a file for input with an ifstream needs the file to be there already: if it is missing there is nothing to read, so the open fails. C++ does not stop the program, the stream just goes into a fail state. That is why a program checks first:\n```\nifstream inFile(\"data.txt\");\nif (!inFile)\n    cout << \"Could not open the file\\n\";\n```"
     },
     {
      "id": "u5-q066",
@@ -912,7 +912,7 @@
       "the body",
       "body of the loop"
      ],
-     "explain": "The first line, such as `while (count < 10)`, is the loop header; what it repeats is the body. The body is a conditionally executed statement, because it runs only while the condition is true."
+     "explain": "The body is the statement, or the block of statements in braces, that the loop repeats. In\n```\nwhile (count < 10)\n{\n    cout << count;\n    count++;\n}\n```\nthe header is `while (count < 10)` and the body is the two statements in braces. The body is also called a conditionally executed statement, because it runs only while the condition is true."
     },
     {
      "id": "u5-q067",
@@ -926,7 +926,7 @@
       "an iteration",
       "iterations"
      ],
-     "explain": "A loop whose body runs 7 times performs 7 iterations. \"How many times does the loop run\" asks for the number of iterations."
+     "explain": "An iteration is one complete pass through the body of a loop. If a loop prints `1 2 3` by printing one number per pass, it performed 3 iterations. When a question asks how many times a loop runs, it is asking for the number of iterations. That is one fewer than the number of tests, because the last test is the one that comes out false."
     },
     {
      "id": "u5-q068",
@@ -941,7 +941,7 @@
       "endless",
       "endless loop"
      ],
-     "explain": "Common causes: never changing the variable the condition tests, a semicolon right after `while (...)`, and using `=` where `==` was meant."
+     "explain": "An infinite loop never stops, because its condition never becomes false. The program seems to freeze or repeats the same output forever. In a terminal, Ctrl+C stops it. The usual causes: the body never changes the variable the condition tests, a semicolon right after `while (...)` makes the body empty, `=` is used where `==` was meant, or `!=` is tested with a step that jumps over the target, such as `i != 10` while adding 3."
     },
     {
      "id": "u5-q069",
@@ -955,7 +955,7 @@
       "prefix mode",
       "pre-fix"
      ],
-     "explain": "Prefix mode changes the variable first and then uses the new value. Postfix mode (`total++`) uses the old value and changes the variable afterward."
+     "explain": "Written before the variable, as in `++total`, the operator is in prefix mode. \"Pre\" means before. Prefix changes the variable first, and the expression's value is the new value: if total is 4, `cout << ++total;` prints 5. The other mode is postfix, `total++`, which puts the operator after the variable and hands back the old value."
     },
     {
      "id": "u5-q070",
@@ -970,7 +970,7 @@
       "counter-limited for loop"
      ],
      "answer": 1,
-     "explain": "A conditional loop repeats while (or until) a condition holds, so its number of passes is not known in advance. A count-controlled loop initializes a counter, tests it against a limit and updates it, which suits a repeat count fixed before the loop starts."
+     "explain": "It is a conditional loop: it repeats while a condition holds (here, \"the password is wrong\"), so nobody knows beforehand how many passes it will take. A while or do-while loop is the usual way to write it.\n\nA count-controlled loop is the opposite: it runs a number of times known before the loop starts, using a counter that is initialized, tested and updated. A nested loop is a loop inside another loop, which has nothing to do with this. \"Counter-limited for loop\" is not a standard term, and a counter limit is exactly what this loop does not have."
     },
     {
      "id": "u5-q071",
@@ -985,7 +985,7 @@
       "for"
      ],
      "answer": 3,
-     "explain": "The for loop is ideal when you can say in advance exactly how many passes are needed: its header initializes, tests and updates the counter in one place. A while could do it, but the for is the tool the book recommends for counting."
+     "explain": "The for loop. The number of passes, 30, is known before the loop starts, so this is a count-controlled loop, and that is what the for loop is built for: `for (int i = 1; i <= 30; i++)`. Its header keeps the start, the test and the update together.\n\nA while loop could do it, but it suits loops whose number of passes is unknown. A do-while suits a body that must run at least once before a test, such as a menu. A nested loop is a loop inside another loop, which is not needed for one list of 30 scores."
     },
     {
      "id": "u5-q072",
@@ -1000,7 +1000,7 @@
       "a nested loop"
      ],
      "answer": 1,
-     "explain": "A while loop is a pretest loop, so with a priming read it can stop before processing anything. A do-while always processes at least once, so it would process the -1 too."
+     "explain": "A while loop with a priming read. The first value is read before the loop, and the while tests it before doing anything else. If it is -1, the test is false at once and the processing never runs. That is exactly what is required.\n\nA do-while reads and processes, then tests, so it would process the -1 as if it were data. A for loop that always runs 10 times ignores the sentinel completely. A nested loop is a loop inside another loop and does not help here."
     },
     {
      "id": "u5-q073",
@@ -1011,7 +1011,7 @@
      "code": "for (int i = 0; i < 10; i++) {\n    cout << i << \" \";\n    i += 2;\n}",
      "answer": "0 3 6 9",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    for (int i = 0; i < 10; i++) {\n        cout << i << \" \";\n        i += 2;\n    }\n    return 0;\n}\n",
-     "explain": "Each pass adds 2 in the body and 1 in the update, so i goes 0, 3, 6, 9, then 12 fails the test. This is why the book warns against changing a for loop's counter inside the body: the loop stops at unexpected values."
+     "explain": "i is changed twice per pass: `i += 2` in the body, then `i++` in the update.\n```\ni = 0   0 < 10   prints 0, body makes 2, update makes 3\ni = 3   3 < 10   prints 3, body makes 5, update makes 6\ni = 6   6 < 10   prints 6, body makes 8, update makes 9\ni = 9   9 < 10   prints 9, body makes 11, update makes 12\ni = 12  12 < 10 false, loop ends\n```\nOutput: `0 3 6 9`. If you answered `0 1 2 ... 9`, you missed the `i += 2` in the body. This is why a for loop's counter should be changed only in the update part."
     },
     {
      "id": "u5-q074",
@@ -1020,7 +1020,7 @@
      "difficulty": 2,
      "prompt": "A counter does not need to be initialized before a loop, because `count++` starts an uninitialized int variable at 0.",
      "answer": false,
-     "explain": "A local variable that is not initialized holds an unpredictable value, and reading it is undefined behavior. Always set a counter (and an accumulator) to its starting value before the loop."
+     "explain": "False. A local variable that is declared without a value is not set to 0. It holds whatever bits happened to be in that memory, often called garbage. `count++` adds 1 to that garbage, so the count could be any number. Reading a variable that was never given a value is undefined behavior. Do not count on the compiler to catch it: g++ with -Wall often gives no warning when the variable is used inside a loop. Always write the starting value: `int count = 0;`."
     },
     {
      "id": "u5-q075",
@@ -1031,7 +1031,7 @@
      "code": "int t = 0;\nwhile (t++ < 3)\n    cout << t << \" \";\ncout << t;",
      "answer": "1 2 3 4",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int t = 0;\n    while (t++ < 3)\n        cout << t << \" \";\n    cout << t;\n    return 0;\n}\n",
-     "explain": "Postfix compares the OLD value and then increments. The tests use 0, 1, 2 (true, printing 1 2 3) and then 3 (false), but t is still incremented to 4 by that last test."
+     "explain": "A while loop checks its condition, runs the body if it is true, then checks again. Here the condition `t++ < 3` compares the OLD t with 3, and then t goes up by 1. That happens every time the test runs.\n```\ntest 1:  0 < 3 true    t is now 1   body prints 1\ntest 2:  1 < 3 true    t is now 2   body prints 2\ntest 3:  2 < 3 true    t is now 3   body prints 3\ntest 4:  3 < 3 false   t is now 4   loop ends\nafter the loop:  cout << t          prints 4\n```\nOutput: `1 2 3 4`. Two traps: the body prints the new t, one more than the value tested, and the failing test still adds 1, so t ends at 4, not 3."
     },
     {
      "id": "u5-q076",
@@ -1047,7 +1047,7 @@
       "It increments both a and b, then prints 11"
      ],
      "answer": 2,
-     "explain": "++ and -- need something that can be changed (an lvalue). `a + b` is a temporary value with no storage to update, so g++ reports \"lvalue required as increment operand\". Write `c = a + b + 1;` instead."
+     "explain": "It does not compile. `++` stores a new value back into its operand, so the operand must be a variable (an lvalue). `(a + b)` is a calculated result, 9, that exists only for a moment. There is no variable to put 10 into, so g++ stops with \"lvalue required as increment operand\".\n\nThat rules out every choice that describes the program running: the code never runs, so it cannot print 10 or 11, and it never changes a or b. To get 10, write `c = a + b + 1;`."
     },
     {
      "id": "u5-q077",
@@ -1063,7 +1063,7 @@
       "the condition should use && instead of ||"
      ],
      "answer": 0,
-     "explain": "The first test reads an uninitialized variable, so whether the body runs at all is unpredictable. A do-while runs the body once before testing again, which is the natural fit for a \"do this again?\" loop. The || is correct: either y or Y should repeat."
+     "explain": "The first test reads `again` before it has ever been given a value. `char again;` leaves it holding leftover garbage, so whether the body runs even once is unpredictable. Reading a variable with no value is undefined behavior. A do-while fixes it, because the body reads `again` before the test uses it. Giving it a value before the loop also works.\n\nThe other choices are not errors. A char compares with a character literal such as 'y' using `==`. `total` must be declared outside the loop so the running total survives each pass. And `||` is right: the loop should repeat if the answer is y OR Y. With `&&` it would need to be both at once, which is impossible."
     },
     {
      "id": "u5-q078",
@@ -1075,7 +1075,7 @@
      "answer": "30",
      "stdin": "4\n10 20 30 40\n",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int howMany, total = 0;\n    cin >> howMany;\n    for (int i = 0; i < howMany; i++) {\n        int num;\n        cin >> num;\n        total += num;\n        i++;\n    }\n    cout << total;\n    return 0;\n}\n",
-     "explain": "i is increased in the body AND in the update, so it goes 0, 2, 4 and only two numbers (10 and 20) are read. Change the counter only in the update expression. Declaring num inside the body is fine."
+     "explain": "howMany is 4, so the loop should read 4 numbers. But i is increased twice per pass, once by the `i++` in the body and once by the update.\n```\ni = 0   0 < 4   reads 10, total 10, body i 1, update i 2\ni = 2   2 < 4   reads 20, total 30, body i 3, update i 4\ni = 4   4 < 4 false, loop ends\n```\nOnly 10 and 20 were read, so it prints `30`, not 100. 30 and 40 are never read. Declaring `num` inside the body is fine. The bug is the extra `i++`."
     },
     {
      "id": "u5-q079",
@@ -1091,7 +1091,7 @@
       "The loop runs again, and keeps running whatever is entered"
      ],
      "answer": 3,
-     "explain": "`choice = 1` assigns 1 to choice, and the value of that expression is 1, which is true. So the test is always true and the loop never ends. The fix is `choice == 1`. It does compile; g++ only warns."
+     "explain": "The loop runs again, and keeps running whatever is entered. `choice = 1` uses one equals sign, so it is an assignment. Each time the test runs it stores 1 in `choice`, overwriting the 0 the user typed, and the value of the assignment is 1. Any nonzero value counts as true, so the test is always true.\n\nIt does compile: g++ only warns \"suggest parentheses around assignment used as truth value\". A do-while does not run exactly once, it runs at least once. \"The loop ends because choice is 0\" would be right for `choice == 1`, which is the fix."
     },
     {
      "id": "u5-q080",
@@ -1100,7 +1100,7 @@
      "difficulty": 2,
      "prompt": "A variable defined inside the body of a while loop can still be used by statements after the loop ends.",
      "answer": false,
-     "explain": "Defining variables inside a loop body is allowed, but their scope is that block. After the closing brace the name no longer exists, so using it is a compile error."
+     "explain": "False. A variable declared inside the braces of a loop body exists only inside that block. That block is its scope. After the closing brace the name no longer exists, so a statement after the loop that uses it does not compile. For example, `while (n < 3) { int t = n * 2; n++; } cout << t;` fails with \"'t' was not declared in this scope\". To keep a value after the loop, declare the variable before the loop."
     },
     {
      "id": "u5-q081",
@@ -1109,7 +1109,7 @@
      "difficulty": 2,
      "prompt": "In a nested loop, the outer loop's counter changes value more often than the inner loop's counter.",
      "answer": false,
-     "explain": "It is the other way around. The inner loop runs all of its iterations for each single iteration of the outer loop, like a clock's second hand moving 60 times for each move of the minute hand."
+     "explain": "False. It is the other way round. For each single pass of the outer loop, the inner loop runs through all its values. So the inner counter changes many times while the outer counter changes once. Think of a clock: the second hand (inner) goes all the way round for every single step of the minute hand (outer). In `for (i...) for (j...)`, j changes fastest."
     },
     {
      "id": "u5-q082",
@@ -1118,7 +1118,7 @@
      "difficulty": 2,
      "prompt": "The break statement skips the rest of the current iteration and then continues with the loop's next iteration.",
      "answer": false,
-     "explain": "That describes continue. break ends the loop immediately, and execution goes to the first statement after the loop."
+     "explain": "False. That describes `continue`, which skips the rest of the current pass and then goes on with the next pass. `break` ends the whole loop immediately: no more passes at all, and the program continues with the first statement after the loop. Example: in a loop over 1 to 5 that has `if (i == 3) break;` before `cout << i;`, the output is 12. With `continue` instead of `break`, it is 1245."
     },
     {
      "id": "u5-q083",
@@ -1132,7 +1132,7 @@
       "continue;",
       "the continue statement"
      ],
-     "explain": "In a while or do-while, continue jumps to the test; in a for, it jumps to the update expression and then the test. break, by contrast, leaves the loop."
+     "explain": "The keyword is `continue`. It abandons the rest of the current pass, but the loop keeps going. In a for loop control goes to the update and then the test. In a while or do-while it goes straight to the test. Example: `for (int i = 1; i <= 4; i++) { if (i == 2) continue; cout << i; }` prints 134. Do not confuse it with `break`, which leaves the loop altogether."
     },
     {
      "id": "u5-q084",
@@ -1141,7 +1141,7 @@
      "difficulty": 2,
      "prompt": "By default, opening a file that already exists with an ofstream object erases the file's previous contents.",
      "answer": true,
-     "explain": "An ofstream opened in its default mode starts the file empty, so old data is lost. Appending instead needs a different open mode, which this course does not require."
+     "explain": "True. By default, an ofstream that opens an existing file erases the old contents and starts the file empty, so anything that was in it is lost. For example, if scores.txt holds three numbers and a program opens it with `ofstream out(\"scores.txt\");` and writes 5, the file afterwards holds only 5. Adding to the end of a file instead needs a different open mode, which this course does not require."
     },
     {
      "id": "u5-q085",
@@ -1156,7 +1156,7 @@
       "In the middle of the file"
      ],
      "answer": 2,
-     "explain": "The read position marks the next byte to be read. It starts at the beginning of the file and moves forward as each value is read."
+     "explain": "At the first byte of the file. The read position marks the next byte the stream will read. A newly opened ifstream starts at the very beginning, so the first `>>` reads the first value in the file. Each read moves the position forward past what it read.\n\nIt is not at the end of the file: then there would be nothing to read. It does not remember where another program stopped, because each newly opened stream starts fresh. And there is no reason for it to start in the middle."
     },
     {
      "id": "u5-q086",
@@ -1172,7 +1172,7 @@
       "`int k = 0`"
      ],
      "answer": 3,
-     "explain": "The initialization expression runs once, before anything else. Here the test is evaluated 9 times (the last one fails), and the body and the update each run 8 times."
+     "explain": "The initialization, `int k = 0`, runs exactly once, before anything else. Then the loop cycles through test, body, update.\n\nFor this loop: the test `k < 8` runs 9 times, for k = 0 to 7 (true) and once more for k = 8, which fails. The body `total += k` runs 8 times. The update `k++` also runs 8 times, once after each pass of the body. So only the initialization is independent of the number of iterations."
     },
     {
      "id": "u5-q087",
@@ -1184,7 +1184,7 @@
      "answer": "32",
      "stdin": "4\n10 20 5 -3\n",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int count, value, total = 0;\n    cin >> count;\n    for (int i = 1; i <= count; i++) {\n        cin >> value;\n        total += value;\n    }\n    cout << total;\n    return 0;\n}\n",
-     "explain": "The user chooses how many times the for loop runs (a user-controlled loop). It reads 4 values and adds them: 10 + 20 + 5 - 3 = 32. A negative value is just data here, because the loop counts rather than watching for a sentinel."
+     "explain": "The first number, 4, is the count, and it becomes the limit of the for loop. So the loop runs exactly 4 times and reads 4 values.\n```\ni = 1   reads 10   total 10\ni = 2   reads 20   total 30\ni = 3   reads 5    total 35\ni = 4   reads -3   total 32\n```\nIt prints `32`. There is no sentinel here. The loop counts passes, so -3 is just another value to add, not a signal to stop."
     },
     {
      "id": "u5-q088",
@@ -1196,7 +1196,7 @@
      "answer": "3",
      "stdin": "y\nY\nn\n",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    char again;\n    int runs = 0;\n    do {\n        runs++;\n        cin >> again;\n    } while (again == 'y' || again == 'Y');\n    cout << runs;\n    return 0;\n}\n",
-     "explain": "The body runs once before the first test, then again after y and after Y. The n makes the test false. This is a user-controlled loop: the user decides when it stops."
+     "explain": "The body runs first, then the answer just read is tested.\n```\npass 1: runs = 1, reads y    test: y is 'y', true, go again\npass 2: runs = 2, reads Y    test: Y is 'Y', true, go again\npass 3: runs = 3, reads n    test: neither, false, loop ends\n```\n`cout << runs` prints `3`. The first pass happens before any answer is tested. That is why this user-controlled loop is a do-while: the user's answer is read inside the body, then the test decides whether to repeat."
     },
     {
      "id": "u5-q089",
@@ -1211,7 +1211,7 @@
      ],
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int total = 0;\n    int k = 1;\n    while (k <= 9) {\n        total += k;\n        k += 2;\n    }\n    cout << total;\n    return 0;\n}\n",
      "expect": "25",
-     "explain": "k takes the values 1, 3, 5, 7, 9, and 11 fails the test. The total is 1 + 3 + 5 + 7 + 9 = 25."
+     "explain": "Translate the pseudocode: \"Add k to total\" is `total += k`, and \"Add 2 to k\" is `k += 2`. Then trace it.\n```\nk    k <= 9?   total\n1    yes       0 + 1 = 1\n3    yes       1 + 3 = 4\n5    yes       4 + 5 = 9\n7    yes       9 + 7 = 16\n9    yes       16 + 9 = 25\n11   no        loop ends\n```\nDisplayed: 25. k goes up by 2 from 1, so only the odd numbers are added. 9 is included because the test is `<=`. If you got 16, you stopped before adding 9."
     },
     {
      "id": "u5-q090",
@@ -1229,7 +1229,7 @@
      "answer": 1,
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int n = 1;\n    do {\n        cout << n << \" \";\n        n *= 3;\n    } while (n <= 50);\n    return 0;\n}\n",
      "expect": "1 3 9 27",
-     "explain": "\"Until n > 50\" means keep going while n <= 50, and the body comes first, so it is a do-while with the opposite test. It prints 1 3 9 27. Copying the Until test unchanged stops after printing 1, multiplying first prints 3 9 27 81, and the for loop never runs."
+     "explain": "Repeat ... Until runs the body first, like a do-while, but it STOPS when its condition becomes true. A do-while KEEPS GOING while its condition is true. So the test must be reversed: \"Until n > 50\" becomes `while (n <= 50)`.\n```\ndisplay 1, n = 3     3 <= 50, again\ndisplay 3, n = 9     again\ndisplay 9, n = 27    again\ndisplay 27, n = 81   81 <= 50 false, stop\n```\nIt prints `1 3 9 27`. Copying the test as `while (n > 50)` stops after printing 1. Multiplying before displaying prints `3 9 27 81`. The for loop tests `1 > 50` before its first pass, so it prints nothing."
     },
     {
      "id": "u5-q091",
@@ -1246,7 +1246,7 @@
      "answer": 1,
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int x = 20;\n    while (x > 2) {\n        cout << x << \" \";\n        x = x / 2;\n    }\n    return 0;\n}\n",
      "expect": "20 10 5",
-     "explain": "The diamond is at the top, so this is a while loop. x is 20, 10 and 5 when tested true and displayed; then 5 / 2 is 2, and 2 > 2 is false, so 2 is never displayed."
+     "explain": "The diamond comes before \"Display x\", so x is tested first and displayed only if it passes. Then it is halved with integer division.\n```\nx = 20   20 > 2 yes   display 20   x becomes 10\nx = 10   10 > 2 yes   display 10   x becomes 5\nx = 5    5 > 2 yes    display 5    x becomes 2   (5 / 2 drops .5)\nx = 2    2 > 2 no     End\n```\nDisplayed: `20 10 5`. \"20 10 5 2\" shows the 2, but 2 fails the test before it can be displayed. \"10 5 2\" halves before displaying, which reverses the order of the boxes. \"20 10 5 2 1\" would need a test like x > 0."
     },
     {
      "id": "u5-q092",
@@ -1264,7 +1264,7 @@
      "answer": 2,
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    for (int i = 1; i <= 3; i++)\n        cout << i;\n    return 0;\n}\n",
      "expect": "123",
-     "explain": "A for loop is a pretest loop: initialize once, test in a diamond, run the body, then the update, then back to the test. It prints 123. Testing i < 3 prints 12, updating before displaying prints 234, and starting at 0 prints 0123."
+     "explain": "Break the for loop into its pieces. The initialization becomes \"Set i to 1\". The test becomes the diamond, `i <= 3?`. On Yes the body runs first (\"Display i\"), then the update (\"Add 1 to i\"), then back to the diamond. On No, End. That flowchart prints `123`.\n\nThe diamond that tests `i < 3` prints only `12`. Adding 1 before displaying prints `234`, because each value is shown after it has changed. Setting i to 0 first prints `0123`."
     },
     {
      "id": "u5-q093",
@@ -1280,7 +1280,7 @@
      "stdin": "6 -2 9 0 4\n",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int sum = 0, value;\n    cin >> value;\n    while (value != 0) {\n        sum += value;\n        cin >> value;\n    }\n    cout << sum;\n    return 0;\n}\n",
      "expect": "13",
-     "explain": "0 is the sentinel. The loop adds 6, -2 and 9 (13), stops when it reads 0, and never reads the 4. The input before the loop is the priming read."
+     "explain": "This is a sentinel loop with 0 as the sentinel. The first \"Input value\" is the priming read.\n```\nvalue = 6    not 0   sum 6,   input -2\nvalue = -2   not 0   sum 4,   input 9\nvalue = 9    not 0   sum 13,  input 0\nvalue = 0    stop\n```\nIt displays `13`. The 0 is never added, and the 4 after it is never read at all, because the loop stops as soon as it sees 0. A negative value such as -2 is real data here, so it is added."
     },
     {
      "id": "u5-q094",
@@ -1298,7 +1298,7 @@
      "answer": 0,
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    for (int row = 1; row <= 3; row++) {\n        for (int col = 1; col <= row; col++)\n            cout << col;\n        cout << endl;\n    }\n    return 0;\n}\n",
      "expect": "1\n12\n123",
-     "explain": "\"From 1 to row\" includes row, so the inner test is `col <= row`, and the new line belongs to the outer loop, after the inner loop ends. The result is 1, 12, 123 on three lines. Using 3 prints 123 three times, `col < row` drops the last number, and moving endl inside puts every number on its own line."
+     "explain": "Match the pseudocode piece by piece. \"For col from 1 to row\" includes row, so the inner test is `col <= row`. \"Start a new line\" sits between the inner End For and the outer End For, so `cout << endl;` goes after the inner loop but inside the outer loop. That code prints `1`, `12` and `123` on three lines.\n\nThe version with `col < row` drops the last number of each row: an empty line, then 1, then 12. The version with `col <= 3` ignores row and prints 123 three times. The version with `endl` inside the inner loop puts every number on its own line."
     },
     {
      "id": "u5-q095",
@@ -1309,7 +1309,7 @@
      "code": "int v = 0;\nwhile (v++ < 6) {\n    if (v % 3 == 0)\n        continue;\n    cout << v << \" \";\n}",
      "answer": "1 2 4 5",
      "program": "#include <iostream>\n#include <iomanip>\nusing namespace std;\nint main() {\n    int v = 0;\n    while (v++ < 6) {\n        if (v % 3 == 0)\n            continue;\n        cout << v << \" \";\n    }\n    return 0;\n}\n",
-     "explain": "The update happens in the condition (`v++`), so continue cannot skip it and the loop still ends. The body sees v = 1 to 6 and skips 3 and 6."
+     "explain": "The update `v++` is inside the condition, so it runs at every test, and `continue` cannot skip it. The test compares the OLD v with 6, and the body sees the NEW v.\n```\n0 < 6   v = 1   prints 1\n1 < 6   v = 2   prints 2\n2 < 6   v = 3   3 % 3 is 0, continue\n3 < 6   v = 4   prints 4\n4 < 6   v = 5   prints 5\n5 < 6   v = 6   6 % 3 is 0, continue\n6 < 6   false   loop ends (v is 7)\n```\nOutput: `1 2 4 5`. The body skips 3 and 6, the multiples of 3, and the loop still ends."
     },
     {
      "id": "u5-q096",
@@ -1324,7 +1324,7 @@
       "loop control variable",
       "control variable"
      ],
-     "explain": "In `while (n <= 5) { ...; n++; }`, n is the loop control variable. If the body never changes it, the loop is infinite."
+     "explain": "It is the loop control variable: the variable the condition tests and the body changes, so it decides when the loop stops. In `while (n <= 5) { cout << n; n++; }`, n is the loop control variable. It needs a starting value before the loop, a test in the header, and a change in the body. If the body never changes it, the condition never becomes false and the loop is infinite."
     },
     {
      "id": "u5-q097",
@@ -1338,7 +1338,7 @@
       "a priming read",
       "the priming read"
      ],
-     "explain": "The priming read gets the first value; a second read at the end of the body gets each later value, so every value is tested before it is used."
+     "explain": "It is the priming read: the input statement placed just before the loop. The while condition is tested before the body runs, so it needs a value to test the first time. The priming read supplies that first value. A second read at the end of the body gets each later value, which is then tested at the top. Example: `cin >> age;` then `while (age < 0) { cout << \"Again: \"; cin >> age; }`."
     },
     {
      "id": "u5-q098",
@@ -1351,7 +1351,7 @@
       "running total",
       "a running total"
      ],
-     "explain": "The running total is the sum itself; the variable that holds it is the accumulator."
+     "explain": "A running total is a sum that grows each time the loop body runs. For the values 4, 6 and 5 the running total goes 4, 10, 15. The variable that holds it, such as `total` in `total += value;`, is called the accumulator. Set it to 0 before the loop so the first addition starts from nothing."
     }
    ],
    "programs": [
