@@ -2280,7 +2280,7 @@
      "code": "class Lamp\n{\nprivate:\n    int watts;\npublic:\n    Lamp() { watts = 40; }\n    Lamp(int w = 60) { watts = w; }\n};",
      "choices": [
       "A constructor cannot have a default argument",
-      "Both constructors can be called with no arguments, so the call is ambiguous; a class cannot have two default constructors",
+      "Both constructors can be called with no arguments, so the call is ambiguous; a class should have only one default constructor",
       "Lamp desk; needs empty parentheses: Lamp desk();",
       "watts must be public for a constructor to set it"
      ],
