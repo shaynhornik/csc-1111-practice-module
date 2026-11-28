@@ -58,6 +58,10 @@ th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--lin
 th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
 .lesson ul, .lesson ol { margin: 0 0 10px; padding-left: 1.3rem; }
 .lesson li { margin-bottom: 4px; }
+.lesson h4 { margin: 22px 0 8px; font-size: 1.02rem; }
+.lesson h4:first-child { margin-top: 0; }
+.lesson table { display: block; overflow-x: auto; }
+.verdict pre { margin: 8px 0 4px; background: var(--surface); color: var(--fg); }
 .tag { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 99px; background: var(--surface-2); color: var(--muted); }
 .tag.good { background: var(--good-soft); color: var(--good); }
 .tag.bad { background: var(--bad-soft); color: var(--bad); }
@@ -207,8 +211,14 @@ function wireBookSetup(after) {
 }
 
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-function rich(s) { // plain text with `inline code`
-  return esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\n/g, '<br>');
+function rich(s) { // plain text with `inline code`, ``` fenced code blocks ``` and blank lines between paragraphs
+  var parts = String(s).split(/```[ \t]*\n?/), h = '';
+  parts.forEach(function (p, i) {
+    if (i % 2) { h += '<pre><code>' + esc(p.replace(/\n+$/, '')) + '</code></pre>'; return; }
+    p = p.replace(/^\n+|\n+$/g, '');
+    if (p) h += esc(p).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>');
+  });
+  return h;
 }
 function el(html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstElementChild; }
 function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
@@ -590,7 +600,7 @@ function examFinish() {
   if (rows.length) {
     h += '<div class="card"><h3>What you missed</h3>';
     rows.forEach(function (r) {
-      h += '<details><summary>' + rich(r.q.prompt.length > 110 ? r.q.prompt.slice(0, 110) + '…' : r.q.prompt) + '</summary><div>' + (r.q.code ? '<pre><code>' + esc(r.q.code) + '</code></pre>' : '') + '<p><strong>Your answer:</strong> ' + (r.a ? (r.q.type === 'mc' ? rich(String(r.q.choices[r.a.given])) : r.q.type === 'tf' ? (r.a.given ? 'True' : 'False') : '</p><pre><code>' + esc(r.a.given) + '</code></pre><p>') : 'none') + '</p><p><strong>Correct:</strong> ' + (r.q.type === 'output' || r.q.type === 'fill' ? '</p><pre><code>' + esc(r.q.answer) + '</code></pre><p>' : rich(answerText(r.q))) + '</p><p>' + rich(r.q.explain) + '</p></div></details>';
+      h += '<details><summary>' + rich(r.q.prompt.length > 110 ? r.q.prompt.slice(0, 110) + '…' : r.q.prompt) + '</summary><div>' + (r.q.code ? '<pre><code>' + esc(r.q.code) + '</code></pre>' : '') + '<p><strong>Your answer:</strong> ' + (r.a ? (r.q.type === 'mc' ? rich(String(r.q.choices[r.a.given])) : r.q.type === 'tf' ? (r.a.given ? 'True' : 'False') : '</p><pre><code>' + esc(r.a.given) + '</code></pre><p>') : 'none') + '</p><p><strong>Correct:</strong> ' + (r.q.type === 'output' || r.q.type === 'fill' ? '</p><pre><code>' + esc(r.q.answer) + '</code></pre><p>' : rich(answerText(r.q))) + '</p><div class="why">' + rich(r.q.explain) + '</div></div></details>';
     });
     h += '</div>';
   }
